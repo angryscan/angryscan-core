@@ -141,10 +141,10 @@ internal class DetectFunctionTest {
         val ip2 = "255.255.255.255"
 
         val text1 = Cleaner.cleanText(ip1)
-        assertEquals(1, DetectFunction.IP.scan(text1))
+        assertEquals(1, DetectFunction.IP.scan(text1).count())
 
         val text2 = Cleaner.cleanText(ip2)
-        assertEquals(1, DetectFunction.IP.scan(text2))
+        assertEquals(1, DetectFunction.IP.scan(text2).count())
     }
 
     @Test
@@ -184,6 +184,6 @@ internal class DetectFunctionTest {
         assertEquals(true, file.exists())
 
         val text = Cleaner.cleanText(file.readText())
-        return field.scan(text)
+        return field.scan(text).count()
     }
 }
