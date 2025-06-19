@@ -4,5 +4,5 @@ interface IDetectFunction {
     val name: String
     val writeName: String
 
-    fun scan(text: String): Int
+    fun scan(text: String): Sequence<String>
 }
