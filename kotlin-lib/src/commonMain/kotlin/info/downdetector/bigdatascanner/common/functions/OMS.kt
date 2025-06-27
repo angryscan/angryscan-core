@@ -12,7 +12,7 @@ fun findOMS(text: String): Sequence<String> {
      */
     fun isOmsValid(input: String): Boolean {
         val oms = input.replace("-", "").replace("""\s+""".toRegex(), "")
-        val key = Character.getNumericValue(oms.last())
+        val key = oms.last().digitToInt()
         val odd = mutableListOf<Char>()  // nechet
         val even = mutableListOf<Char>() // chet
         oms.substring(0 until oms.length - 1).reversed().forEachIndexed { index, digit ->
@@ -27,9 +27,9 @@ fun findOMS(text: String): Sequence<String> {
         // getValue sum of all elements
         var summ = 0
         for (elem in even)
-            summ += Character.getNumericValue(elem)
+            summ += elem.digitToInt()
         for (elem in right)
-            summ += Character.getNumericValue(elem)
+            summ += elem.digitToInt()
         // nearest value more or equal sum and sum % 10 = 0 minus sum
         val checker = 10 - summ % 10
         return checker == key || (checker == 10 && key == 0)

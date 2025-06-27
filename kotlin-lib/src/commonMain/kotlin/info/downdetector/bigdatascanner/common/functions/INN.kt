@@ -17,12 +17,12 @@ fun findINN(text:String): Sequence<String> {
         // first control sum
         var summ1 = 0
         for (index in firstSequence.indices)
-            summ1 += firstSequence[index] * Character.getNumericValue(inn[index])
+            summ1 += firstSequence[index] * inn[index].digitToInt()
         val key1 = (summ1 % 11).toString().last()
         // second control sum
         var summ2 = 0
         for (index in secondSequence.indices)
-            summ2 += secondSequence[index] * Character.getNumericValue(inn[index])
+            summ2 += secondSequence[index] * inn[index].digitToInt()
         val key2 = (summ2 % 11).toString().last()
         return key1 == inn[10] && key2 == inn[11]
     }

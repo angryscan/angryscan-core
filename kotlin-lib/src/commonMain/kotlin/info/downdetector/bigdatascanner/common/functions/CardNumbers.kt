@@ -12,10 +12,10 @@ fun findCardNumbers(text: String): Sequence<String> {
         var controlSum = 0
         for (index in card.indices) {
             controlSum += if ((index % 2) == 0) {
-                val count = 2 * Character.getNumericValue(card[index])
+                val count = 2 * card[index].digitToInt()
                 if (count <= 9) count else count - 9
             } else {
-                Character.getNumericValue(card[index])
+                card[index].digitToInt()
             }
         }
         return controlSum % 10 == 0

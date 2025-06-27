@@ -13,7 +13,7 @@ fun findSNILS(text: String): Sequence<String> {
         val snils = input.replace(" ", "").replace("-", "").trim()
 
         for (index in 0 until snils.length - 2) {
-            summ += Character.getNumericValue(snils[index]) * (9 - index)
+            summ += snils[index].digitToInt() * (9 - index)
         }
         val controlSum = if (listOf(100, 101).contains(summ)) {
             "00"
