@@ -1,7 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.ByteArrayOutputStream
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -34,6 +33,15 @@ kotlin {
             configurations = listOf(jvmRuntimeConfiguration)
             archiveClassifier.set("fatjar")
         }
+    }
+    js {
+        nodejs {
+
+        }
+        browser {
+
+        }
+        binaries.executable()
     }
 
     val hostOs = System.getProperty("os.name")
@@ -71,20 +79,26 @@ kotlin {
 }
 
 fun String.runCommand(currentWorkingDir: File = file("./")): String {
-    val byteOut = ByteArrayOutputStream()
-    project.exec {
-        workingDir = currentWorkingDir
-        commandLine = this@runCommand.split("\\s".toRegex())
-        standardOutput = byteOut
-    }
-    return String(byteOut.toByteArray()).trim()
+    val process = ProcessBuilder(this.split("\\s".toRegex()))
+        .directory(currentWorkingDir)
+        .start()
+    
+    val output = process.inputStream.bufferedReader().use { it.readText() }
+    process.waitFor()
+    return output.trim()
 }
 
 val gitBranch = System.getProperty("GIT_BRANCH") ?: "git rev-parse --abbrev-ref HEAD".runCommand()
 
-tasks.create("printVersion") {
+tasks.register("printVersion") {
     doLast {
         print(version)
+    }
+}
+
+tasks.register("printGitBranch") {
+    doLast {
+        print(gitBranch)
     }
 }
 
