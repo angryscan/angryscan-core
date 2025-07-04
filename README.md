@@ -13,3 +13,7 @@
 ```
 implementation("info.downdetector.bigdatascanner:datascanner:1.1.1")
 ```
+### Подключение JS (Gradle)
+```
+implementation("info.downdetector.bigdatascanner:datascanner-js:1.1.1")
+```
