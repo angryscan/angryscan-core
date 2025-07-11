@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "info.downdetector.bigdatascanner"
-version = "1.1.1"
+version = "1.1.2"
 description = "Data Scanner Library"
 
 
@@ -113,14 +113,14 @@ koverReport {
 mavenPublishing {
     coordinates(
         groupId = "info.downdetector.bigdatascanner",
-        artifactId = "datascanner",
+        artifactId = "core",
         version = project.version.toString()
     )
 
     pom {
         name.set("Big Data Scanner library for Java and Kotlin")
         description.set("Big Data Scanner library for Java and Kotlin")
-        url.set("https://github.com/packetdima/angrydata")
+        url.set("https://github.com/packetdima/big-data-scanner-core")
 
         licenses {
             license {
@@ -138,7 +138,7 @@ mavenPublishing {
         }
 
         scm {
-            url.set("https://github.com/packetdima/angrydata")
+            url.set("https://github.com/packetdima/big-data-scanner-core")
         }
     }
 
