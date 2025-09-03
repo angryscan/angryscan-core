@@ -5,15 +5,15 @@
 <dependency>
     <groupId>info.downdetector.bigdatascanner</groupId>
     <artifactId>core</artifactId>
-    <version>1.1.3</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
 ### Подключение Gradle
 ```
-implementation("info.downdetector.bigdatascanner:core:1.1.3")
+implementation("info.downdetector.bigdatascanner:core:1.2.0")
 ```
 ### Подключение JS (Gradle)
 ```
-implementation("info.downdetector.bigdatascanner:core-js:1.1.3")
+implementation("info.downdetector.bigdatascanner:core-js:1.2.0")
 ```
