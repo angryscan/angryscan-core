@@ -13,9 +13,9 @@ fun customRegexDetector(text: String, regex: Regex, withContext: Boolean): Seque
                     maxOf(0,match.range.start - 10),
                     match.range.start
                 ),
-                 after = text.substring(
-                     match.range.last,
-                     minOf(match.range.last + 10, text.length)
+                 after = "$text ".substring(
+                     match.range.last + 1,
+                     minOf(match.range.last + 11, text.length)
                  )
             )
         }

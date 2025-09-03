@@ -4,6 +4,7 @@ import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 internal class DetectFunctionTest {
     @Test
@@ -175,6 +176,20 @@ internal class DetectFunctionTest {
         val file = javaClass.getResource("/testFiles/passport/passport.txt")?.file
         assertNotNull(file)
         assertEquals(1, getCountOfAttribute(file, DetectFunction.Passport))
+    }
+
+    @Test
+    fun getContext() {
+        val filePath = javaClass.getResource("/testFiles/first.csv")?.file
+        assertNotNull(filePath)
+        val file = File(filePath)
+        assertTrue(file.exists())
+        val text = Cleaner.cleanText(file.readText())
+        val searchRes = DetectFunction.CardNumbers.scan(text, true)
+        assertEquals(1, searchRes.count())
+        assertEquals("4276 8070 1492 7948", searchRes.first().value)
+        assertEquals("83  Карта ", searchRes.first().before)
+        assertEquals("  г. Санкт", searchRes.first().after)
     }
 
 
