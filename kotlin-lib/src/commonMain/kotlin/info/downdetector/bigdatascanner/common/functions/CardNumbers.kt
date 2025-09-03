@@ -1,9 +1,10 @@
 package info.downdetector.bigdatascanner.common.functions
 
 import info.downdetector.bigdatascanner.common.constants.CardBins
+import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
-fun findCardNumbers(text: String): Sequence<String> {
+fun findCardNumbers(text: String, withContext: Boolean): Sequence<MatchWithContext> {
     fun isBinValid(card: String): Boolean {
         return CardBins.cardBins.contains(card.substring(0, 4))
     }
@@ -24,13 +25,13 @@ fun findCardNumbers(text: String): Sequence<String> {
     val cards = regexDetector(
         text,
         """(?<=[-:,()=*\s]|^)(([0-9]{4}[ ][0-9]{4}[ ][0-9]{4}[ ][0-9]{4})|([0-9]{16}))(?=[-(),*\s]|$)"""
-            .toRegex(setOf(RegexOption.MULTILINE))
+            .toRegex(setOf(RegexOption.MULTILINE)),
+        withContext
     )
-    return cards.map {
-        it.replace(" ", "").replace("-", "").trim()
-    }.filter {
-        it != "0000000000000000"
-                && isBinValid(it)
-                && isCardValid(it)
+    return cards.filter {
+        val cleanCard = it.value.replace(" ", "").replace("-", "").trim()
+        cleanCard != "0000000000000000"
+                && isBinValid(cleanCard)
+                && isCardValid(cleanCard)
     }
 }
