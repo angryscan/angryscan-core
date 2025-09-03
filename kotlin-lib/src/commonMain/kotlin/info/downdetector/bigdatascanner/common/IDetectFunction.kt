@@ -6,5 +6,5 @@ interface IDetectFunction {
     val name: String
     val writeName: String
 
-    fun scan(text: String, withContext: Boolean = true): Sequence<MatchWithContext>
+    fun scan(text: String, withContext: Boolean = false): Sequence<MatchWithContext>
 }
