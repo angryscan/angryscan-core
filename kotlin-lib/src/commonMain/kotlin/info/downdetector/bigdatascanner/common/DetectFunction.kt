@@ -1,5 +1,6 @@
 package info.downdetector.bigdatascanner.common
 
+import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.functions.findAccountNumbers
 import info.downdetector.bigdatascanner.common.functions.findAddresses
 import info.downdetector.bigdatascanner.common.functions.findCVVs
@@ -43,39 +44,39 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     IP("ips"),
     IPv6("ipv6s");
 
-    override fun scan(text: String): Sequence<String> = when (this) {
-        Emails -> findEmails(text)
+    override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
+        Emails -> findEmails(text, withContext)
 
-        Phones -> findPhones(text)
+        Phones -> findPhones(text, withContext)
 
-        CardNumbers -> findCardNumbers(text)
+        CardNumbers -> findCardNumbers(text, withContext)
 
-        CarNumber -> findCarNumbers(text)
+        CarNumber -> findCarNumbers(text, withContext)
 
-        SNILS -> findSNILS(text)
+        SNILS -> findSNILS(text, withContext)
 
-        Passport -> findPassports(text)
+        Passport -> findPassports(text, withContext)
 
-        OMS -> findOMS(text)
+        OMS -> findOMS(text, withContext)
 
-        INN -> findINN(text)
+        INN -> findINN(text, withContext)
 
-        AccountNumber -> findAccountNumbers(text)
+        AccountNumber -> findAccountNumbers(text, withContext)
 
-        Address -> findAddresses(text)
+        Address -> findAddresses(text, withContext)
 
-        ValuableInfo -> findValuableInfo(text)
+        ValuableInfo -> findValuableInfo(text, withContext)
 
-        Login -> findLogins(text)
+        Login -> findLogins(text, withContext)
 
-        Password -> findPasswords(text)
+        Password -> findPasswords(text, withContext)
 
-        CVV -> findCVVs(text)
+        CVV -> findCVVs(text, withContext)
 
-        Name -> findNames(text)
+        Name -> findNames(text, withContext)
 
-        IP -> findIPs(text)
+        IP -> findIPs(text, withContext)
 
-        IPv6 -> findIPv6s(text)
+        IPv6 -> findIPv6s(text, withContext)
     }
 }

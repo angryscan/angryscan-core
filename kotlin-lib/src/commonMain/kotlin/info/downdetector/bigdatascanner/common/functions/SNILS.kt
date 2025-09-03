@@ -1,8 +1,9 @@
 package info.downdetector.bigdatascanner.common.functions
 
+import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
-fun findSNILS(text: String): Sequence<String> {
+fun findSNILS(text: String, withContext: Boolean): Sequence<MatchWithContext> {
     /**
      * This function checks if the given SNILS is correct.
      * @param input the SNILS to check
@@ -28,8 +29,9 @@ fun findSNILS(text: String): Sequence<String> {
     return regexDetector(
         text,
         """(?<=[-,()=*\s]|^)[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?=[-(),*\s]|$)"""
-            .toRegex(setOf(RegexOption.MULTILINE))
+            .toRegex(setOf(RegexOption.MULTILINE)),
+        withContext
     ).filter {
-        isSnilsCorrect(it)
+        isSnilsCorrect(it.value)
     }
 }

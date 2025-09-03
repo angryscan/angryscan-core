@@ -1,8 +1,9 @@
 package info.downdetector.bigdatascanner.common.functions
 
+import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
 
-fun findINN(text:String): Sequence<String> {
+fun findINN(text:String, withContext: Boolean): Sequence<MatchWithContext> {
     // validate inn
     /**
      * Checks if the given INN is correct.
@@ -29,8 +30,9 @@ fun findINN(text:String): Sequence<String> {
     return customRegexDetector(
         text,
         """(?<=[-:,()=*\s]|^)[0-9]{12}(?=[-(),*\s]|$)"""
-            .toRegex(setOf(RegexOption.MULTILINE))
+            .toRegex(setOf(RegexOption.MULTILINE)),
+        withContext
     ).filter {
-        isInnValid(it)
+        isInnValid(it.value)
     }
 }
