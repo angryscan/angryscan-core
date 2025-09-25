@@ -1,7 +1,11 @@
 package info.downdetector.bigdatascanner.common.scan
 
+import info.downdetector.bigdatascanner.common.functions.AccountNumber
+import info.downdetector.bigdatascanner.common.functions.CarNumber
 import info.downdetector.bigdatascanner.common.functions.CardNumber
 import info.downdetector.bigdatascanner.common.functions.Email
+import info.downdetector.bigdatascanner.common.functions.Phone
+import info.downdetector.bigdatascanner.common.functions.SNILS
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -17,7 +21,7 @@ class HyperScanTest {
         val file = File(filePath)
 
         assertEquals(true, file.exists())
-        val hyperScan = HyperScan(listOf(Email, CardNumber))
+        val hyperScan = HyperScan(listOf(Email, CardNumber, Phone, AccountNumber, CarNumber, SNILS))
         val res = hyperScan.scan(file.readText())
         //Check Email
         assertContains(res.map { it.matcher }, Email)
@@ -25,6 +29,18 @@ class HyperScanTest {
         //Check CardNumber
         assertContains(res.map { it.matcher }, CardNumber)
         assertEquals(res.count { it.matcher == CardNumber }, 1)
+        //Check Phone
+        assertContains(res.map { it.matcher }, Phone)
+        assertEquals(res.count { it.matcher == Phone }, 2)
+        //Check AccountNumber
+        assertContains(res.map { it.matcher }, AccountNumber)
+        assertEquals(res.count { it.matcher == AccountNumber }, 1)
+        //Check CarNumber
+        assertContains(res.map { it.matcher }, CarNumber)
+        assertEquals(res.count { it.matcher == CarNumber }, 2)
+        //Check SNILS
+        assertContains(res.map { it.matcher }, SNILS)
+        assertEquals(res.count { it.matcher == SNILS }, 1)
     }
 
 }
