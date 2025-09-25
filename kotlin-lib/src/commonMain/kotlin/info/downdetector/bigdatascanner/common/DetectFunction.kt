@@ -31,13 +31,13 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
         Emails -> Email.find(text, withContext)
 
-        Phones -> findPhones(text, withContext)
+        Phones -> Phone.find(text, withContext)
 
         CardNumbers -> CardNumber.find(text, withContext)
 
-        CarNumber -> findCarNumbers(text, withContext)
+        CarNumber -> info.downdetector.bigdatascanner.common.functions.CarNumber.find(text, withContext)
 
-        SNILS -> findSNILS(text, withContext)
+        SNILS -> info.downdetector.bigdatascanner.common.functions.SNILS.find(text, withContext)
 
         Passport -> findPassports(text, withContext)
 
@@ -45,7 +45,7 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
 
         INN -> findINN(text, withContext)
 
-        AccountNumber -> findAccountNumbers(text, withContext)
+        AccountNumber -> info.downdetector.bigdatascanner.common.functions.AccountNumber.find(text, withContext)
 
         Address -> findAddresses(text, withContext)
 

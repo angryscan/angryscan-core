@@ -3,15 +3,28 @@ package info.downdetector.bigdatascanner.common.functions
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
-fun findSNILS(text: String, withContext: Boolean): Sequence<MatchWithContext> {
-    /**
-     * This function checks if the given SNILS is correct.
-     * @param input the SNILS to check
-     * @return true if the SNILS is correct, false otherwise
-     */
-    fun isSnilsCorrect(input: String): Boolean {
+object SNILS: IHyperPattern {
+    const val JAVA_PATTERN = """(?<=[-,()=*\s]|^)[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?=[-(),*\s]|$)"""
+
+    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
+        return regexDetector(
+            text,
+            JAVA_PATTERN
+                .toRegex(setOf(RegexOption.MULTILINE)),
+            withContext
+        ).filter {
+            check(it.value)
+        }
+    }
+
+    override val hyperPatterns: List<String> = listOf(
+        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
+    )
+    override val options = setOf(ExpressionOption.MULTILINE)
+
+    override fun check(value: String): Boolean {
         var summ = 0
-        val snils = input.replace(" ", "").replace("-", "").trim()
+        val snils = value.replace(" ", "").replace("-", "").trim()
 
         for (index in 0 until snils.length - 2) {
             summ += snils[index].digitToInt() * (9 - index)
@@ -26,12 +39,5 @@ fun findSNILS(text: String, withContext: Boolean): Sequence<MatchWithContext> {
         return snils.substring(snils.length - 2 until snils.length) == controlSum
     }
 
-    return regexDetector(
-        text,
-        """(?<=[-,()=*\s]|^)[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?=[-(),*\s]|$)"""
-            .toRegex(setOf(RegexOption.MULTILINE)),
-        withContext
-    ).filter {
-        isSnilsCorrect(it.value)
-    }
 }
+
