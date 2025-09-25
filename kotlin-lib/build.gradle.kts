@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "info.downdetector.bigdatascanner"
-version = "1.2.2"
+version = "1.2.3-alpha-1"
 description = "Data Scanner Library"
 
 
@@ -144,5 +144,5 @@ mavenPublishing {
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-    signAllPublications()
+//    signAllPublications()
 }

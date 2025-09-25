@@ -3,9 +3,12 @@ package info.downdetector.bigdatascanner.common
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.functions.findAccountNumbers
 import info.downdetector.bigdatascanner.common.functions.findAddresses
+import info.downdetector.bigdatascanner.common.functions.findBirthCert
+import info.downdetector.bigdatascanner.common.functions.findBirthday
 import info.downdetector.bigdatascanner.common.functions.findCVVs
 import info.downdetector.bigdatascanner.common.functions.findCarNumbers
 import info.downdetector.bigdatascanner.common.functions.findCardNumbers
+import info.downdetector.bigdatascanner.common.functions.findDeathDate
 import info.downdetector.bigdatascanner.common.functions.findEmails
 import info.downdetector.bigdatascanner.common.functions.findINN
 import info.downdetector.bigdatascanner.common.functions.findIPs
@@ -42,7 +45,10 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     CVV("cvv"),
     Name("full_names"),
     IP("ips"),
-    IPv6("ipv6s");
+    IPv6("ipv6s"),
+    Birthday("birthday"),
+    DeathDate("death_date"),
+    BirthCert("birth_cert");
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
         Emails -> findEmails(text, withContext)
@@ -78,5 +84,11 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
         IP -> findIPs(text, withContext)
 
         IPv6 -> findIPv6s(text, withContext)
+
+        Birthday -> findBirthday(text, withContext)
+
+        DeathDate -> findDeathDate(text, withContext)
+
+        BirthCert -> findBirthCert(text, withContext)
     }
 }
