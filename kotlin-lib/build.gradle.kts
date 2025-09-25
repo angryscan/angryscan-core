@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "info.downdetector.bigdatascanner"
-version = "1.2.2"
+version = "1.2.2-hyper"
 description = "Data Scanner Library"
 
 
@@ -73,6 +73,11 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation(libs.hyperscan)
             }
         }
     }

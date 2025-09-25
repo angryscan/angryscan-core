@@ -1,23 +1,7 @@
 package info.downdetector.bigdatascanner.common
 
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
-import info.downdetector.bigdatascanner.common.functions.findAccountNumbers
-import info.downdetector.bigdatascanner.common.functions.findAddresses
-import info.downdetector.bigdatascanner.common.functions.findCVVs
-import info.downdetector.bigdatascanner.common.functions.findCarNumbers
-import info.downdetector.bigdatascanner.common.functions.findCardNumbers
-import info.downdetector.bigdatascanner.common.functions.findEmails
-import info.downdetector.bigdatascanner.common.functions.findINN
-import info.downdetector.bigdatascanner.common.functions.findIPs
-import info.downdetector.bigdatascanner.common.functions.findIPv6s
-import info.downdetector.bigdatascanner.common.functions.findLogins
-import info.downdetector.bigdatascanner.common.functions.findNames
-import info.downdetector.bigdatascanner.common.functions.findOMS
-import info.downdetector.bigdatascanner.common.functions.findPassports
-import info.downdetector.bigdatascanner.common.functions.findPasswords
-import info.downdetector.bigdatascanner.common.functions.findPhones
-import info.downdetector.bigdatascanner.common.functions.findSNILS
-import info.downdetector.bigdatascanner.common.functions.findValuableInfo
+import info.downdetector.bigdatascanner.common.functions.*
 import kotlinx.serialization.Serializable
 
 @Suppress("unused")
@@ -45,7 +29,7 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     IPv6("ipv6s");
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
-        Emails -> findEmails(text, withContext)
+        Emails -> Email.findEmails(text, withContext)
 
         Phones -> findPhones(text, withContext)
 
