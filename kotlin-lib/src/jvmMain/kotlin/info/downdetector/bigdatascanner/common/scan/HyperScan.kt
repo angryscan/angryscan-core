@@ -42,7 +42,9 @@ class HyperScan(patterns: List<IHyperPattern>) {
         val db = Database.compile(expressions.keys.toList())
         val scanner = Scanner()
         scanner.allocScratch(db)
-        val res = scanner.scan(db, text)
+        val res = scanner.scan(db, text).filter {
+            expressions[it.matchedExpression]!!.check(it.matchedString)
+        }
         return res.map {
             HyperMatch(
                 value = it.matchedString,

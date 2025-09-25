@@ -29,11 +29,11 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     IPv6("ipv6s");
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
-        Emails -> Email.findEmails(text, withContext)
+        Emails -> Email.find(text, withContext)
 
         Phones -> findPhones(text, withContext)
 
-        CardNumbers -> findCardNumbers(text, withContext)
+        CardNumbers -> CardNumber.find(text, withContext)
 
         CarNumber -> findCarNumbers(text, withContext)
 
