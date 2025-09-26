@@ -39,9 +39,9 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
 
         SNILS -> info.downdetector.bigdatascanner.common.functions.SNILS.find(text, withContext)
 
-        Passport -> findPassports(text, withContext)
+        Passport -> info.downdetector.bigdatascanner.common.functions.Passport.find(text, withContext)
 
-        OMS -> findOMS(text, withContext)
+        OMS -> info.downdetector.bigdatascanner.common.functions.OMS.find(text, withContext)
 
         INN -> findINN(text, withContext)
 

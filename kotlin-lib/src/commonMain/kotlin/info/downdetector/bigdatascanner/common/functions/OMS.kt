@@ -4,15 +4,31 @@ import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
 import kotlin.text.iterator
 
-fun findOMS(text: String, withContext: Boolean): Sequence<MatchWithContext> {
-    // validate oms
-    /**
-     * Checks if the given OMS is correct.
-     * @param input the OMS to check
-     * @return true if the OMS is correct, false otherwise
-     */
-    fun isOmsValid(input: String): Boolean {
-        val oms = input.replace("-", "").replace("""\s+""".toRegex(), "")
+object OMS: IHyperPattern {
+    const val JAVA_PATTERN = """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
+
+    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
+
+        return customRegexDetector(
+            text,
+JAVA_PATTERN
+            .toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
+        withContext
+        ).filter {
+            check(it.value)
+        }
+    }
+
+    override val hyperPatterns = listOf(
+        """(?:^|\D)(омс|полис|страховка|страхование)\s[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}(?:\D|$)"""
+    )
+    override val options = setOf(
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS
+    )
+
+    override fun check(value: String): Boolean {
+        val oms = value.replace("""\D""".toRegex(), "")
         val key = oms.last().digitToInt()
         val odd = mutableListOf<Char>()  // nechet
         val even = mutableListOf<Char>() // chet
@@ -36,12 +52,6 @@ fun findOMS(text: String, withContext: Boolean): Sequence<MatchWithContext> {
         return checker == key || (checker == 10 && key == 0)
     }
 
-    return customRegexDetector(
-        text,
-        """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
-            .toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
-        withContext
-    ).filter {
-        isOmsValid(it.value)
-    }
 }
+
+
