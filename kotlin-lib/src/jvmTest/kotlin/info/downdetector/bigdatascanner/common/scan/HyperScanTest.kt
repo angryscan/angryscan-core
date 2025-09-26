@@ -4,6 +4,8 @@ import info.downdetector.bigdatascanner.common.functions.AccountNumber
 import info.downdetector.bigdatascanner.common.functions.CarNumber
 import info.downdetector.bigdatascanner.common.functions.CardNumber
 import info.downdetector.bigdatascanner.common.functions.Email
+import info.downdetector.bigdatascanner.common.functions.OMS
+import info.downdetector.bigdatascanner.common.functions.Passport
 import info.downdetector.bigdatascanner.common.functions.Phone
 import info.downdetector.bigdatascanner.common.functions.SNILS
 import java.io.File
@@ -21,7 +23,18 @@ class HyperScanTest {
         val file = File(filePath)
 
         assertEquals(true, file.exists())
-        val hyperScan = HyperScan(listOf(Email, CardNumber, Phone, AccountNumber, CarNumber, SNILS))
+        val hyperScan = HyperScan(
+            listOf(
+                Email,
+                CardNumber,
+                Phone,
+                AccountNumber,
+                CarNumber,
+                SNILS,
+                Passport,
+                OMS,
+            )
+        )
         val res = hyperScan.scan(file.readText())
         //Check Email
         assertContains(res.map { it.matcher }, Email)
@@ -41,6 +54,12 @@ class HyperScanTest {
         //Check SNILS
         assertContains(res.map { it.matcher }, SNILS)
         assertEquals(res.count { it.matcher == SNILS }, 1)
+        //Check Passport
+        assertContains(res.map { it.matcher }, Passport)
+        assertEquals(res.count { it.matcher == Passport }, 2)
+        //Check OMS
+        assertContains(res.map { it.matcher }, OMS)
+        assertEquals(res.count { it.matcher == OMS }, 1)
     }
 
 }
