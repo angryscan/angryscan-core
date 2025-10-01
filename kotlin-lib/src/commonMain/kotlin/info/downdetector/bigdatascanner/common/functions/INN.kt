@@ -4,7 +4,7 @@ import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
 
 object INN : IHyperPattern {
-    const val JAVA_PATTERN = """(?<=[-:,()=*\s]|^)[0-9]{12}(?=[-(),*\s]|$)"""
+    const val JAVA_PATTERN = """(?<![^\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?![^\s.,;)"])"""
 
     fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
         return customRegexDetector(
@@ -18,7 +18,7 @@ object INN : IHyperPattern {
     }
 
     override val hyperPatterns = listOf(
-        """\b[0-9]{12}\b"""
+        """(^|[\s.,\-:"(])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))([\s.,;)]|$)"""
     )
     override val options = setOf(
         ExpressionOption.MULTILINE,

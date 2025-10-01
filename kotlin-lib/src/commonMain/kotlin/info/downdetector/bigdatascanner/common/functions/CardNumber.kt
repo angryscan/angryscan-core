@@ -6,13 +6,17 @@ import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
 object CardNumber : IHyperPattern {
     const val JAVA_PATTERN =
-        """(?<=[-:,()=*\s]|^)(([0-9]{4}[ ][0-9]{4}[ ][0-9]{4}[ ][0-9]{4})|([0-9]{16}))(?=[-(),*\s]|$)"""
+        """(?<![^\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"])"""
 
     fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
         val cards = regexDetector(
             text,
             JAVA_PATTERN
-                .toRegex(setOf(RegexOption.MULTILINE)),
+                .toRegex(
+                    setOf(
+                        RegexOption.MULTILINE
+                    )
+                ),
             withContext
         )
         return cards.filter {
@@ -41,7 +45,7 @@ object CardNumber : IHyperPattern {
     }
 
     override val hyperPatterns: List<String> = listOf(
-        """\b([0-9]{4}[ ][0-9]{4}[ ][0-9]{4}[ ][0-9]{4}|[0-9]{16})\b"""
+        """\b([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
     )
     override val options: Set<ExpressionOption> = setOf(
         ExpressionOption.MULTILINE

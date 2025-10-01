@@ -4,7 +4,7 @@ import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
 object SNILS : IHyperPattern {
-    const val JAVA_PATTERN = """(?<=[-,()=*\s]|^)[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?=[-(),*\s]|$)"""
+    const val JAVA_PATTERN = """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
 
     fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
         return regexDetector(

@@ -37,14 +37,16 @@ class HyperScan(patterns: List<IHyperPattern>) {
                 expr to pair.second //Результат с возможностью обратного преобразования
             }.associate { it.first to it.second }
 
+    private val database = Database.compile(expressions.keys.toList())
+
 
     fun scan(text: String): List<HyperMatch> {
-        val db = Database.compile(expressions.keys.toList())
         val scanner = Scanner()
-        scanner.allocScratch(db)
-        val res = scanner.scan(db, text).filter {
+        scanner.allocScratch(database)
+        val res = scanner.scan(database, text).filter {
             expressions[it.matchedExpression]!!.check(it.matchedString)
         }
+        scanner.close()
         return res.map {
             HyperMatch(
                 value = it.matchedString,
