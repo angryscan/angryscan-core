@@ -1,7 +1,6 @@
 package info.downdetector.bigdatascanner.common
 
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
-import info.downdetector.bigdatascanner.common.functions.*
 import kotlinx.serialization.Serializable
 
 @Suppress("unused")
@@ -29,11 +28,11 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     IPv6("ipv6s");
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
-        Emails -> Email.find(text, withContext)
+        Emails -> info.downdetector.bigdatascanner.common.functions.Email.find(text, withContext)
 
-        Phones -> Phone.find(text, withContext)
+        Phones -> info.downdetector.bigdatascanner.common.functions.Phone.find(text, withContext)
 
-        CardNumbers -> CardNumber.find(text, withContext)
+        CardNumbers -> info.downdetector.bigdatascanner.common.functions.CardNumber.find(text, withContext)
 
         CarNumber -> info.downdetector.bigdatascanner.common.functions.CarNumber.find(text, withContext)
 
@@ -43,24 +42,24 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
 
         OMS -> info.downdetector.bigdatascanner.common.functions.OMS.find(text, withContext)
 
-        INN -> findINN(text, withContext)
+        INN -> info.downdetector.bigdatascanner.common.functions.INN.find(text, withContext)
 
         AccountNumber -> info.downdetector.bigdatascanner.common.functions.AccountNumber.find(text, withContext)
 
-        Address -> findAddresses(text, withContext)
+        Address -> info.downdetector.bigdatascanner.common.functions.Address.find(text, withContext)
 
-        ValuableInfo -> findValuableInfo(text, withContext)
+        ValuableInfo -> info.downdetector.bigdatascanner.common.functions.ValuableInfo.find(text, withContext)
 
-        Login -> findLogins(text, withContext)
+        Login -> info.downdetector.bigdatascanner.common.functions.Login.find(text, withContext)
 
-        Password -> findPasswords(text, withContext)
+        Password -> info.downdetector.bigdatascanner.common.functions.Password.find(text, withContext)
 
-        CVV -> findCVVs(text, withContext)
+        CVV -> info.downdetector.bigdatascanner.common.functions.CVV.find(text, withContext)
 
-        Name -> findNames(text, withContext)
+        Name -> info.downdetector.bigdatascanner.common.functions.FullName.find(text, withContext)
 
-        IP -> findIPs(text, withContext)
+        IP -> info.downdetector.bigdatascanner.common.functions.IP.find(text, withContext)
 
-        IPv6 -> findIPv6s(text, withContext)
+        IPv6 -> info.downdetector.bigdatascanner.common.functions.IPv6.find(text, withContext)
     }
 }

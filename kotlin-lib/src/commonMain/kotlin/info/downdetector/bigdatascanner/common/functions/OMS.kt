@@ -4,16 +4,17 @@ import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
 import kotlin.text.iterator
 
-object OMS: IHyperPattern {
-    const val JAVA_PATTERN = """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
+object OMS : IHyperPattern {
+    const val JAVA_PATTERN =
+        """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
 
     fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
 
         return customRegexDetector(
             text,
-JAVA_PATTERN
-            .toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
-        withContext
+            JAVA_PATTERN
+                .toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
+            withContext
         ).filter {
             check(it.value)
         }
@@ -24,7 +25,8 @@ JAVA_PATTERN
     )
     override val options = setOf(
         ExpressionOption.MULTILINE,
-        ExpressionOption.CASELESS
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
     )
 
     override fun check(value: String): Boolean {

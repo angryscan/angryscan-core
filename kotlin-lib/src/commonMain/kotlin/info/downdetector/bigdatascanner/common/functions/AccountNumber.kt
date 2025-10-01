@@ -2,10 +2,10 @@ package info.downdetector.bigdatascanner.common.functions
 
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
-object AccountNumber: IHyperPattern {
+object AccountNumber : IHyperPattern {
     const val JAVA_PATTERN: String = """(?<=\D|^)40[0-9]{3}(810|840|978)[0-9]{12}(?=\D|$)"""
 
-    fun find(text:String, withContext: Boolean) = regexDetector(
+    fun find(text: String, withContext: Boolean) = regexDetector(
         text,
         JAVA_PATTERN
             .toRegex(setOf(RegexOption.MULTILINE)),

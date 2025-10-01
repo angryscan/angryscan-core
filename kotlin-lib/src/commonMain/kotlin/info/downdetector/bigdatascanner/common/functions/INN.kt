@@ -3,15 +3,29 @@ package info.downdetector.bigdatascanner.common.functions
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
 
-fun findINN(text:String, withContext: Boolean): Sequence<MatchWithContext> {
-    // validate inn
-    /**
-     * Checks if the given INN is correct.
-     * @param input the INN to check
-     * @return true if the INN is correct, false otherwise
-     */
-    fun isInnValid(input: String): Boolean {
-        val inn = input.replace("-", "").replace(" ", "").trim()
+object INN : IHyperPattern {
+    const val JAVA_PATTERN = """(?<=[-:,()=*\s]|^)[0-9]{12}(?=[-(),*\s]|$)"""
+
+    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
+        return customRegexDetector(
+            text,
+            JAVA_PATTERN
+                .toRegex(setOf(RegexOption.MULTILINE)),
+            withContext
+        ).filter {
+            check(it.value)
+        }
+    }
+
+    override val hyperPatterns = listOf(
+        """\b[0-9]{12}\b"""
+    )
+    override val options = setOf(
+        ExpressionOption.MULTILINE,
+    )
+
+    override fun check(value: String): Boolean {
+        val inn = value.replace("-", "").replace(" ", "").trim()
         // control sequences
         val firstSequence = listOf(7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
         val secondSequence = listOf(3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
@@ -27,12 +41,5 @@ fun findINN(text:String, withContext: Boolean): Sequence<MatchWithContext> {
         val key2 = (summ2 % 11).toString().last()
         return key1 == inn[10] && key2 == inn[11]
     }
-    return customRegexDetector(
-        text,
-        """(?<=[-:,()=*\s]|^)[0-9]{12}(?=[-(),*\s]|$)"""
-            .toRegex(setOf(RegexOption.MULTILINE)),
-        withContext
-    ).filter {
-        isInnValid(it.value)
-    }
+
 }
