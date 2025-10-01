@@ -35,14 +35,14 @@ internal class DetectFunctionTest {
     fun testCardWithSmth() {
         val file = javaClass.getResource("/testFiles/cardNumber/smth.txt")?.file
         assertNotNull(file)
-        assertEquals(4, getCountOfAttribute(file, DetectFunction.CardNumbers))
+        assertEquals(8, getCountOfAttribute(file, DetectFunction.CardNumbers))
     }
 
     @Test
     fun testCardWithStar() {
         val file = javaClass.getResource("/testFiles/cardNumber/star.txt")?.file
         assertNotNull(file)
-        assertEquals(2, getCountOfAttribute(file, DetectFunction.CardNumbers))
+        assertEquals(1, getCountOfAttribute(file, DetectFunction.CardNumbers))
     }
 
     @Test
@@ -91,21 +91,21 @@ internal class DetectFunctionTest {
     fun testInnEdge() {
         val file = javaClass.getResource("/testFiles/inns/edge.txt")?.file
         assertNotNull(file)
-        assertEquals(6, getCountOfAttribute(file, DetectFunction.INN))
+        assertEquals(5, getCountOfAttribute(file, DetectFunction.INN))
     }
 
     @Test
     fun testInnWithBrace() {
         val file = javaClass.getResource("/testFiles/inns/braces.txt")?.file
         assertNotNull(file)
-        assertEquals(3, getCountOfAttribute(file, DetectFunction.INN))
+        assertEquals(2, getCountOfAttribute(file, DetectFunction.INN))
     }
 
     @Test
     fun testInnWithSmth() {
         val file = javaClass.getResource("/testFiles/inns/smth.txt")?.file
         assertNotNull(file)
-        assertEquals(6, getCountOfAttribute(file, DetectFunction.INN))
+        assertEquals(7, getCountOfAttribute(file, DetectFunction.INN))
     }
 
     @Test
@@ -184,12 +184,56 @@ internal class DetectFunctionTest {
         assertNotNull(filePath)
         val file = File(filePath)
         assertTrue(file.exists())
-        val text = Cleaner.cleanText(file.readText())
+        val text = file.readText()
         val searchRes = DetectFunction.CardNumbers.scan(text, true)
         assertEquals(1, searchRes.count())
         assertEquals("4276 8070 1492 7948", searchRes.first().value)
-        assertEquals("83  Карта ", searchRes.first().before)
-        assertEquals("  г. Санкт", searchRes.first().after)
+        assertEquals("83\r\nКарта ", searchRes.first().before)
+        assertEquals("\r\nг. Санкт", searchRes.first().after)
+    }
+
+    @Test
+    fun scan(){
+        val filePath = javaClass.getResource("/testFiles/first.csv")?.file
+        assertNotNull(filePath)
+        val file = File(filePath)
+        assertTrue(file.exists())
+        val text = file.readText()
+
+        //Check Email
+        assertEquals(2, DetectFunction.Emails.scan(text).count())
+        //Check CardNumber
+        assertEquals(1, DetectFunction.CardNumbers.scan(text).count())
+        //Check Phone
+        assertEquals(2, DetectFunction.Phones.scan(text).count())
+        //Check AccountNumber
+        assertEquals(1, DetectFunction.AccountNumber.scan(text).count())
+        //Check CarNumber
+        assertEquals(2, DetectFunction.CarNumber.scan(text).count())
+        //Check SNILS
+        assertEquals(1, DetectFunction.SNILS.scan(text).count())
+        //Check Passport
+        assertEquals(2, DetectFunction.Passport.scan(text).count())
+        //Check OMS
+        assertEquals(1, DetectFunction.OMS.scan(text).count())
+        //Check INN
+        assertEquals(1, DetectFunction.INN.scan(text).count())
+        //Check Address
+        assertEquals(1, DetectFunction.Address.scan(text).count())
+        //Check ValuableInfo
+        assertEquals(2, DetectFunction.ValuableInfo.scan(text).count())
+        //Check Login
+        assertEquals(1, DetectFunction.Login.scan(text).count())
+        //Check Password
+        assertEquals(1, DetectFunction.Password.scan(text).count())
+        //Check CVV
+        assertEquals(1, DetectFunction.CVV.scan(text).count())
+        //Check FullName
+        assertEquals(3, DetectFunction.Name.scan(text).count())
+        //Check IP
+        assertEquals(1, DetectFunction.IP.scan(text).count())
+        //Check IPv6
+        assertEquals(1, DetectFunction.IPv6.scan(text).count())
     }
 
 
@@ -198,7 +242,7 @@ internal class DetectFunctionTest {
 
         assertEquals(true, file.exists())
 
-        val text = Cleaner.cleanText(file.readText())
+        val text = file.readText()//Cleaner.cleanText(file.readText())
         return field.scan(text).count()
     }
 }

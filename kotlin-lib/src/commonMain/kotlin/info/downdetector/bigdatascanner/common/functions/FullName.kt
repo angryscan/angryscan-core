@@ -4,17 +4,17 @@ import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
 object FullName : IHyperPattern {
     const val JAVA_PATTERN =
-        """(^|\s)(?!Республика|Область|Край|Город|Село|Деревня|Улица|Проспект|Марий)((([А-ЯЁ][а-яё]+\s)([А-ЯЁ][а-яё]+[ая]\s)([А-ЯЁ][а-яё]+на))|(([А-ЯЁ][а-яё]+\s)([А-ЯЁ][а-яё]+[^ая]\s)([А-ЯЁ][а-яё]+(ич|ь))))($|\W|\s)"""
+        """(^|[\p{Z}\uFEFF\u00A0])((([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[ая]\p{Z})([А-ЯЁ][а-яё]+(на|НА)))|(([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[^ая]\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+(ич|ь|ИЧ|Ь))))($|\W|\p{Z}|[,.-;\s])"""
 
     fun find(text: String, withContext: Boolean) = regexDetector(
         text,
         JAVA_PATTERN
             .toRegex(setOf(RegexOption.MULTILINE)),
         withContext
-    )
+    ).filter { check(it.value) }
 
     override val hyperPatterns = listOf(
-        """(^|\s)((([А-ЯЁ][а-яё]+\s)([А-ЯЁ][а-яё]+[ая]\s)([А-ЯЁ][а-яё]+на))|(([А-ЯЁ][а-яё]+\s)([А-ЯЁ][а-яё]+[^ая]\s)([А-ЯЁ][а-яё]+(ич|ь))))($|\W|\s)"""
+        """(^|[^а-яА-Я])((([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[ая]\p{Z})([А-ЯЁ][а-яё]+(на|НА)))|(([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[^ая]\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+(ич|ь|ИЧ|Ь))))($|[^а-яА-Я]|\p{Z}|[,.-;\s])"""
     )
     override val options = setOf(
         ExpressionOption.MULTILINE,
