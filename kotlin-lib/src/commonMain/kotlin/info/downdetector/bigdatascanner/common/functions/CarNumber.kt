@@ -18,7 +18,7 @@ object CarNumber : IHyperPattern {
     )
     override val options = setOf(ExpressionOption.MULTILINE, ExpressionOption.CASELESS)
 
-    override fun check(value: String): Boolean  = true
+    override fun check(value: String): Boolean = true
 
 }
 

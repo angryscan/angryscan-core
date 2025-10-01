@@ -4,8 +4,9 @@ import info.downdetector.bigdatascanner.common.constants.CardBins
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
-object CardNumber: IHyperPattern {
-    const val JAVA_PATTERN = """(?<=[-:,()=*\s]|^)(([0-9]{4}[ ][0-9]{4}[ ][0-9]{4}[ ][0-9]{4})|([0-9]{16}))(?=[-(),*\s]|$)"""
+object CardNumber : IHyperPattern {
+    const val JAVA_PATTERN =
+        """(?<=[-:,()=*\s]|^)(([0-9]{4}[ ][0-9]{4}[ ][0-9]{4}[ ][0-9]{4})|([0-9]{16}))(?=[-(),*\s]|$)"""
 
     fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
         val cards = regexDetector(

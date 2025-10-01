@@ -2,7 +2,7 @@ package info.downdetector.bigdatascanner.common.functions
 
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
-object Email: IHyperPattern {
+object Email : IHyperPattern {
     const val JAVA_PATTERN: String = """(?<=[-, ()=*]|^)[a-zA-Z0-9_.+-]+@[a-z0-9-.]+?(\.[a-z]{2,})+(?=\W|$)"""
     override val hyperPatterns: List<String> = listOf(
         """\b[a-zA-Z0-9][a-zA-Z0-9._%+-]+@[a-zA-Z0-9][a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b"""
@@ -10,6 +10,7 @@ object Email: IHyperPattern {
     override val options: Set<ExpressionOption> = setOf(
         ExpressionOption.MULTILINE
     )
+
     fun find(text: String, withContext: Boolean) = regexDetector(
         text,
         JAVA_PATTERN.toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
