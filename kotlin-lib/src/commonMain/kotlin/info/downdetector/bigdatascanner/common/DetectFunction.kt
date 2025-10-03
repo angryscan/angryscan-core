@@ -25,30 +25,32 @@ import kotlinx.serialization.Serializable
 
 @Suppress("unused")
 @Serializable(with = DetectFunctionSerializer::class)
-enum class DetectFunction(override val writeName: String) : IDetectFunction {
+enum class DetectFunction(
+    override val writeName: String
+) : IDetectFunction {
     /** This class is responsible on detection and
      * extraction information from documents
      **/
-    Emails("emails"),
-    Phones("phones"),
-    CardNumbers("card_numbers"),
-    CarNumber("car_numbers"),
-    SNILS("snilses"),
-    Passport("passports"),
-    OMS("omses"),
-    INN("inns"),
-    AccountNumber("account_number"),
-    Address("address"),
-    ValuableInfo("valuable_info"),
-    Login("logins"),
-    Password("passwords"),
-    CVV("cvv"),
-    Name("full_names"),
-    IP("ips"),
-    IPv6("ipv6s"),
-    Birthday("birthday"),
-    DeathDate("death_date"),
-    BirthCert("birth_cert");
+    Emails("Emails"),
+    Phones("Phones"),
+    CardNumbers("CardNumbers"),
+    CarNumber("CarNumber"),
+    SNILS("SNILS"),
+    Passport("Passport"),
+    OMS("OMS"),
+    INN("INN"),
+    AccountNumber("AccountNumber"),
+    Address("Address"),
+    ValuableInfo("ValuableInfo"),
+    Login("Login"),
+    Password("Password"),
+    CVV("CVV"),
+    Name("Name"),
+    IP("IP"),
+    IPv6("IPv6"),
+    Birthday("Birthday"),
+    DeathDate("DeathDate"),
+    BirthCert("BirthCert");
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
         Emails -> findEmails(text, withContext)
