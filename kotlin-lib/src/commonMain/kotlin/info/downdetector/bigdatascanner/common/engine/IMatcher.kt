@@ -1,9 +1,6 @@
-package info.downdetector.bigdatascanner.common.functions
+package info.downdetector.bigdatascanner.common.engine
 
-interface IHyperPattern {
-    val hyperPatterns: List<String>
-    val options: Set<ExpressionOption>
-
+interface IMatcher {
     /**
      * This function checks if the given value is correct.
      * @param value the value to check

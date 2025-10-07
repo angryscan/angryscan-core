@@ -1,29 +1,22 @@
 package info.downdetector.bigdatascanner.common.functions
 
-import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
-import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
-import kotlin.text.iterator
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object OMS : IHyperPattern {
-    const val JAVA_PATTERN =
+object OMS : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
         """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
-
-    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
-
-        return customRegexDetector(
-            text,
-            JAVA_PATTERN
-                .toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
-            withContext
-        ).filter {
-            check(it.value)
-        }
-    }
+    )
+    override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
+        RegexOption.MULTILINE
+    )
 
     override val hyperPatterns = listOf(
         """(?:^|\D)(омс|полис|страховка|страхование)\s[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}(?:\D|$)"""
     )
-    override val options = setOf(
+    override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,
         ExpressionOption.UTF8

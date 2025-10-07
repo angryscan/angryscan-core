@@ -1,22 +1,22 @@
 package info.downdetector.bigdatascanner.common.functions
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object Password : IHyperPattern {
-    const val JAVA_PATTERN =
+object Password : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
         """(((password|пароль)\s((?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@$}{'?;,:=+_\-]*))\S{3,25})|((password|пароль):\s?\S{3,25}))"""
-
-    fun find(text: String, withContext: Boolean) = regexDetector(
-        text,
-        JAVA_PATTERN
-            .toRegex(setOf(RegexOption.IGNORE_CASE, RegexOption.MULTILINE)),
-        withContext
+    )
+    override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
+        RegexOption.MULTILINE
     )
 
     override val hyperPatterns = listOf(
         """(password|пароль):?\s*\S{3,25}($|\s)"""
     )
-    override val options = setOf(
+    override val expressionOptions = setOf(
         ExpressionOption.CASELESS,
         ExpressionOption.MULTILINE,
         ExpressionOption.UTF8

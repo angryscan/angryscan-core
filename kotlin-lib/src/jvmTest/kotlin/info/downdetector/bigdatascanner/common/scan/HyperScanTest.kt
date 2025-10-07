@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 
-class HyperScanTest {
+internal class HyperScanTest {
     @Test
     fun scan() {
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
@@ -15,7 +15,7 @@ class HyperScanTest {
         val file = File(filePath)
 
         assertEquals(true, file.exists())
-        val hyperScan = HyperScan(
+        val hyperScan = HyperScanEngine(
             listOf(
                 Email,
                 CardNumber,

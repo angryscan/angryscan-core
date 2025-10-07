@@ -1,4 +1,4 @@
-package info.downdetector.bigdatascanner.common.functions
+package info.downdetector.bigdatascanner.common.engine
 
 enum class ExpressionOption {
     CASELESS,

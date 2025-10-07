@@ -1,26 +1,21 @@
 package info.downdetector.bigdatascanner.common.functions
 
-import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
-import info.downdetector.bigdatascanner.common.extensions.customRegexDetector
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object INN : IHyperPattern {
-    const val JAVA_PATTERN = """(?<![^\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?![^\s.,;)"])"""
-
-    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
-        return customRegexDetector(
-            text,
-            JAVA_PATTERN
-                .toRegex(setOf(RegexOption.MULTILINE)),
-            withContext
-        ).filter {
-            check(it.value)
-        }
-    }
+object INN : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
+        """(?<![^\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?![^\s.,;)"])"""
+    )
+    override val regexOptions = setOf(
+        RegexOption.MULTILINE
+    )
 
     override val hyperPatterns = listOf(
         """(^|[\s.,\-:"(])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))([\s.,;)]|$)"""
     )
-    override val options = setOf(
+    override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
     )
 

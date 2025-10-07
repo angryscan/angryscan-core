@@ -17,7 +17,7 @@ import info.downdetector.bigdatascanner.common.functions.Password
 import info.downdetector.bigdatascanner.common.functions.Phone
 import info.downdetector.bigdatascanner.common.functions.SNILS
 import info.downdetector.bigdatascanner.common.functions.ValuableInfo
-import info.downdetector.bigdatascanner.common.scan.HyperScan
+import info.downdetector.bigdatascanner.common.scan.HyperScanEngine
 import java.io.File
 import kotlin.system.measureTimeMillis
 import kotlin.test.Test
@@ -27,7 +27,7 @@ import kotlin.test.assertNotNull
 internal class LongScanTest {
     @Test
     fun longScanDF() {
-        val filePath = javaClass.getResource("/testfiles/first.csv")?.file
+        val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
         val file = File(filePath)
 
@@ -48,7 +48,7 @@ internal class LongScanTest {
             multipleScanTime.add(
                 measureTimeMillis {
                     print("")
-                    foundCount += DetectFunction.entries.sumOf { df -> df.scan(text, true).count() }
+                    foundCount += DetectFunction.entries.sumOf { df -> df.scan(text).count() }
                 }
             )
             progressBar.update(i)
@@ -66,7 +66,7 @@ internal class LongScanTest {
 
     @Test
     fun longScanHS() {
-        val filePath = javaClass.getResource("/testfiles/first.csv")?.file
+        val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
         val file = File(filePath)
 
@@ -90,7 +90,7 @@ internal class LongScanTest {
             IP,
             IPv6
         )
-        val hyperScan = HyperScan(
+        val hyperScan = HyperScanEngine(
             matchers
         )
 

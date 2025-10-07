@@ -27,14 +27,11 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(project(":kotlin-lib"))
-            }
+        commonMain.dependencies {
+            implementation(project(":kotlin-lib"))
         }
-        val commonTest by getting {
-            dependencies {
-            }
+        commonTest.dependencies {
+
         }
     }
 }

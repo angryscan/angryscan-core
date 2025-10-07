@@ -1,26 +1,21 @@
 package info.downdetector.bigdatascanner.common.functions
 
-import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object SNILS : IHyperPattern {
-    const val JAVA_PATTERN = """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
-
-    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
-        return regexDetector(
-            text,
-            JAVA_PATTERN
-                .toRegex(setOf(RegexOption.MULTILINE)),
-            withContext
-        ).filter {
-            check(it.value)
-        }
-    }
+object SNILS : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
+        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
+    )
+    override val regexOptions = setOf(
+        RegexOption.MULTILINE
+    )
 
     override val hyperPatterns: List<String> = listOf(
         """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
     )
-    override val options = setOf(ExpressionOption.MULTILINE)
+    override val expressionOptions = setOf(ExpressionOption.MULTILINE)
 
     override fun check(value: String): Boolean {
         var summ = 0
