@@ -4,11 +4,13 @@ import com.gliwka.hyperscan.wrapper.Database
 import com.gliwka.hyperscan.wrapper.Expression
 import com.gliwka.hyperscan.wrapper.ExpressionFlag
 import com.gliwka.hyperscan.wrapper.Scanner
-import info.downdetector.bigdatascanner.common.extensions.HyperMatch
-import info.downdetector.bigdatascanner.common.functions.IHyperPattern
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.IScanEngine
+import info.downdetector.bigdatascanner.common.extensions.Match
+import info.downdetector.bigdatascanner.common.extensions.toExpressionFlag
 import java.util.*
 
-class HyperScan(patterns: List<IHyperPattern>) {
+class HyperScanEngine(patterns: List<IHyperMatcher>): IScanEngine, AutoCloseable {
     private val expressions =
         patterns
             .flatMap { ip ->
@@ -18,7 +20,7 @@ class HyperScan(patterns: List<IHyperPattern>) {
             }.mapIndexed { index, pair ->
                 //Конвертируем набор опций
                 val es = EnumSet.of(ExpressionFlag.SOM_LEFTMOST)
-                pair.second.options.forEach {
+                pair.second.expressionOptions.forEach {
                     es.add(it.toExpressionFlag())
                 }
 
@@ -40,7 +42,7 @@ class HyperScan(patterns: List<IHyperPattern>) {
     private val database = Database.compile(expressions.keys.toList())
 
 
-    fun scan(text: String): List<HyperMatch> {
+    override fun scan(text: String): List<Match> {
         val scanner = Scanner()
         scanner.allocScratch(database)
         val res = scanner.scan(database, text).filter {
@@ -48,12 +50,24 @@ class HyperScan(patterns: List<IHyperPattern>) {
         }
         scanner.close()
         return res.map {
-            HyperMatch(
+            Match(
                 value = it.matchedString,
+                before = text.substring(
+                    maxOf(0, it.startPosition.toInt() - 10),
+                    it.startPosition.toInt()
+                ),
+                after = text.substring(
+                    it.endPosition.toInt(),
+                    minOf(text.length, it.endPosition.toInt() + 10),
+                ),
                 startPosition = it.startPosition,
                 endPosition = it.endPosition,
                 matcher = expressions[it.matchedExpression]!!
             )
         }
+    }
+
+    override fun close() {
+        database.close()
     }
 }

@@ -1,10 +1,12 @@
 package info.downdetector.bigdatascanner.common
 
-import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
+import info.downdetector.bigdatascanner.common.engine.KotlinEngine
+import info.downdetector.bigdatascanner.common.extensions.Match
 import kotlinx.serialization.Serializable
 
 @Suppress("unused")
 @Serializable(with = DetectFunctionSerializer::class)
+@Deprecated("Use KotlinEngine with  instead")
 enum class DetectFunction(override val writeName: String) : IDetectFunction {
     /** This class is responsible on detection and
      * extraction information from documents
@@ -27,39 +29,39 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     IP("ips"),
     IPv6("ipv6s");
 
-    override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> = when (this) {
-        Emails -> info.downdetector.bigdatascanner.common.functions.Email.find(text, withContext)
+    override fun scan(text: String): List<Match> = when (this) {
+        Emails -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.Email)).scan(text)
 
-        Phones -> info.downdetector.bigdatascanner.common.functions.Phone.find(text, withContext)
+        Phones -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.Phone)).scan(text)
 
-        CardNumbers -> info.downdetector.bigdatascanner.common.functions.CardNumber.find(text, withContext)
+        CardNumbers -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.CardNumber)).scan(text)
 
-        CarNumber -> info.downdetector.bigdatascanner.common.functions.CarNumber.find(text, withContext)
+        CarNumber -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.CarNumber)).scan(text)
 
-        SNILS -> info.downdetector.bigdatascanner.common.functions.SNILS.find(text, withContext)
+        SNILS -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.SNILS)).scan(text)
 
-        Passport -> info.downdetector.bigdatascanner.common.functions.Passport.find(text, withContext)
+        Passport -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.Passport)).scan(text)
 
-        OMS -> info.downdetector.bigdatascanner.common.functions.OMS.find(text, withContext)
+        OMS -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.OMS)).scan(text)
 
-        INN -> info.downdetector.bigdatascanner.common.functions.INN.find(text, withContext)
+        INN -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.INN)).scan(text)
 
-        AccountNumber -> info.downdetector.bigdatascanner.common.functions.AccountNumber.find(text, withContext)
+        AccountNumber -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.AccountNumber)).scan(text)
 
-        Address -> info.downdetector.bigdatascanner.common.functions.Address.find(text, withContext)
+        Address -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.Address)).scan(text)
 
-        ValuableInfo -> info.downdetector.bigdatascanner.common.functions.ValuableInfo.find(text, withContext)
+        ValuableInfo -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.ValuableInfo)).scan(text)
 
-        Login -> info.downdetector.bigdatascanner.common.functions.Login.find(text, withContext)
+        Login -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.Login)).scan(text)
 
-        Password -> info.downdetector.bigdatascanner.common.functions.Password.find(text, withContext)
+        Password -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.Password)).scan(text)
 
-        CVV -> info.downdetector.bigdatascanner.common.functions.CVV.find(text, withContext)
+        CVV -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.CVV)).scan(text)
 
-        Name -> info.downdetector.bigdatascanner.common.functions.FullName.find(text, withContext)
+        Name -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.FullName)).scan(text)
 
-        IP -> info.downdetector.bigdatascanner.common.functions.IP.find(text, withContext)
+        IP -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.IP)).scan(text)
 
-        IPv6 -> info.downdetector.bigdatascanner.common.functions.IPv6.find(text, withContext)
+        IPv6 -> KotlinEngine(listOf(info.downdetector.bigdatascanner.common.functions.IPv6)).scan(text)
     }
 }

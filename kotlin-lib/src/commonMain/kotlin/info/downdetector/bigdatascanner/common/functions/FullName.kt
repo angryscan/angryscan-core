@@ -1,22 +1,21 @@
 package info.downdetector.bigdatascanner.common.functions
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object FullName : IHyperPattern {
-    const val JAVA_PATTERN =
+object FullName : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
         """(^|[\p{Z}\uFEFF\u00A0])((([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[ая]\p{Z})([А-ЯЁ][а-яё]+(на|НА)))|(([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[^ая]\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+(ич|ь|ИЧ|Ь))))($|\W|\p{Z}|[,.-;\s])"""
-
-    fun find(text: String, withContext: Boolean) = regexDetector(
-        text,
-        JAVA_PATTERN
-            .toRegex(setOf(RegexOption.MULTILINE)),
-        withContext
-    ).filter { check(it.value) }
+    )
+    override val regexOptions = setOf(
+        RegexOption.MULTILINE
+    )
 
     override val hyperPatterns = listOf(
         """(^|[^а-яА-Я])((([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[ая]\p{Z})([А-ЯЁ][а-яё]+(на|НА)))|(([А-ЯЁ][а-яА-ЯёЁ]+\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+[^ая]\p{Z})([А-ЯЁ][а-яА-ЯёЁ]+(ич|ь|ИЧ|Ь))))($|[^а-яА-Я]|\p{Z}|[,.-;\s])"""
     )
-    override val options = setOf(
+    override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.UTF8
     )

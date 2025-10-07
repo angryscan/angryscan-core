@@ -1,5 +1,6 @@
 package info.downdetector.bigdatascanner.common
 
+@Deprecated("Use KotlinEngine instead")
 object Cleaner {
     /*This class is responsible for cleaning documents text*/
     // delete all junk from text

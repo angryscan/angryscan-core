@@ -185,7 +185,7 @@ internal class DetectFunctionTest {
         val file = File(filePath)
         assertTrue(file.exists())
         val text = file.readText()
-        val searchRes = DetectFunction.CardNumbers.scan(text, true)
+        val searchRes = DetectFunction.CardNumbers.scan(text)
         assertEquals(1, searchRes.count())
         assertEquals("4276 8070 1492 7948", searchRes.first().value)
         assertEquals("83\r\nКарта ", searchRes.first().before)

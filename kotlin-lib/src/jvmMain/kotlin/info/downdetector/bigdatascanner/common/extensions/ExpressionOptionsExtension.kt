@@ -1,7 +1,7 @@
-package info.downdetector.bigdatascanner.common.scan
+package info.downdetector.bigdatascanner.common.extensions
 
 import com.gliwka.hyperscan.wrapper.ExpressionFlag
-import info.downdetector.bigdatascanner.common.functions.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
 
 fun ExpressionOption.toExpressionFlag(): ExpressionFlag = when (this) {
     ExpressionOption.CASELESS -> ExpressionFlag.CASELESS

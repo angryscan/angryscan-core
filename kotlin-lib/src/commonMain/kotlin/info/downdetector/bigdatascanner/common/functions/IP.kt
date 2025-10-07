@@ -1,22 +1,21 @@
 package info.downdetector.bigdatascanner.common.functions
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object IP : IHyperPattern {
-    const val JAVA_PATTERN =
+object IP : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
         """(^|\s)((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)($|\s)"""
-
-    fun find(text: String, withContext: Boolean) = regexDetector(
-        text,
-        JAVA_PATTERN
-            .toRegex(setOf(RegexOption.MULTILINE)),
-        withContext
+    )
+    override val regexOptions = setOf(
+        RegexOption.MULTILINE
     )
 
     override val hyperPatterns = listOf(
         """(^|\s)((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)($|\s)"""
     )
-    override val options = setOf(
+    override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
     )
 

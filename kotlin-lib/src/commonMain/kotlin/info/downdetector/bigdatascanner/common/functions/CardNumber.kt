@@ -1,31 +1,17 @@
 package info.downdetector.bigdatascanner.common.functions
 
 import info.downdetector.bigdatascanner.common.constants.CardBins
-import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import info.downdetector.bigdatascanner.common.engine.IHyperMatcher
+import info.downdetector.bigdatascanner.common.engine.ExpressionOption
+import info.downdetector.bigdatascanner.common.engine.IKotlinMatcher
 
-object CardNumber : IHyperPattern {
-    const val JAVA_PATTERN =
+object CardNumber : IHyperMatcher, IKotlinMatcher {
+    override val javaPatterns = listOf(
         """(?<![^\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"])"""
-
-    fun find(text: String, withContext: Boolean): Sequence<MatchWithContext> {
-        val cards = regexDetector(
-            text,
-            JAVA_PATTERN
-                .toRegex(
-                    setOf(
-                        RegexOption.MULTILINE
-                    )
-                ),
-            withContext
-        )
-        return cards.filter {
-            val cleanCard = it.value.replace(" ", "").replace("-", "").trim()
-            cleanCard != "0000000000000000"
-                    && isBinValid(cleanCard)
-                    && isCardValid(cleanCard)
-        }
-    }
+    )
+    override val regexOptions = setOf(
+        RegexOption.MULTILINE
+    )
 
     private fun isBinValid(card: String): Boolean {
         return CardBins.cardBins.contains(card.take(4))
@@ -47,7 +33,7 @@ object CardNumber : IHyperPattern {
     override val hyperPatterns: List<String> = listOf(
         """\b([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
     )
-    override val options: Set<ExpressionOption> = setOf(
+    override val expressionOptions: Set<ExpressionOption> = setOf(
         ExpressionOption.MULTILINE
     )
 
