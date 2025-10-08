@@ -73,7 +73,7 @@ internal class LongScanTest {
         assertEquals(true, file.exists())
         val matchers = listOf(
             Email,
-            CardNumber,
+            CardNumber(),
             Phone,
             AccountNumber,
             CarNumber,

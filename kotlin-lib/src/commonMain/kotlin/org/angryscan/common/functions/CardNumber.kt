@@ -5,7 +5,7 @@ import org.angryscan.common.engine.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.IKotlinMatcher
 
-object CardNumber : IHyperMatcher, IKotlinMatcher {
+class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """(?<![^\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"])"""
     )
@@ -40,7 +40,7 @@ object CardNumber : IHyperMatcher, IKotlinMatcher {
     override fun check(value: String): Boolean {
         val cleanCard = value.replace(" ", "").replace("-", "").trim()
         return cleanCard != "0000000000000000"
-                && isBinValid(cleanCard)
+                && (!checkCardBins || isBinValid(cleanCard))
                 && isCardValid(cleanCard)
     }
 }
