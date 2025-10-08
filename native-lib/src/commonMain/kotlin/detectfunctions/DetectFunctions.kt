@@ -1,23 +1,23 @@
 package detectfunctions
 
-import info.downdetector.bigdatascanner.common.engine.KotlinEngine
-import info.downdetector.bigdatascanner.common.functions.AccountNumber
-import info.downdetector.bigdatascanner.common.functions.Address
-import info.downdetector.bigdatascanner.common.functions.CVV
-import info.downdetector.bigdatascanner.common.functions.CarNumber
-import info.downdetector.bigdatascanner.common.functions.CardNumber
-import info.downdetector.bigdatascanner.common.functions.Email
-import info.downdetector.bigdatascanner.common.functions.FullName
-import info.downdetector.bigdatascanner.common.functions.INN
-import info.downdetector.bigdatascanner.common.functions.IP
-import info.downdetector.bigdatascanner.common.functions.IPv6
-import info.downdetector.bigdatascanner.common.functions.Login
-import info.downdetector.bigdatascanner.common.functions.OMS
-import info.downdetector.bigdatascanner.common.functions.Passport
-import info.downdetector.bigdatascanner.common.functions.Password
-import info.downdetector.bigdatascanner.common.functions.Phone
-import info.downdetector.bigdatascanner.common.functions.SNILS
-import info.downdetector.bigdatascanner.common.functions.ValuableInfo
+import org.angryscan.common.engine.KotlinEngine
+import org.angryscan.common.functions.AccountNumber
+import org.angryscan.common.functions.Address
+import org.angryscan.common.functions.CVV
+import org.angryscan.common.functions.CarNumber
+import org.angryscan.common.functions.CardNumber
+import org.angryscan.common.functions.Email
+import org.angryscan.common.functions.FullName
+import org.angryscan.common.functions.INN
+import org.angryscan.common.functions.IP
+import org.angryscan.common.functions.IPv6
+import org.angryscan.common.functions.Login
+import org.angryscan.common.functions.OMS
+import org.angryscan.common.functions.Passport
+import org.angryscan.common.functions.Password
+import org.angryscan.common.functions.Phone
+import org.angryscan.common.functions.SNILS
+import org.angryscan.common.functions.ValuableInfo
 
 @Suppress("Unused")
 fun detectEmails(text: String): Int {

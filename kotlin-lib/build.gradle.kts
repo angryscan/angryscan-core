@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "info.downdetector.bigdatascanner"
+group = "org.angryscan"
 version = "1.2.3-alpha-1"
 description = "Data Scanner Library"
 
@@ -18,6 +18,7 @@ description = "Data Scanner Library"
 val targetName = "native"
 
 kotlin {
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     jvm {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
@@ -75,6 +76,11 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        jvmMain {
+            dependencies {
+                implementation(libs.hyperscan)
+            }
+        }
     }
 }
 
@@ -112,7 +118,7 @@ koverReport {
 
 mavenPublishing {
     coordinates(
-        groupId = "info.downdetector.bigdatascanner",
+        groupId = "org.angryscan",
         artifactId = "core",
         version = project.version.toString()
     )
