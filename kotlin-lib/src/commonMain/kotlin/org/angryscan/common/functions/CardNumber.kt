@@ -4,8 +4,10 @@ import org.angryscan.common.constants.CardBins
 import org.angryscan.common.engine.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.IMask
 
-class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher {
+class CardNumber(val checkCardBins: Boolean = true)
+    : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """(?<![^\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"])"""
     )
@@ -43,5 +45,22 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
                 && (!checkCardBins || isBinValid(cleanCard))
                 && isCardValid(cleanCard)
     }
+
+    companion object: IMask {
+        override fun mask(value: String): String {
+            var i = 0
+            return value.map { c ->
+                if (c.isDigit()) {
+                    i++
+                    if(i > 6 && i < 13)
+                        '*'
+                    else
+                        c
+                } else
+                    c
+            }.joinToString(separator = "")
+        }
+    }
+
 }
 
