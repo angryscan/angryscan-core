@@ -1,7 +1,7 @@
 import ctypes
 from ctypes import c_bool, c_char, c_short, c_int, c_long, c_ubyte, c_ushort, c_uint, c_byte, c_float, c_double, POINTER, Structure, c_ulong, CFUNCTYPE, c_char_p
 
-lib = ctypes.CDLL("../library/build/bin/native/releaseShared/AngryData.dll")
+lib = ctypes.CDLL("../native-lib/build/bin/native/releaseShared/AngryData.dll")
 # Define the necessary types
 class AngryData_KNativePtr(Structure):
     pass  # Define the structure as needed
