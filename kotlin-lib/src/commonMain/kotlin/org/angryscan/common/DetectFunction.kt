@@ -37,7 +37,7 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
         Phones -> KotlinEngine(listOf(Phone))
             .scan(text)
 
-        CardNumbers -> KotlinEngine(listOf(org.angryscan.common.functions.CardNumber))
+        CardNumbers -> KotlinEngine(listOf(org.angryscan.common.functions.CardNumber()))
             .scan(text)
 
         CarNumber -> KotlinEngine(listOf(org.angryscan.common.functions.CarNumber))

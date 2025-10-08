@@ -31,7 +31,7 @@ fun detectPhones(text: String): Int {
 
 @Suppress("Unused")
 fun detectCardNumbers(text: String): Int {
-    return KotlinEngine(listOf(CardNumber)).scan(text).count()
+    return KotlinEngine(listOf(CardNumber())).scan(text).count()
 }
 
 @Suppress("Unused")

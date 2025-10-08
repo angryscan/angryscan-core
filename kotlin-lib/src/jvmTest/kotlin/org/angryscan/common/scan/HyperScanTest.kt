@@ -18,7 +18,7 @@ internal class HyperScanTest {
         val hyperScan = HyperScanEngine(
             listOf(
                 Email,
-                CardNumber,
+                CardNumber(),
                 Phone,
                 AccountNumber,
                 CarNumber,
@@ -38,38 +38,38 @@ internal class HyperScanTest {
         )
         val res = hyperScan.scan(file.readText())
         //Check Email
-        assertEquals(2, res.count { it.matcher == Email })
+        assertEquals(2, res.count { it.matcher is Email })
         //Check CardNumber
-        assertEquals(1, res.count { it.matcher == CardNumber })
+        assertEquals(1, res.count { it.matcher is CardNumber })
         //Check Phone
-        assertEquals(2, res.count { it.matcher == Phone })
+        assertEquals(2, res.count { it.matcher is Phone })
         //Check AccountNumber
-        assertEquals(1, res.count { it.matcher == AccountNumber })
+        assertEquals(1, res.count { it.matcher is AccountNumber })
         //Check CarNumber
-        assertEquals(2, res.count { it.matcher == CarNumber })
+        assertEquals(2, res.count { it.matcher is CarNumber })
         //Check SNILS
-        assertEquals(1, res.count { it.matcher == SNILS })
+        assertEquals(1, res.count { it.matcher is SNILS })
         //Check Passport
-        assertEquals(2, res.count { it.matcher == Passport })
+        assertEquals(2, res.count { it.matcher is Passport })
         //Check OMS
-        assertEquals(1, res.count { it.matcher == OMS })
+        assertEquals(1, res.count { it.matcher is OMS })
         //Check INN
-        assertEquals(1, res.count { it.matcher == INN })
+        assertEquals(1, res.count { it.matcher is INN })
         //Check Address
-        assertEquals(1, res.count { it.matcher == Address })
+        assertEquals(1, res.count { it.matcher is Address })
         //Check ValuableInfo
-        assertEquals(2, res.count { it.matcher == ValuableInfo })
+        assertEquals(2, res.count { it.matcher is ValuableInfo })
         //Check Login
-        assertEquals(1, res.count { it.matcher == Login })
+        assertEquals(1, res.count { it.matcher is Login })
         //Check Password
-        assertEquals(1, res.count { it.matcher == Password })
+        assertEquals(1, res.count { it.matcher is Password })
         //Check CVV
-        assertEquals(1, res.count { it.matcher == CVV })
+        assertEquals(1, res.count { it.matcher is CVV })
         //Check FullName
-        assertEquals(3, res.count { it.matcher == FullName })
+        assertEquals(3, res.count { it.matcher is FullName })
         //Check IP
-        assertEquals(1, res.count { it.matcher == IP })
+        assertEquals(1, res.count { it.matcher is IP })
         //Check IPv6
-        assertEquals(1, res.count { it.matcher == IPv6 })
+        assertEquals(1, res.count { it.matcher is IPv6 })
     }
 }
