@@ -1,9 +1,8 @@
 package org.angryscan.common
 
 import kotlinx.serialization.Serializable
-import org.angryscan.common.engine.KotlinEngine
-import org.angryscan.common.functions.Email
-import org.angryscan.common.functions.Phone
+import org.angryscan.common.engine.Match
+import org.angryscan.common.engine.kotlin.KotlinEngine
 
 @Suppress("unused")
 @Serializable(with = DetectFunctionSerializer::class)
@@ -30,56 +29,56 @@ enum class DetectFunction(override val writeName: String) : IDetectFunction {
     IP("ips"),
     IPv6("ipv6s");
 
-    override fun scan(text: String): List<org.angryscan.common.extensions.Match> = when (this) {
-        Emails -> KotlinEngine(listOf(Email))
+    override fun scan(text: String): List<Match> = when (this) {
+        Emails -> KotlinEngine(listOf(org.angryscan.common.matchers.Email))
             .scan(text)
 
-        Phones -> KotlinEngine(listOf(Phone))
+        Phones -> KotlinEngine(listOf(org.angryscan.common.matchers.Phone))
             .scan(text)
 
-        CardNumbers -> KotlinEngine(listOf(org.angryscan.common.functions.CardNumber()))
+        CardNumbers -> KotlinEngine(listOf(org.angryscan.common.matchers.CardNumber()))
             .scan(text)
 
-        CarNumber -> KotlinEngine(listOf(org.angryscan.common.functions.CarNumber))
+        CarNumber -> KotlinEngine(listOf(org.angryscan.common.matchers.CarNumber))
             .scan(text)
 
-        SNILS -> KotlinEngine(listOf(org.angryscan.common.functions.SNILS))
+        SNILS -> KotlinEngine(listOf(org.angryscan.common.matchers.SNILS))
             .scan(text)
 
-        Passport -> KotlinEngine(listOf(org.angryscan.common.functions.Passport))
+        Passport -> KotlinEngine(listOf(org.angryscan.common.matchers.Passport))
             .scan(text)
 
-        OMS -> KotlinEngine(listOf(org.angryscan.common.functions.OMS))
+        OMS -> KotlinEngine(listOf(org.angryscan.common.matchers.OMS))
             .scan(text)
 
-        INN -> KotlinEngine(listOf(org.angryscan.common.functions.INN))
+        INN -> KotlinEngine(listOf(org.angryscan.common.matchers.INN))
             .scan(text)
 
-        AccountNumber -> KotlinEngine(listOf(org.angryscan.common.functions.AccountNumber))
+        AccountNumber -> KotlinEngine(listOf(org.angryscan.common.matchers.AccountNumber))
             .scan(text)
 
-        Address -> KotlinEngine(listOf(org.angryscan.common.functions.Address))
+        Address -> KotlinEngine(listOf(org.angryscan.common.matchers.Address))
             .scan(text)
 
-        ValuableInfo -> KotlinEngine(listOf(org.angryscan.common.functions.ValuableInfo))
+        ValuableInfo -> KotlinEngine(listOf(org.angryscan.common.matchers.ValuableInfo))
             .scan(text)
 
-        Login -> KotlinEngine(listOf(org.angryscan.common.functions.Login))
+        Login -> KotlinEngine(listOf(org.angryscan.common.matchers.Login))
             .scan(text)
 
-        Password -> KotlinEngine(listOf(org.angryscan.common.functions.Password))
+        Password -> KotlinEngine(listOf(org.angryscan.common.matchers.Password))
             .scan(text)
 
-        CVV -> KotlinEngine(listOf(org.angryscan.common.functions.CVV))
+        CVV -> KotlinEngine(listOf(org.angryscan.common.matchers.CVV))
             .scan(text)
 
-        Name -> KotlinEngine(listOf(org.angryscan.common.functions.FullName))
+        Name -> KotlinEngine(listOf(org.angryscan.common.matchers.FullName))
             .scan(text)
 
-        IP -> KotlinEngine(listOf(org.angryscan.common.functions.IP))
+        IP -> KotlinEngine(listOf(org.angryscan.common.matchers.IP))
             .scan(text)
 
-        IPv6 -> KotlinEngine(listOf(org.angryscan.common.functions.IPv6))
+        IPv6 -> KotlinEngine(listOf(org.angryscan.common.matchers.IPv6))
             .scan(text)
     }
 }

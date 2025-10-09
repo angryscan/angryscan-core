@@ -1,10 +1,11 @@
-package org.angryscan.common.functions
+package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IHyperMatcher
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
-import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 object Email : IHyperMatcher, IKotlinMatcher {
+    override val name = "Email"
     override val javaPatterns = listOf(
         """(?<=[-, ()=*]|^)[a-zA-Z0-9_.+-]+@[a-z0-9-.]+?(\.[a-z]{2,})+(?=\W|$)"""
     )

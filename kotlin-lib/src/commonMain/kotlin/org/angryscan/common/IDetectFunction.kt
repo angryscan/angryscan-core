@@ -1,6 +1,6 @@
 package org.angryscan.common
 
-import org.angryscan.common.extensions.Match
+import org.angryscan.common.engine.Match
 
 @Deprecated("Use KotlinEngine instead")
 interface IDetectFunction {

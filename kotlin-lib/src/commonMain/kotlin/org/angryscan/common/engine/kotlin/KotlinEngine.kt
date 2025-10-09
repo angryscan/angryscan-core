@@ -1,7 +1,8 @@
-package org.angryscan.common.engine
+package org.angryscan.common.engine.kotlin
 
-import org.angryscan.common.extensions.Match
 import kotlinx.serialization.Serializable
+import org.angryscan.common.engine.IScanEngine
+import org.angryscan.common.engine.Match
 
 @Serializable
 class KotlinEngine(val patterns: List<IKotlinMatcher>) : IScanEngine {

@@ -1,14 +1,13 @@
-package org.angryscan.common.scan
+package org.angryscan.common.engine.hyperscan
 
 import com.gliwka.hyperscan.wrapper.Database
 import com.gliwka.hyperscan.wrapper.Expression
 import com.gliwka.hyperscan.wrapper.ExpressionFlag
 import com.gliwka.hyperscan.wrapper.Scanner
-import org.angryscan.common.engine.IHyperMatcher
 import org.angryscan.common.engine.IScanEngine
-import org.angryscan.common.extensions.Match
+import org.angryscan.common.engine.Match
 import org.angryscan.common.extensions.toExpressionFlag
-import java.util.*
+import java.util.EnumSet
 
 class HyperScanEngine(patterns: List<IHyperMatcher>): IScanEngine, AutoCloseable {
     private val expressions =

@@ -1,4 +1,7 @@
-package org.angryscan.common.engine
+package org.angryscan.common.engine.hyperscan
+
+import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.IMatcher
 
 interface IHyperMatcher: IMatcher {
     /**
@@ -22,7 +25,7 @@ interface IHyperMatcher: IMatcher {
      *
      * These options can modify how the pattern matching is performed, such as case sensitivity,
      * multiline matching, or other pattern-specific behaviors. The available options are defined
-     * in the [ExpressionOption] enum.
+     * in the [org.angryscan.common.engine.ExpressionOption] enum.
      *
      * ### Example:
      * ```kotlin
@@ -32,7 +35,7 @@ interface IHyperMatcher: IMatcher {
      * )
      * ```
      *
-     * @see ExpressionOption for the list of available options
+     * @see org.angryscan.common.engine.ExpressionOption for the list of available options
      */
     val expressionOptions: Set<ExpressionOption>
 }

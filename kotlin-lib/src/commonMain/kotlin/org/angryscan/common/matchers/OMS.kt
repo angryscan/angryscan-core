@@ -1,10 +1,11 @@
-package org.angryscan.common.functions
+package org.angryscan.common.matchers
 
 import org.angryscan.common.engine.ExpressionOption
-import org.angryscan.common.engine.IHyperMatcher
-import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 object OMS : IHyperMatcher, IKotlinMatcher {
+    override val name = "ОМС"
     override val javaPatterns = listOf(
         """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
     )
