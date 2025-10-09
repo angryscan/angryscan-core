@@ -1,6 +1,4 @@
-package org.angryscan.common.extensions
-
-import org.angryscan.common.engine.IMatcher
+package org.angryscan.common.engine
 
 data class Match(
     val value: String,

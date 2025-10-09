@@ -1,10 +1,11 @@
-package org.angryscan.common.functions
+package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IHyperMatcher
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
-import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 object SNILS : IHyperMatcher, IKotlinMatcher {
+    override val name = "СНИЛС"
     override val javaPatterns = listOf(
         """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
     )

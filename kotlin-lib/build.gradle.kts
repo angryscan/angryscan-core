@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.angryscan"
-version = "1.2.2-hyper"
+version = "1.3.0"
 description = "Data Scanner Library"
 
 
@@ -124,9 +124,9 @@ mavenPublishing {
     )
 
     pom {
-        name.set("Big Data Scanner library for Java and Kotlin")
-        description.set("Big Data Scanner library for Java and Kotlin")
-        url.set("https://github.com/packetdima/big-data-scanner-core")
+        name.set("Angry Data Scanner library for Java and Kotlin")
+        description.set("Angry Data Scanner library for Java and Kotlin")
+        url.set("https://github.com/angryscan/angrydata-core")
 
         licenses {
             license {
@@ -144,7 +144,7 @@ mavenPublishing {
         }
 
         scm {
-            url.set("https://github.com/packetdima/big-data-scanner-core")
+            url.set("https://github.com/angryscan/angrydata-core")
         }
     }
 

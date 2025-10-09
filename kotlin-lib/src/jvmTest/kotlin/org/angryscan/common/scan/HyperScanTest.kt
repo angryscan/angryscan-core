@@ -1,6 +1,7 @@
 package org.angryscan.common.scan
 
-import org.angryscan.common.functions.*
+import org.angryscan.common.engine.hyperscan.HyperScanEngine
+import org.angryscan.common.matchers.*
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,10 +1,11 @@
-package org.angryscan.common.functions
+package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IHyperMatcher
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
-import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 object Address : IHyperMatcher, IKotlinMatcher {
+    override val name = "Address"
     override val javaPatterns = listOf(
         """(г\.|р-н|обл\.|ул\.|гор\.).{4,70}(д\.|дом)"""
     )
@@ -22,6 +23,7 @@ object Address : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.CASELESS,
         ExpressionOption.UTF8
     )
+
 
     override fun check(value: String): Boolean = true
 

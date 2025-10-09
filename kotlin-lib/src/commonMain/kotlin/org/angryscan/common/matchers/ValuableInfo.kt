@@ -1,10 +1,11 @@
-package org.angryscan.common.functions
+package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IHyperMatcher
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
-import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 object ValuableInfo : IHyperMatcher, IKotlinMatcher {
+    override val name = "Valuable Info"
     override val javaPatterns = listOf(
         """(\.|\s|^)(СЕКРЕТ|КОНФИДЕНЦИАЛЬН|КОМПЕНСАЦ|КОММЕРЧ|ТАЙНА|КЛЮЧ|ШИФР|PIN|SECRET|PRIVACY|ДЕТАЛИ ПЛАТЕЖА|НАЗНАЧЕНИЕ ПЛАТЕЖА|DETAILS OF PAYMENT|PAYMENT DETAILS|БЕЗОПАСНОСТ|ВНУТРИБАНК|ФСБ|ФЕДЕРАЛ|ФСО|РАЗВЕДК|НАЦИОНАЛЬН|ГВАРДИ|МИНИСТЕРСТВО|МВД|ОБОРОН|МЧС|ПРЕМЬЕР|VIP|МВС|МВК|СКУД|ИНКАССАЦИЯ|ГОСУДАРСТВ)[А-Яа-яA-Za-z]*(\.|\s|$)"""
     )

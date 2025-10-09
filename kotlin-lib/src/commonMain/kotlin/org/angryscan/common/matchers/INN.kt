@@ -1,10 +1,11 @@
-package org.angryscan.common.functions
+package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IHyperMatcher
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
-import org.angryscan.common.engine.IKotlinMatcher
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 object INN : IHyperMatcher, IKotlinMatcher {
+    override val name = "ИНН"
     override val javaPatterns = listOf(
         """(?<![^\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?![^\s.,;)"])"""
     )
