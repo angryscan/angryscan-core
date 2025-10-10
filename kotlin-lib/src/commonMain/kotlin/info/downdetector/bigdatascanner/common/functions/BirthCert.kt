@@ -3,14 +3,14 @@ package info.downdetector.bigdatascanner.common.functions
 import info.downdetector.bigdatascanner.common.extensions.regexDetector
 
 private val BIRTH_CERT_REGEX_ONLY = """
-(?ix)                                        # ignore-case + free-spacing
-(?<!\p{L})
-(?:свидетельство\s+о\s+рождении|серия)?      # опциональный префикс
+(?ix)                                        
+(?<![\p{L}\d\p{S}\p{P}])                     
+(?:свидетельство\s+о\s+рождении|серия)?     
 \s*[:\-]?\s*
-([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2})             # серия: римские цифры + 2 кириллические
-[\s,;:№Nn]*                                  # разделитель/метка номера
-(\d{6})                                      # номер: ровно 6 цифр
-(?!\p{L})
+([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2})            
+[\s,;:№Nn]*                           
+(\d{6})                                 
+(?![\p{L}\d\p{S}\p{P}])                      
 """.trimIndent()
 
 fun findBirthCert(text: String, withContext: Boolean) = regexDetector(
