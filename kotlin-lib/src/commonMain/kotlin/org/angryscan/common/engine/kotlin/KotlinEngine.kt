@@ -5,9 +5,9 @@ import org.angryscan.common.engine.IScanEngine
 import org.angryscan.common.engine.Match
 
 @Serializable
-class KotlinEngine(val patterns: List<IKotlinMatcher>) : IScanEngine {
+class KotlinEngine(@Serializable override val matchers: List<IKotlinMatcher>) : IScanEngine {
     override fun scan(text: String): List<Match> {
-        return patterns.flatMap { pattern ->
+        return matchers.flatMap { pattern ->
             regexDetector(
                 text,
                 pattern

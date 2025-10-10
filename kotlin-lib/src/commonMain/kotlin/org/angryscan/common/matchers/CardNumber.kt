@@ -1,10 +1,12 @@
 package org.angryscan.common.matchers
 
+import kotlinx.serialization.Serializable
 import org.angryscan.common.constants.CardBins
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+@Serializable
 class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher {
     override val name = "Card number"
     override val javaPatterns = listOf(

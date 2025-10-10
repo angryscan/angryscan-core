@@ -1,9 +1,11 @@
 package org.angryscan.common.matchers
 
+import kotlinx.serialization.Serializable
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+@Serializable
 object Address : IHyperMatcher, IKotlinMatcher {
     override val name = "Address"
     override val javaPatterns = listOf(
