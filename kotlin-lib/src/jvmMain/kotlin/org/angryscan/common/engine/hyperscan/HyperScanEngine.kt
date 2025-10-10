@@ -4,14 +4,18 @@ import com.gliwka.hyperscan.wrapper.Database
 import com.gliwka.hyperscan.wrapper.Expression
 import com.gliwka.hyperscan.wrapper.ExpressionFlag
 import com.gliwka.hyperscan.wrapper.Scanner
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.angryscan.common.engine.IScanEngine
 import org.angryscan.common.engine.Match
 import org.angryscan.common.extensions.toExpressionFlag
-import java.util.EnumSet
+import java.util.*
 
-class HyperScanEngine(patterns: List<IHyperMatcher>): IScanEngine, AutoCloseable {
+@Serializable
+class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>): IScanEngine, AutoCloseable {
+    @Transient
     private val expressions =
-        patterns
+        matchers
             .flatMap { ip ->
                 ip.hyperPatterns.map { hp ->
                     hp to ip
@@ -38,6 +42,7 @@ class HyperScanEngine(patterns: List<IHyperMatcher>): IScanEngine, AutoCloseable
                 expr to pair.second //Результат с возможностью обратного преобразования
             }.associate { it.first to it.second }
 
+    @Transient
     private val database = Database.compile(expressions.keys.toList())
 
 
