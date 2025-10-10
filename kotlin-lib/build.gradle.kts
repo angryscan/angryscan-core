@@ -10,14 +10,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "info.downdetector.bigdatascanner"
-version = "1.2.2"
+group = "org.angryscan"
+version = "1.3.0"
 description = "Data Scanner Library"
 
 
 val targetName = "native"
 
 kotlin {
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     jvm {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_1_8)
@@ -75,6 +76,11 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        jvmMain {
+            dependencies {
+                implementation(libs.hyperscan)
+            }
+        }
     }
 }
 
@@ -112,15 +118,15 @@ koverReport {
 
 mavenPublishing {
     coordinates(
-        groupId = "info.downdetector.bigdatascanner",
+        groupId = "org.angryscan",
         artifactId = "core",
         version = project.version.toString()
     )
 
     pom {
-        name.set("Big Data Scanner library for Java and Kotlin")
-        description.set("Big Data Scanner library for Java and Kotlin")
-        url.set("https://github.com/packetdima/big-data-scanner-core")
+        name.set("Angry Data Scanner library for Java and Kotlin")
+        description.set("Angry Data Scanner library for Java and Kotlin")
+        url.set("https://github.com/angryscan/angrydata-core")
 
         licenses {
             license {
@@ -138,7 +144,7 @@ mavenPublishing {
         }
 
         scm {
-            url.set("https://github.com/packetdima/big-data-scanner-core")
+            url.set("https://github.com/angryscan/angrydata-core")
         }
     }
 
