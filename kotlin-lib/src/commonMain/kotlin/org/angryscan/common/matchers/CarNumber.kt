@@ -17,11 +17,13 @@ object CarNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(гос|номер|авто|рег).{0,15}([авекмнорстухabekmhopctyx][ \t]?[0-9]{3}[ \t]?[авекмнорстухabekmhopctyx]{2}[ \t]?[0-9]{2,3})"""
+        """(гос|номер|авто|рег).{0,15}([авекмнорстухabekmhopctyx][ \t]?[0-9]{3}[ \t]?[авекмнорстухabekmhopctyx]{2}[ \t]?[0-9]{2,3})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
-        ExpressionOption.CASELESS
+        ExpressionOption.CASELESS,
+        ExpressionOption.SOM_LEFTMOST,
+        ExpressionOption.UTF8
     )
 
     override fun check(value: String): Boolean = true
