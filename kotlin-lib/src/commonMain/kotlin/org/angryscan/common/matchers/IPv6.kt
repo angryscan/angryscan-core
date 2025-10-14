@@ -16,11 +16,13 @@ object IPv6 : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(^|\s)(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})($|\s)"""
+        """(^|\s)(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
     )
 
     override fun check(value: String) = true
+
+    override fun toString() = name
 }

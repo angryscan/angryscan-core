@@ -34,17 +34,19 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     }
 
     override val hyperPatterns: List<String> = listOf(
-        """\b([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
+        """(?:^|[\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE
     )
 
     override fun check(value: String): Boolean {
-        val cleanCard = value.replace(" ", "").replace("-", "").trim()
+        val cleanCard = value.replace("[^0-9]".toRegex(), "")
         return cleanCard != "0000000000000000"
                 && (!checkCardBins || isBinValid(cleanCard))
                 && isCardValid(cleanCard)
     }
+
+    override fun toString() = name
 }
 

@@ -39,5 +39,6 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
         return snils.substring(snils.length - 2 until snils.length) == controlSum
     }
 
+    override fun toString() = name
 }
 
