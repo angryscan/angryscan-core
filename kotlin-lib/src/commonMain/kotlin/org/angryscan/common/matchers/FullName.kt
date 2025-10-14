@@ -38,5 +38,6 @@ object FullName : IHyperMatcher, IKotlinMatcher {
         return !falseList.any { value.contains(it) }
     }
 
+    override fun toString() = name
 }
 

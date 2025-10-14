@@ -23,4 +23,6 @@ object IPv6 : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String) = true
+
+    override fun toString() = name
 }

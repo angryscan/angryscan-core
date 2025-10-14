@@ -1,4 +1,4 @@
-package org.angryscan.common
+package org.angryscan.common.extensions
 
 class ProgressBar(private val total: Int, private val prefix: String = "Progress") {
 
