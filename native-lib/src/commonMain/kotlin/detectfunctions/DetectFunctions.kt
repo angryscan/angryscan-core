@@ -17,7 +17,6 @@ import org.angryscan.common.matchers.Passport
 import org.angryscan.common.matchers.Password
 import org.angryscan.common.matchers.Phone
 import org.angryscan.common.matchers.SNILS
-import org.angryscan.common.matchers.ValuableInfo
 
 @Suppress("Unused")
 fun detectEmails(text: String): Int {
@@ -67,11 +66,6 @@ fun detectAccountNumber(text: String): Int {
 @Suppress("Unused")
 fun detectAddress(text: String): Int {
     return KotlinEngine(listOf(Address)).scan(text).count()
-}
-
-@Suppress("Unused")
-fun detectValuableInfo(text: String): Int {
-    return KotlinEngine(listOf(ValuableInfo)).scan(text).count()
 }
 
 @Suppress("Unused")

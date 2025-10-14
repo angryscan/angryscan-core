@@ -27,4 +27,6 @@ class UserSignature(
         RegexOption.IGNORE_CASE
     )
     override fun check(value: String) = true
+
+    override fun toString() = name
 }

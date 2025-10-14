@@ -50,6 +50,7 @@ object OMS : IHyperMatcher, IKotlinMatcher {
         return checker == key || (checker == 10 && key == 0)
     }
 
+    override fun toString() = name
 }
 
 

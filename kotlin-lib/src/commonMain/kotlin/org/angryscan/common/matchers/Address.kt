@@ -29,5 +29,6 @@ object Address : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean = true
 
+    override fun toString() = name
 }
 

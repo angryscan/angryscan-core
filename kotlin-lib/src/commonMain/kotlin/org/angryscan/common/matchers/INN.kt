@@ -16,14 +16,15 @@ object INN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(^|[\s.,\-:"(])([0-9]{12}|([0-9]{2} [0-9]{2}|([0-9]{4})) ([0-9]{6} [0-9]{2}|[0-9]{8}))([\s.,;)]|$)"""
+        """(?:^|[\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|[0-9]{4}) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?:$|[\s.,;)])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
+        ExpressionOption.SOM_LEFTMOST
     )
 
     override fun check(value: String): Boolean {
-        val inn = value.replace("-", "").replace(" ", "").trim()
+        val inn = value.replace("[^0-9]".toRegex(), "")
         // control sequences
         val firstSequence = listOf(7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
         val secondSequence = listOf(3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
@@ -40,4 +41,5 @@ object INN : IHyperMatcher, IKotlinMatcher {
         return key1 == inn[10] && key2 == inn[11]
     }
 
+    override fun toString() = name
 }

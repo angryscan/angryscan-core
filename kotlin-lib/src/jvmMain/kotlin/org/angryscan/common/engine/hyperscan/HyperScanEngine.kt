@@ -12,7 +12,7 @@ import org.angryscan.common.extensions.toExpressionFlag
 import java.util.*
 
 @Serializable
-class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>): IScanEngine, AutoCloseable {
+class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) : IScanEngine, AutoCloseable {
     @Transient
     private val expressions =
         matchers
@@ -36,7 +36,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>):
 
                 // Проверяем выражения
                 val validate = expr.validate()
-                if(!validate.isValid)
+                if (!validate.isValid)
                     throw Exception("Not valid pattern: ${pair.first}")
 
                 expr to pair.second //Результат с возможностью обратного преобразования
@@ -61,8 +61,8 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>):
                     it.startPosition.toInt()
                 ),
                 after = text.substring(
-                    it.endPosition.toInt(),
-                    minOf(text.length, it.endPosition.toInt() + 10),
+                    it.endPosition.toInt() + 1,
+                    minOf(text.length, it.endPosition.toInt() + 11),
                 ),
                 startPosition = it.startPosition,
                 endPosition = it.endPosition,
