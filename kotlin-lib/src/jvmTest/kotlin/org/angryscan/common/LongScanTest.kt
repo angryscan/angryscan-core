@@ -51,7 +51,7 @@ internal class LongScanTest {
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
 
-        println("##### Detect Function Scan #####")
+        println("##### Kotlin Engine #####")
         val kotlinEngine = KotlinEngine(MatchersRegister.matchers.filterIsInstance<IKotlinMatcher>())
         assertEquals(224422, longScan(kotlinEngine, filePath))
     }

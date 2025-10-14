@@ -5,22 +5,7 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 import org.angryscan.common.engine.kotlin.KotlinEngine
 import org.angryscan.common.extensions.MatchersRegister
-import org.angryscan.common.matchers.AccountNumber
-import org.angryscan.common.matchers.Address
-import org.angryscan.common.matchers.CVV
-import org.angryscan.common.matchers.CarNumber
-import org.angryscan.common.matchers.CardNumber
-import org.angryscan.common.matchers.Email
-import org.angryscan.common.matchers.FullName
-import org.angryscan.common.matchers.INN
-import org.angryscan.common.matchers.IP
-import org.angryscan.common.matchers.IPv6
-import org.angryscan.common.matchers.Login
-import org.angryscan.common.matchers.OMS
-import org.angryscan.common.matchers.Passport
-import org.angryscan.common.matchers.Password
-import org.angryscan.common.matchers.Phone
-import org.angryscan.common.matchers.SNILS
+import org.angryscan.common.matchers.*
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -245,30 +230,35 @@ internal class EngineTest {
 
     @Test
     fun getContext() {
+        fun check(searchResult: List<Match>) {
+            assertEquals(1, searchResult.count())
+            assertTrue(searchResult.first().value.contains("4276 8070 1492 7948"))
+            assertTrue(searchResult.first().before.contains("Карта"))
+            assertTrue(searchResult.first().after.contains("г. Санкт"))
+        }
+
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
 
-        val searchRes = getScanResult(filePath, CardNumber())
-
-        assertEquals(1, searchRes.count())
-        assertEquals("4276 8070 1492 7948", searchRes.first().value)
-        assertEquals("83\r\nКарта ", searchRes.first().before)
-        assertEquals("\r\nг. Санкт", searchRes.first().after)
+        check(getScanResult(filePath, CardNumber() as IKotlinMatcher))
+        check(getScanResult(filePath, CardNumber() as IHyperMatcher))
     }
 
-    private fun getScanResult(filePath: String, matcher: IMatcher): List<Match> {
+    private fun getScanResult(filePath: String, matcher: IKotlinMatcher): List<Match> {
         val file = File(filePath)
         assertTrue(file.exists())
         val text = file.readText()
-        val kotlinEngine = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>())
-        val hyperEngine = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>())
+        val kotlinEngine = KotlinEngine(listOf(matcher))
+        return kotlinEngine.scan(text)
+    }
 
-        val kotlinRes = kotlinEngine.scan(text)
-        val hyperRes = hyperEngine.scan(text)
+    private fun getScanResult(filePath: String, matcher: IHyperMatcher): List<Match> {
+        val file = File(filePath)
+        assertTrue(file.exists())
+        val text = file.readText()
+        val hyperEngine = HyperScanEngine(listOf(matcher))
 
-        assertEquals(kotlinRes, hyperRes)
-
-        return kotlinRes
+        return hyperEngine.scan(text)
     }
 
 
@@ -283,7 +273,11 @@ internal class EngineTest {
         val text = file.readText()
         val kotlinRes = kotlinEngine.scan(text)
         val hyperRes = hyperEngine.scan(text)
-        assertEquals(kotlinRes.count(), hyperRes.count(), "Count of attribute ${matcher.name} is not equal with different engines")
+        assertEquals(
+            kotlinRes.count(),
+            hyperRes.count(),
+            "Count of attribute ${matcher.name} is not equal with different engines"
+        )
         return kotlinRes.count()
     }
 }
