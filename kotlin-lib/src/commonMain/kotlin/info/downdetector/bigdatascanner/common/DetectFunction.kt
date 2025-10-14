@@ -20,12 +20,15 @@ import info.downdetector.bigdatascanner.common.functions.findINN
 import info.downdetector.bigdatascanner.common.functions.findIPs
 import info.downdetector.bigdatascanner.common.functions.findIPv6s
 import info.downdetector.bigdatascanner.common.functions.findInheritanceDoc
+import info.downdetector.bigdatascanner.common.functions.findLegalEntityId
+import info.downdetector.bigdatascanner.common.functions.findLegalEntityName
 import info.downdetector.bigdatascanner.common.functions.findLogins
 import info.downdetector.bigdatascanner.common.functions.findMarriageCert
 import info.downdetector.bigdatascanner.common.functions.findMilitaryID
 import info.downdetector.bigdatascanner.common.functions.findMilitaryRank
 import info.downdetector.bigdatascanner.common.functions.findNames
 import info.downdetector.bigdatascanner.common.functions.findOGRNIP
+import info.downdetector.bigdatascanner.common.functions.findOKPO
 import info.downdetector.bigdatascanner.common.functions.findOMS
 import info.downdetector.bigdatascanner.common.functions.findOSAGOPolicy
 import info.downdetector.bigdatascanner.common.functions.findPassports
@@ -36,6 +39,7 @@ import info.downdetector.bigdatascanner.common.functions.findResidencePermit
 import info.downdetector.bigdatascanner.common.functions.findSNILS
 import info.downdetector.bigdatascanner.common.functions.findSecurityAffiliation
 import info.downdetector.bigdatascanner.common.functions.findSocialUserId
+import info.downdetector.bigdatascanner.common.functions.findStateRegContract
 import info.downdetector.bigdatascanner.common.functions.findTemporaryID
 import info.downdetector.bigdatascanner.common.functions.findVIN
 import info.downdetector.bigdatascanner.common.functions.findValuableInfo
@@ -86,7 +90,11 @@ enum class DetectFunction(
     CadastralNumber("CadastralNumber", ::findCadastralNumber),
     VIN("VIN", ::findVIN),
     VehicleRegNumber("VehicleRegNumber", ::findVehicleRegNumber),
-    SocialUserId("SocialUserId", ::findSocialUserId),;
+    SocialUserId("SocialUserId", ::findSocialUserId),
+    LegalEntityName("LegalEntityName", ::findLegalEntityName),
+    LegalEntityId("LegalEntityId", ::findLegalEntityId),
+    OKPO("OKPO", ::findOKPO),
+    StateRegContract("StateRegContract", ::findStateRegContract),;
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> =
         scanFunction(text, withContext)
