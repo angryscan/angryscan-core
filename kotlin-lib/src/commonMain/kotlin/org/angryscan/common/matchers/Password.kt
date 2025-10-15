@@ -17,7 +17,7 @@ object Password : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(password|пароль):?\s*\S{3,25}($|\s)"""
+        """(password|пароль):?\s*\S{3,25}($|[ \t\r])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,
