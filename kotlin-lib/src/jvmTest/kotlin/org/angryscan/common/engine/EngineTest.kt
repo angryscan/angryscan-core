@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
 internal class EngineTest {
 
     @Test
-    fun scan() {
+    fun first() {
         fun check(scanResult: List<Match>) {
             //Check Email
             assertEquals(2, scanResult.count { it.matcher is Email })
@@ -56,17 +56,24 @@ internal class EngineTest {
         val file = File(filePath)
         val text = file.readText()
 
+        val secondFilePath = javaClass.getResource("/testFiles/first_2.csv")?.file
+        assertNotNull(secondFilePath)
+        val secondFile = File(secondFilePath)
+        val secondText = secondFile.readText()
+
+
         assertEquals(true, file.exists())
         val hyperScan = HyperScanEngine(
             MatchersRegister.matchers.filterIsInstance<IHyperMatcher>()
         )
         check(hyperScan.scan(text))
+        check(hyperScan.scan(secondText))
 
         val kotlinScan = KotlinEngine(
             MatchersRegister.matchers.filterIsInstance<IKotlinMatcher>()
         )
         check(kotlinScan.scan(text))
-
+        check(kotlinScan.scan(secondText))
     }
 
     @Test
@@ -229,6 +236,13 @@ internal class EngineTest {
     }
 
     @Test
+    fun testPhonesSmth() {
+        val file = javaClass.getResource("/testFiles/phone/smth.txt")?.file
+        assertNotNull(file)
+        assertEquals(2, getCountOfAttribute(file, Phone))
+    }
+
+    @Test
     fun getContext() {
         fun check(searchResult: List<Match>) {
             assertEquals(1, searchResult.count())
@@ -244,40 +258,40 @@ internal class EngineTest {
         check(getScanResult(filePath, CardNumber() as IHyperMatcher))
     }
 
-    private fun getScanResult(filePath: String, matcher: IKotlinMatcher): List<Match> {
-        val file = File(filePath)
-        assertTrue(file.exists())
-        val text = file.readText()
-        val kotlinEngine = KotlinEngine(listOf(matcher))
-        return kotlinEngine.scan(text)
-    }
 
-    private fun getScanResult(filePath: String, matcher: IHyperMatcher): List<Match> {
-        val file = File(filePath)
-        assertTrue(file.exists())
-        val text = file.readText()
-        val hyperEngine = HyperScanEngine(listOf(matcher))
+    companion object {
+        fun getCountOfAttribute(filePath: String, matcher: IMatcher): Int {
+            val file = File(filePath)
 
-        return hyperEngine.scan(text)
-    }
+            assertEquals(true, file.exists())
 
+            val kotlinEngine = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>())
+            val hyperEngine = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>())
 
-    private fun getCountOfAttribute(filePath: String, matcher: IMatcher): Int {
-        val file = File(filePath)
+            val text = file.readText()
+            val kotlinRes = kotlinEngine.scan(text)
+            val hyperRes = hyperEngine.scan(text)
+            assertEquals(
+                kotlinRes.count(),
+                hyperRes.count(),
+                "Count of attribute ${matcher.name} is not equal with different engines"
+            )
+            return kotlinRes.count()
+        }
+        private fun getScanResult(filePath: String, matcher: IHyperMatcher): List<Match> {
+            val file = File(filePath)
+            assertTrue(file.exists())
+            val text = file.readText()
+            val hyperEngine = HyperScanEngine(listOf(matcher))
 
-        assertEquals(true, file.exists())
-
-        val kotlinEngine = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>())
-        val hyperEngine = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>())
-
-        val text = file.readText()
-        val kotlinRes = kotlinEngine.scan(text)
-        val hyperRes = hyperEngine.scan(text)
-        assertEquals(
-            kotlinRes.count(),
-            hyperRes.count(),
-            "Count of attribute ${matcher.name} is not equal with different engines"
-        )
-        return kotlinRes.count()
+            return hyperEngine.scan(text)
+        }
+        private fun getScanResult(filePath: String, matcher: IKotlinMatcher): List<Match> {
+            val file = File(filePath)
+            assertTrue(file.exists())
+            val text = file.readText()
+            val kotlinEngine = KotlinEngine(listOf(matcher))
+            return kotlinEngine.scan(text)
+        }
     }
 }
