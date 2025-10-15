@@ -49,33 +49,16 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
     override fun scan(text: String): List<Match> {
         val scanner = Scanner()
         scanner.allocScratch(database)
-        val res = scanner.scan(database, text).filter {
-            expressions[it.matchedExpression]!!.check(it.matchedString)
-        }.toMutableList()
+        val res = scanner
+            .scan(
+                database,
+                text.replace("\u0000", "")
+            )
+            .filter {
+                expressions[it.matchedExpression]!!.check(it.matchedString)
+            }.toMutableList()
         scanner.close()
 
-//        var i = 0
-//
-//        while (i < res.count()) {
-//            var j = 0
-//            while (j < res.count()) {
-//                if (res[i] != res[j] && expressions[res[i].matchedExpression] == expressions[res[j].matchedExpression]) {
-//                    if (
-//                        res[i].startPosition in res[j].startPosition..res[j].endPosition &&
-//                        res[i].endPosition in res[j].startPosition..res[j].endPosition
-//                    ) {
-//                        res.remove(res[j])
-//                    } else if (
-//                        res[j].startPosition in res[i].startPosition..res[i].endPosition &&
-//                        res[j].endPosition in res[i].startPosition..res[i].endPosition
-//                    ) {
-//                        res.remove(res[i])
-//                    }
-//                }
-//                j++
-//            }
-//            i++
-//        }
         return res.map {
             Match(
                 value = it.matchedString,

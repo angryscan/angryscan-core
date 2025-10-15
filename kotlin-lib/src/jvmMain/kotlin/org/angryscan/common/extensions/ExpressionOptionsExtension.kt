@@ -10,4 +10,5 @@ fun ExpressionOption.toExpressionFlag(): ExpressionFlag = when (this) {
     ExpressionOption.UTF8 -> ExpressionFlag.UTF8
     ExpressionOption.SOM_LEFTMOST -> ExpressionFlag.SOM_LEFTMOST
     ExpressionOption.PREFILTER -> ExpressionFlag.PREFILTER
+    ExpressionOption.SINGLE_MATCH -> ExpressionFlag.SINGLEMATCH
 }

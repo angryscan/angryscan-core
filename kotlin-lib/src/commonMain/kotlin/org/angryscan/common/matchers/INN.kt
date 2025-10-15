@@ -16,7 +16,7 @@ object INN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|[0-9]{4}) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?:$|[\s.,;()"])"""
+        """(?:^|[\s.,\-:"()])([0-9]{12}|([0-9]{2} [0-9]{2}|[0-9]{4}) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?:$|[ \t\r.,;()"])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

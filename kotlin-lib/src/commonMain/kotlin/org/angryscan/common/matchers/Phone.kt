@@ -16,9 +16,13 @@ object Phone : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:[-, ()=*]|^)((\+?7)|8)[ \t\-]?\(?[489][0-9]{2}\)?[ \t\-]?[0-9]{3}[ \t\-]?[0-9]{2}[ \t\-]?[0-9]{2}(?:\W|$)"""
+        """(?:[-, ()=*]|^)((\+?7)|8)[ \t\-]?\(?[489][0-9]{2}\)?[ \t\-]?[0-9]{3}[ \t\-]?[0-9]{2}[ \t\-]?[0-9]{2}(?:\b)"""
     )
-    override val expressionOptions = setOf(ExpressionOption.MULTILINE)
+    override val expressionOptions = setOf(
+        ExpressionOption.MULTILINE,
+        ExpressionOption.SOM_LEFTMOST,
+        ExpressionOption.UTF8
+    )
 
     override fun check(value: String): Boolean = true
 

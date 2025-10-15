@@ -6,5 +6,6 @@ enum class ExpressionOption {
     MULTILINE,
     UTF8,
     SOM_LEFTMOST,
-    PREFILTER
+    PREFILTER,
+    SINGLE_MATCH
 }
