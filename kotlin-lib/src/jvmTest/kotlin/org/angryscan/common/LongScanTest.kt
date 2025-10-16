@@ -5,7 +5,7 @@ import org.angryscan.common.engine.hyperscan.HyperScanEngine
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 import org.angryscan.common.engine.kotlin.KotlinEngine
-import org.angryscan.common.extensions.MatchersRegister
+import org.angryscan.common.extensions.Matchers
 import org.angryscan.common.extensions.ProgressBar
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -52,7 +52,7 @@ internal class LongScanTest {
         assertNotNull(filePath)
 
         println("##### Kotlin Engine #####")
-        val kotlinEngine = KotlinEngine(MatchersRegister.matchers.filterIsInstance<IKotlinMatcher>())
+        val kotlinEngine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
         assertEquals(224422, longScan(kotlinEngine, filePath))
     }
 
@@ -61,7 +61,7 @@ internal class LongScanTest {
     fun longScanHS() {
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
-        val hyperEngine = HyperScanEngine(MatchersRegister.matchers.filterIsInstance<IHyperMatcher>())
+        val hyperEngine = HyperScanEngine(Matchers.filterIsInstance<IHyperMatcher>())
         println("##### Hyper Scan #####")
         assertEquals(224422, longScan(hyperEngine, filePath))
     }
