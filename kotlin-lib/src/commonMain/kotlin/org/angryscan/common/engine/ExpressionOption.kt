@@ -5,7 +5,6 @@ enum class ExpressionOption {
     DOTALL,
     MULTILINE,
     UTF8,
-    SOM_LEFTMOST,
     PREFILTER,
     SINGLE_MATCH
 }

@@ -20,7 +20,6 @@ object OMS : IHyperMatcher, IKotlinMatcher {
         """(?:^|[\s.,\-:"()])(омс|полис|страховка|страхование)\s[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}(?:$|[ \t\r.,;()"])"""
     )
     override val expressionOptions = setOf(
-        ExpressionOption.SOM_LEFTMOST,
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,
         ExpressionOption.UTF8

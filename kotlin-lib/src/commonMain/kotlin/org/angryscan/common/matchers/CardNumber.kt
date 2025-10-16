@@ -47,6 +47,15 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
                 && isCardValid(cleanCard)
     }
 
-    override fun toString() = name
+    override fun toString() = name + if (!checkCardBins) "(w/o BINs)" else ""
+    override fun equals(other: Any?): Boolean {
+        return other is CardNumber && other.checkCardBins == checkCardBins
+    }
+    
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + checkCardBins.hashCode()
+        return result
+    }
 }
 

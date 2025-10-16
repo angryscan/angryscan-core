@@ -23,6 +23,8 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
+        if(value.length <= 2)
+            return false
         var summ = 0
         val snils = value.replace(" ", "").replace("-", "").trim()
 
