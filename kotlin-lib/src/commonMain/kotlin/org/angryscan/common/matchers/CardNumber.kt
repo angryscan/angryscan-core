@@ -10,7 +10,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher {
     override val name = "Card number"
     override val javaPatterns = listOf(
-        """(?<![^\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"])"""
+        """(?<=[\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"<])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE

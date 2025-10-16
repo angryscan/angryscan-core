@@ -20,21 +20,21 @@ internal class LongScanTest {
         assertEquals(true, file.exists())
         val text = file.readText()
             .let { t ->
-                (0..100).joinToString { t + "\r\n" }
+                (0..99).joinToString { t + "\r\n" }
             }
 
         var foundCount = 0
-        val repeatCount = 100
-        val progressBar = ProgressBar(repeatCount, "Scanning")
+        val progressBar = ProgressBar(100, "Scanning")
         val multipleScanTime: MutableList<Long> = mutableListOf()
-        for (i in 0..repeatCount) {
+
+        repeat(100) { i ->
             multipleScanTime.add(
                 measureTimeMillis {
                     print("")
                     foundCount += engine.scan(text).count()
                 }
             )
-            progressBar.update(i)
+            progressBar.update(i + 1)
         }
         println("Scan count: $foundCount")
         println("Multiple scan time: ${multipleScanTime.sumOf { it }}ms")
@@ -53,7 +53,7 @@ internal class LongScanTest {
 
         println("##### Kotlin Engine #####")
         val kotlinEngine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
-        assertEquals(224422, longScan(kotlinEngine, filePath))
+        assertEquals(220000, longScan(kotlinEngine, filePath))
     }
 
 
@@ -63,6 +63,6 @@ internal class LongScanTest {
         assertNotNull(filePath)
         val hyperEngine = HyperScanEngine(Matchers.filterIsInstance<IHyperMatcher>())
         println("##### Hyper Scan #####")
-        assertEquals(224422, longScan(hyperEngine, filePath))
+        assertEquals(220000, longScan(hyperEngine, filePath))
     }
 }

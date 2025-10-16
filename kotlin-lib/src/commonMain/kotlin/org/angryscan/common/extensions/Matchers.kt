@@ -12,7 +12,7 @@ object Matchers: List<IMatcher> by listOf<IMatcher>(
     Email,
     FullName,
     INN,
-    IP,
+    IPv4,
     IPv6,
     Login,
     OMS,

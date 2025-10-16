@@ -7,7 +7,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 @Serializable
 object SNILS : IHyperMatcher, IKotlinMatcher {
-    override val name = "СНИЛС"
+    override val name = "SNILS"
     override val javaPatterns = listOf(
         """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
     )

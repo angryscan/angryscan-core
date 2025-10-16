@@ -9,7 +9,7 @@ import org.angryscan.common.matchers.CardNumber
 import org.angryscan.common.matchers.Email
 import org.angryscan.common.matchers.FullName
 import org.angryscan.common.matchers.INN
-import org.angryscan.common.matchers.IP
+import org.angryscan.common.matchers.IPv4
 import org.angryscan.common.matchers.IPv6
 import org.angryscan.common.matchers.Login
 import org.angryscan.common.matchers.OMS
@@ -90,7 +90,7 @@ fun detectFullName(text: String): Int {
 
 @Suppress("Unused")
 fun detectIP(text: String): Int {
-    return KotlinEngine(listOf(IP)).scan(text).count()
+    return KotlinEngine(listOf(IPv4)).scan(text).count()
 }
 
 @Suppress("Unused")
