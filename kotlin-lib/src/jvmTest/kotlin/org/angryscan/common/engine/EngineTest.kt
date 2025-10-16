@@ -18,37 +18,37 @@ internal class EngineTest {
     fun first() {
         fun check(scanResult: List<Match>) {
             //Check Email
-            assertEquals(2, scanResult.count { it.matcher is Email })
+            assertEquals(2, scanResult.count { it.matcher is Email }, "Email check")
             //Check CardNumbscanResult
-            assertEquals(1, scanResult.count { it.matcher is CardNumber })
+            assertEquals(1, scanResult.count { it.matcher is CardNumber }, "Card number check")
             //Check Phone
-            assertEquals(2, scanResult.count { it.matcher is Phone })
+            assertEquals(2, scanResult.count { it.matcher is Phone }, "Phone check")
             //Check AccountNscanResulter
-            assertEquals(1, scanResult.count { it.matcher is AccountNumber })
+            assertEquals(1, scanResult.count { it.matcher is AccountNumber }, "Account number check")
             //Check CarNumbescanResult
-            assertEquals(2, scanResult.count { it.matcher is CarNumber })
+            assertEquals(2, scanResult.count { it.matcher is CarNumber }, "Car number check")
             //Check SNILS
-            assertEquals(1, scanResult.count { it.matcher is SNILS })
+            assertEquals(1, scanResult.count { it.matcher is SNILS }, "SNILS check")
             //Check Passport
-            assertEquals(2, scanResult.count { it.matcher is Passport })
+            assertEquals(2, scanResult.count { it.matcher is Passport }, "Passport check")
             //Check OMS
-            assertEquals(1, scanResult.count { it.matcher is OMS })
+            assertEquals(1, scanResult.count { it.matcher is OMS }, "OMS check")
             //Check INN
-            assertEquals(1, scanResult.count { it.matcher is INN })
+            assertEquals(1, scanResult.count { it.matcher is INN }, "INN check")
             //Check Address
-            assertEquals(1, scanResult.count { it.matcher is Address })
+            assertEquals(1, scanResult.count { it.matcher is Address }, "Address check")
             //Check Login
-            assertEquals(1, scanResult.count { it.matcher is Login })
+            assertEquals(1, scanResult.count { it.matcher is Login }, "Login check")
             //Check Password
-            assertEquals(1, scanResult.count { it.matcher is Password })
+            assertEquals(1, scanResult.count { it.matcher is Password }, "Password check")
             //Check CVV
-            assertEquals(1, scanResult.count { it.matcher is CVV })
+            assertEquals(1, scanResult.count { it.matcher is CVV }, "CVV check")
             //Check FullName
-            assertEquals(3, scanResult.count { it.matcher is FullName })
-            //Check IP
-            assertEquals(1, scanResult.count { it.matcher is IP })
+            assertEquals(3, scanResult.count { it.matcher is FullName }, "Full name check")
+            //Check IPv4
+            assertEquals(1, scanResult.count { it.matcher is IPv4 }, "IPv4 check")
             //Check IPv6
-            assertEquals(1, scanResult.count { it.matcher is IPv6 })
+            assertEquals(1, scanResult.count { it.matcher is IPv6 }, "IPv6 check")
         }
 
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
@@ -61,6 +61,11 @@ internal class EngineTest {
         val secondFile = File(secondFilePath)
         val secondText = secondFile.readText()
 
+        val thirdFilePath = javaClass.getResource("/testFiles/first.xml")?.file
+        assertNotNull(thirdFilePath)
+        val thirdFile = File(thirdFilePath)
+        val thirdText = thirdFile.readText()
+
 
         assertEquals(true, file.exists())
         val hyperScan = HyperScanEngine(
@@ -68,12 +73,14 @@ internal class EngineTest {
         )
         check(hyperScan.scan(text))
         check(hyperScan.scan(secondText))
+        check(hyperScan.scan(thirdText))
 
         val kotlinScan = KotlinEngine(
             Matchers.filterIsInstance<IKotlinMatcher>()
         )
         check(kotlinScan.scan(text))
         check(kotlinScan.scan(secondText))
+        check(kotlinScan.scan(thirdText))
     }
 
     @Test
@@ -195,14 +202,14 @@ internal class EngineTest {
     fun testIP() {
         val file = javaClass.getResource("/testFiles/ip.txt")?.file
         assertNotNull(file)
-        assertEquals(4, getCountOfAttribute(file, IP))
+        assertEquals(4, getCountOfAttribute(file, IPv4))
     }
 
     @Test
     fun testIPFalse() {
         val file = javaClass.getResource("/testFiles/ip_false.txt")?.file
         assertNotNull(file)
-        assertEquals(0, getCountOfAttribute(file, IP))
+        assertEquals(0, getCountOfAttribute(file, IPv4))
     }
 
     @Test

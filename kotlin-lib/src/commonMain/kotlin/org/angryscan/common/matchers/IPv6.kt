@@ -9,14 +9,14 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object IPv6 : IHyperMatcher, IKotlinMatcher {
     override val name = "IPv6"
     override val javaPatterns = listOf(
-        """(^|\s)(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})($|\s)"""
+        """(?:^|[\s>])(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})(?:[^0-9a-zA-Z:])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns = listOf(
-        """(^|\s)(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})\b"""
+        """(?:^|[\s>])(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})(?:[^0-9a-zA-Z:])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
