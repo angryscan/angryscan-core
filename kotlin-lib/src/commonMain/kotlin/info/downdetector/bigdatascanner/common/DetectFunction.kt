@@ -3,6 +3,8 @@ package info.downdetector.bigdatascanner.common
 import info.downdetector.bigdatascanner.common.extensions.MatchWithContext
 import info.downdetector.bigdatascanner.common.functions.findAccountNumbers
 import info.downdetector.bigdatascanner.common.functions.findAddresses
+import info.downdetector.bigdatascanner.common.functions.findBankAccount
+import info.downdetector.bigdatascanner.common.functions.findBankAccountLE
 import info.downdetector.bigdatascanner.common.functions.findBirthCert
 import info.downdetector.bigdatascanner.common.functions.findBirthday
 import info.downdetector.bigdatascanner.common.functions.findCVVs
@@ -14,8 +16,10 @@ import info.downdetector.bigdatascanner.common.functions.findDriverLicense
 import info.downdetector.bigdatascanner.common.functions.findEducationDoc
 import info.downdetector.bigdatascanner.common.functions.findEmails
 import info.downdetector.bigdatascanner.common.functions.findEpCertificateNumber
+import info.downdetector.bigdatascanner.common.functions.findExecDocNumber
 import info.downdetector.bigdatascanner.common.functions.findForeignPassports
 import info.downdetector.bigdatascanner.common.functions.findForeignTIN
+import info.downdetector.bigdatascanner.common.functions.findHashData
 import info.downdetector.bigdatascanner.common.functions.findINN
 import info.downdetector.bigdatascanner.common.functions.findIPs
 import info.downdetector.bigdatascanner.common.functions.findIPv6s
@@ -37,10 +41,12 @@ import info.downdetector.bigdatascanner.common.functions.findPhones
 import info.downdetector.bigdatascanner.common.functions.findRefugeeCert
 import info.downdetector.bigdatascanner.common.functions.findResidencePermit
 import info.downdetector.bigdatascanner.common.functions.findSNILS
+import info.downdetector.bigdatascanner.common.functions.findSberBook
 import info.downdetector.bigdatascanner.common.functions.findSecurityAffiliation
 import info.downdetector.bigdatascanner.common.functions.findSocialUserId
 import info.downdetector.bigdatascanner.common.functions.findStateRegContract
 import info.downdetector.bigdatascanner.common.functions.findTemporaryID
+import info.downdetector.bigdatascanner.common.functions.findUidContractBank
 import info.downdetector.bigdatascanner.common.functions.findVIN
 import info.downdetector.bigdatascanner.common.functions.findValuableInfo
 import info.downdetector.bigdatascanner.common.functions.findVehicleRegNumber
@@ -94,7 +100,13 @@ enum class DetectFunction(
     LegalEntityName("LegalEntityName", ::findLegalEntityName),
     LegalEntityId("LegalEntityId", ::findLegalEntityId),
     OKPO("OKPO", ::findOKPO),
-    StateRegContract("StateRegContract", ::findStateRegContract),;
+    StateRegContract("StateRegContract", ::findStateRegContract),
+    UidContractBank("UidContractBank", ::findUidContractBank),
+    ExecDocNumber("ExecDocNumber", ::findExecDocNumber),
+    BankAccount("BankAccount", ::findBankAccount),
+    SberBook("SberBook", ::findSberBook),
+    BankAccountLE("BankAccountLE", ::findBankAccountLE),
+    HashData("HashData", ::findHashData),;
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> =
         scanFunction(text, withContext)

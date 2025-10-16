@@ -7,7 +7,7 @@ object Cleaner {
         val patternTags = """<[^>]*?>""".toRegex()
         val singleSpacePattern = """${160.toChar()}""".toRegex()
         val nextLinePattern = """\n""".toRegex()
-        val pattern = """([^а-яА-Яa-zA-Z@,.:0-9- ()*=+])|(quot)""".toRegex()
+        val pattern = """([^а-яА-Яa-zA-Z@,.:0-9- ()*=+/])|(quot)""".toRegex()
         return text
             .replace(singleSpacePattern, " ")
             .replace(nextLinePattern, "  ")
