@@ -22,7 +22,6 @@ object CarNumber : IHyperMatcher, IKotlinMatcher {
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,
-        ExpressionOption.SOM_LEFTMOST,
         ExpressionOption.UTF8
     )
 

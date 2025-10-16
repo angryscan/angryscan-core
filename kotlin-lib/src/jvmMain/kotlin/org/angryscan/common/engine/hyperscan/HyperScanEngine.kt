@@ -2,6 +2,7 @@ package org.angryscan.common.engine.hyperscan
 
 import com.gliwka.hyperscan.wrapper.Database
 import com.gliwka.hyperscan.wrapper.Expression
+import com.gliwka.hyperscan.wrapper.ExpressionFlag
 import com.gliwka.hyperscan.wrapper.Scanner
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -21,9 +22,9 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
                 }
             }.mapIndexed { index, pair ->
                 //Конвертируем набор опций
-                val es = EnumSet.of(pair.second.expressionOptions.first().toExpressionFlag())
+                val es = EnumSet.of(ExpressionFlag.SOM_LEFTMOST)
 
-                pair.second.expressionOptions.drop(1).forEach {
+                pair.second.expressionOptions.forEach {
                     es.add(it.toExpressionFlag())
                 }
 
@@ -59,6 +60,8 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
                 expressions[it.matchedExpression]!!.check(it.matchedString)
             }.toMutableList()
 
+        scanner.close()
+
         return res.map {
             Match(
                 value = it.matchedString,
@@ -73,9 +76,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
                 startPosition = it.startPosition,
                 endPosition = it.endPosition,
                 matcher = expressions[it.matchedExpression]!!
-            ).also {
-                scanner.close()
-            }
+            )
         }
     }
 

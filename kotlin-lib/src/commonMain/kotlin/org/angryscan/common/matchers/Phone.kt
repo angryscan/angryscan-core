@@ -20,7 +20,6 @@ object Phone : IHyperMatcher, IKotlinMatcher {
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
-        ExpressionOption.SOM_LEFTMOST,
         ExpressionOption.UTF8
     )
 

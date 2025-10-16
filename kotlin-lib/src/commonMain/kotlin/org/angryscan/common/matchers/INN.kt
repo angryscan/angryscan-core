@@ -20,7 +20,6 @@ object INN : IHyperMatcher, IKotlinMatcher {
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
-        ExpressionOption.SOM_LEFTMOST
     )
 
     override fun check(value: String): Boolean {
