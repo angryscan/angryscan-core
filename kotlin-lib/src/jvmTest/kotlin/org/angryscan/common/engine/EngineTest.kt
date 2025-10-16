@@ -4,7 +4,7 @@ import org.angryscan.common.engine.hyperscan.HyperScanEngine
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 import org.angryscan.common.engine.kotlin.KotlinEngine
-import org.angryscan.common.extensions.MatchersRegister
+import org.angryscan.common.extensions.Matchers
 import org.angryscan.common.matchers.*
 import java.io.File
 import kotlin.test.Test
@@ -64,13 +64,13 @@ internal class EngineTest {
 
         assertEquals(true, file.exists())
         val hyperScan = HyperScanEngine(
-            MatchersRegister.matchers.filterIsInstance<IHyperMatcher>()
+            Matchers.filterIsInstance<IHyperMatcher>()
         )
         check(hyperScan.scan(text))
         check(hyperScan.scan(secondText))
 
         val kotlinScan = KotlinEngine(
-            MatchersRegister.matchers.filterIsInstance<IKotlinMatcher>()
+            Matchers.filterIsInstance<IKotlinMatcher>()
         )
         check(kotlinScan.scan(text))
         check(kotlinScan.scan(secondText))
@@ -81,7 +81,7 @@ internal class EngineTest {
         val file = javaClass.getResource("/testFiles/testText.txt")?.file
         assertNotNull(file)
 
-        for (attribute in MatchersRegister.matchers.filterIsInstance<IKotlinMatcher>()) {
+        for (attribute in Matchers.filterIsInstance<IKotlinMatcher>()) {
             assertEquals(1, getCountOfAttribute(file, attribute))
         }
     }
