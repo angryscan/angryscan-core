@@ -51,36 +51,34 @@ internal class EngineTest {
             assertEquals(1, scanResult.count { it.matcher is IPv6 }, "IPv6 check")
         }
 
-        val filePath = javaClass.getResource("/testFiles/first.csv")?.file
-        assertNotNull(filePath)
-        val file = File(filePath)
-        val text = file.readText()
+        val filePathList = listOf(
+            "/testFiles/first.csv",
+            "/testFiles/first_2.csv",
+            "/testFiles/first.xml",
+            "/testFiles/first.json"
+        ).map { assertNotNull(javaClass.getResource(it)?.file, "File not found: $it") }
 
-        val secondFilePath = javaClass.getResource("/testFiles/first_2.csv")?.file
-        assertNotNull(secondFilePath)
-        val secondFile = File(secondFilePath)
-        val secondText = secondFile.readText()
+        val textList = filePathList.map {
+            File(it)
+        }.map {
+            it to it.readText()
+        }
 
-        val thirdFilePath = javaClass.getResource("/testFiles/first.xml")?.file
-        assertNotNull(thirdFilePath)
-        val thirdFile = File(thirdFilePath)
-        val thirdText = thirdFile.readText()
-
-
-        assertEquals(true, file.exists())
         val hyperScan = HyperScanEngine(
             Matchers.filterIsInstance<IHyperMatcher>()
         )
-        check(hyperScan.scan(text))
-        check(hyperScan.scan(secondText))
-        check(hyperScan.scan(thirdText))
+        textList.forEach { pair ->
+            println("Test Hyperscan on file: ${pair.first.name}")
+            check(hyperScan.scan(pair.second))
+        }
 
         val kotlinScan = KotlinEngine(
             Matchers.filterIsInstance<IKotlinMatcher>()
         )
-        check(kotlinScan.scan(text))
-        check(kotlinScan.scan(secondText))
-        check(kotlinScan.scan(thirdText))
+        textList.forEach { pair ->
+            println("Test Kotlin on file: ${pair.first.name}")
+            check(kotlinScan.scan(pair.second))
+        }
     }
 
     @Test
