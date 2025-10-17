@@ -14,19 +14,24 @@ import info.downdetector.bigdatascanner.common.functions.findCardNumbers
 import info.downdetector.bigdatascanner.common.functions.findDeathDate
 import info.downdetector.bigdatascanner.common.functions.findDriverLicense
 import info.downdetector.bigdatascanner.common.functions.findEducationDoc
+import info.downdetector.bigdatascanner.common.functions.findEducationLevel
+import info.downdetector.bigdatascanner.common.functions.findEducationLicense
 import info.downdetector.bigdatascanner.common.functions.findEmails
 import info.downdetector.bigdatascanner.common.functions.findEpCertificateNumber
 import info.downdetector.bigdatascanner.common.functions.findExecDocNumber
 import info.downdetector.bigdatascanner.common.functions.findForeignPassports
 import info.downdetector.bigdatascanner.common.functions.findForeignTIN
+import info.downdetector.bigdatascanner.common.functions.findGeo
 import info.downdetector.bigdatascanner.common.functions.findHashData
 import info.downdetector.bigdatascanner.common.functions.findINN
 import info.downdetector.bigdatascanner.common.functions.findIPs
 import info.downdetector.bigdatascanner.common.functions.findIPv6s
+import info.downdetector.bigdatascanner.common.functions.findIdentityDocType
 import info.downdetector.bigdatascanner.common.functions.findInheritanceDoc
 import info.downdetector.bigdatascanner.common.functions.findLegalEntityId
 import info.downdetector.bigdatascanner.common.functions.findLegalEntityName
 import info.downdetector.bigdatascanner.common.functions.findLogins
+import info.downdetector.bigdatascanner.common.functions.findMaritalStatus
 import info.downdetector.bigdatascanner.common.functions.findMarriageCert
 import info.downdetector.bigdatascanner.common.functions.findMilitaryID
 import info.downdetector.bigdatascanner.common.functions.findMilitaryRank
@@ -106,7 +111,13 @@ enum class DetectFunction(
     BankAccount("BankAccount", ::findBankAccount),
     SberBook("SberBook", ::findSberBook),
     BankAccountLE("BankAccountLE", ::findBankAccountLE),
-    HashData("HashData", ::findHashData),;
+    HashData("HashData", ::findHashData),
+    Geo("Geo", ::findGeo),
+    EducationLicense("EducationLicense", ::findEducationLicense),
+    IdentityDocType("IdentityDocType", ::findIdentityDocType),
+    MaritalStatus("MaritalStatus", ::findMaritalStatus),
+    EducationLevel("EducationLevel", ::findEducationLevel),;
+
 
     override fun scan(text: String, withContext: Boolean): Sequence<MatchWithContext> =
         scanFunction(text, withContext)
