@@ -28,10 +28,9 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     override fun check(value: String): Boolean {
         val oms = value.replace("""\D""".toRegex(), "")
         val key = oms.last().digitToInt()
-        val odd = mutableListOf<Char>()  // nechet
-        val even = mutableListOf<Char>() // chet
+        val odd = mutableListOf<Char>()
+        val even = mutableListOf<Char>()
         oms.substring(0 until oms.length - 1).reversed().forEachIndexed { index, digit ->
-            // it's odd because starts with index = 0
             if (index % 2 == 0) {
                 odd.add(digit)
             } else {
@@ -39,18 +38,14 @@ object OMS : IHyperMatcher, IKotlinMatcher {
             }
         }
         val right = (odd.joinToString(separator = "").toInt() * 2).toString()
-        // getValue sum of all elements
         var summ = 0
         for (elem in even)
             summ += elem.digitToInt()
         for (elem in right)
             summ += elem.digitToInt()
-        // nearest value more or equal sum and sum % 10 = 0 minus sum
         val checker = 10 - summ % 10
         return checker == key || (checker == 10 && key == 0)
     }
 
     override fun toString() = name
 }
-
-

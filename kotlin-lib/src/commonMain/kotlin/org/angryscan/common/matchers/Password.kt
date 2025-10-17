@@ -17,7 +17,7 @@ object Password : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(password|пароль):?\s*[a-zA-Z0-9,.\/\\\-|_=`~!@#$%^&*()+{}[\]]{3,25}($|[ \t\r<"])"""
+        """(password|пароль):?\s*[a-zA-Z0-9,.\/\\\-|_=`~!@#$%^&*()+{}\[\]]{3,25}($|[ \t\r<"])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,
@@ -29,4 +29,3 @@ object Password : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

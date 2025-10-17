@@ -58,4 +58,3 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
         return result
     }
 }
-

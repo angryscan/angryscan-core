@@ -1,19 +1,43 @@
-package info.downdetector.bigdatascanner.common.functions
+package org.angryscan.common.matchers
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import kotlinx.serialization.Serializable
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
+import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
-private val EXEC_DOC_NUMBER_REGEX_ONLY = """
-(?ix)
-(?<![\p{L}\d\p{S}\p{P}])
-(?:номер\s+исполнительного\s+документа|номер\s+исполнительного\s+производства|исполнительный\s+лист)?
-\s*[:\-]?\s*
-(?:№\s?)?
-(\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД))
-(?![\p{L}\d\p{S}\p{P}])
-""".trimIndent()
+@Serializable
+object ExecDocNumber : IHyperMatcher, IKotlinMatcher {
+    override val name = "Executive Document Number"
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d\p{S}\p{P}])
+        (?:
+          номер\s+исполнительного\s+документа|
+          номер\s+исполнительного\s+производства|
+          исполнительный\s+лист
+        )?
+        \s*[:\-]?\s*
+        (?:№\s?)?
+        (\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД))
+        (?![\p{L}\d\p{S}\p{P}])
+        """.trimIndent()
+    )
+    override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
+        RegexOption.MULTILINE
+    )
 
-fun findExecDocNumber(text: String, withContext: Boolean) = regexDetector(
-    text,
-    EXEC_DOC_NUMBER_REGEX_ONLY.toRegex(setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)),
-    withContext
-)
+    override val hyperPatterns: List<String> = listOf(
+        """(?<![\p{L}\d\p{S}\p{P}])(?:№\s?)?(\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД))(?![\p{L}\d\p{S}\p{P}])"""
+    )
+    override val expressionOptions = setOf(
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
+    )
+
+    override fun check(value: String): Boolean = true
+
+    override fun toString() = name
+}

@@ -28,4 +28,3 @@ object CVV : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

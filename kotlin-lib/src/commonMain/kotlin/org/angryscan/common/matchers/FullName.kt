@@ -40,4 +40,3 @@ object FullName : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

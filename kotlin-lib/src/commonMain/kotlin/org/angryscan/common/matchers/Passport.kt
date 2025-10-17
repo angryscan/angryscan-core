@@ -10,7 +10,7 @@ object Passport : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport"
     override val javaPatterns = listOf(
         """(паспорт[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t]?[0-9]{2}[ \t]?[0-9]{6})""",
-        """[сc]ерия[ \t-]?[0-9]{2}(\s|\t)?[0-9]{2}[ \t,]?(номер)?[ \t-]?[0-9]{6}?"""
+        """[сc]ерия[ \t-]?[0-9]{2}(\s|\t)?[0-9]{2}[ \t,]?(номер)?[ \t-]?[0-9]{6}"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -31,5 +31,3 @@ object Passport : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-
-

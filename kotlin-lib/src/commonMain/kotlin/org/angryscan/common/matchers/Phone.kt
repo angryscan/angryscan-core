@@ -27,4 +27,3 @@ object Phone : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

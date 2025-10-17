@@ -24,15 +24,12 @@ object INN : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean {
         val inn = value.replace("[^0-9]".toRegex(), "")
-        // control sequences
         val firstSequence = listOf(7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
         val secondSequence = listOf(3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
-        // first control sum
         var summ1 = 0
         for (index in firstSequence.indices)
             summ1 += firstSequence[index] * inn[index].digitToInt()
         val key1 = (summ1 % 11).toString().last()
-        // second control sum
         var summ2 = 0
         for (index in secondSequence.indices)
             summ2 += secondSequence[index] * inn[index].digitToInt()

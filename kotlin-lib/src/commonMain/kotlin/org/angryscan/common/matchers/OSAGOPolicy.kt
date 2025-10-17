@@ -1,18 +1,45 @@
-package info.downdetector.bigdatascanner.common.functions
+package org.angryscan.common.matchers
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import kotlinx.serialization.Serializable
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
+import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
-private val OSAGO_POLICY_REGEX_ONLY = """
-(?ix)                                      
-(?<![\p{L}\d\p{S}\p{P}])                   
-(?:полис\s+ОСАГО|ОСАГО|номер\s+полиса\s+ОСАГО|е-ОСАГО|электронный\s+полис\s+ОСАГО|страховка\s+ОСАГО)?
-\s*[:\-]?\s*
-([A-Z]{3}\s?(?:№\s?)?\s?\d{10}) 
-(?![\p{L}\d\p{S}\p{P}])                    
-""".trimIndent()
+@Serializable
+object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
+    override val name = "OSAGO Policy"
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d\p{S}\p{P}])
+        (?:
+          полис\s+ОСАГО|
+          ОСАГО|
+          номер\s+полиса\s+ОСАГО|
+          е-ОСАГО|
+          электронный\s+полис\s+ОСАГО|
+          страховка\s+ОСАГО
+        )?
+        \s*[:\-]?\s*
+        ([A-Z]{3}\s?(?:№\s?)?\s?\d{10})
+        (?![\p{L}\d\p{S}\p{P}])
+        """.trimIndent()
+    )
+    override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
+        RegexOption.MULTILINE
+    )
 
-fun findOSAGOPolicy(text: String, withContext: Boolean) = regexDetector(
-    text,
-    OSAGO_POLICY_REGEX_ONLY.toRegex(setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)),
-    withContext
-)
+    override val hyperPatterns: List<String> = listOf(
+        """(?<![\p{L}\d\p{S}\p{P}])([A-Z]{3}\s?(?:№\s?)?\s?\d{10})(?![\p{L}\d\p{S}\p{P}])"""
+    )
+    override val expressionOptions = setOf(
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
+    )
+
+    override fun check(value: String): Boolean = true
+
+    override fun toString() = name
+}

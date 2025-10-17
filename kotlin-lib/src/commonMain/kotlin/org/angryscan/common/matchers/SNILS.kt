@@ -43,4 +43,3 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

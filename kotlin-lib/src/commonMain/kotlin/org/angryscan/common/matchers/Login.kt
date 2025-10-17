@@ -29,4 +29,3 @@ object Login : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

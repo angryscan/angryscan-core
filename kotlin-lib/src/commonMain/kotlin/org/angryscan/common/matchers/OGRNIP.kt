@@ -1,18 +1,43 @@
-package info.downdetector.bigdatascanner.common.functions
+package org.angryscan.common.matchers
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import kotlinx.serialization.Serializable
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
+import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
-private val OGRNIP_REGEX_ONLY = """
-(?ix)                                      
-(?<![\p{L}\d\p{S}\p{P}])                   
-(?:ОГРНИП|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП)?
-\s*[:\-]?\s*
-([34]\d{14})                  
-(?![\p{L}\d\p{S}\p{P}])                    
-""".trimIndent()
+@Serializable
+object OGRNIP : IHyperMatcher, IKotlinMatcher {
+    override val name = "OGRNIP"
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d\p{S}\p{P}])
+        (?:
+          ОГРНИП|
+          регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|
+          регистрационный\s+номер\s+индивидуального\s+предпринимателя|
+          государственный\s+регистрационный\s+номер\s+ИП
+        )?
+        \s*[:\-]?\s*
+        ([34]\d{14})
+        (?![\p{L}\d\p{S}\p{P}])
+        """.trimIndent()
+    )
+    override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
+        RegexOption.MULTILINE
+    )
 
-fun findOGRNIP(text: String, withContext: Boolean) = regexDetector(
-    text,
-    OGRNIP_REGEX_ONLY.toRegex(setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)),
-    withContext
-)
+    override val hyperPatterns: List<String> = listOf(
+        """(?<![\p{L}\d\p{S}\p{P}])([34]\d{14})(?![\p{L}\d\p{S}\p{P}])"""
+    )
+    override val expressionOptions = setOf(
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
+    )
+
+    override fun check(value: String): Boolean = true
+
+    override fun toString() = name
+}

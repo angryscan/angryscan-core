@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.10"
 mpublish = "0.30.0"
-hyperscan = "5.4.0-2.0.0"
+hyperscan = "5.4.11-3.1.0"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

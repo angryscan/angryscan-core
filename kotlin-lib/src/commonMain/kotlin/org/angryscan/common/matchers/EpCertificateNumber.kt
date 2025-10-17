@@ -1,18 +1,44 @@
-package info.downdetector.bigdatascanner.common.functions
+package org.angryscan.common.matchers
 
-import info.downdetector.bigdatascanner.common.extensions.regexDetector
+import kotlinx.serialization.Serializable
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
+import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
-private val EP_CERT_NUMBER_REGEX_ONLY = """
-(?ix)                                      
-(?<![\p{L}\d\p{S}\p{P}])                   
-(?:серийный\s+номер\s+сертификата\s+ЭП|номер\s+сертификата\s+электронной\s+подписи|serial\s+number\s+ЭП|номер\s+сертификата\s+ключа\s+проверки\s+ЭП|уникальный\s+номер\s+сертификата)?
-\s*[:\-]?\s*
-(([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4})
-(?![\p{L}\d\p{S}\p{P}])                    
-""".trimIndent()
+@Serializable
+object EpCertificateNumber : IHyperMatcher, IKotlinMatcher {
+    override val name = "EP Certificate Number"
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d\p{S}\p{P}])
+        (?:
+          серийный\s+номер\s+сертификата\s+ЭП|
+          номер\s+сертификата\s+электронной\s+подписи|
+          serial\s+number\s+ЭП|
+          номер\s+сертификата\s+ключа\s+проверки\s+ЭП|
+          уникальный\s+номер\s+сертификата
+        )?
+        \s*[:\-]?\s*
+        (([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4})
+        (?![\p{L}\d\p{S}\p{P}])
+        """.trimIndent()
+    )
+    override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
+        RegexOption.MULTILINE
+    )
 
-fun findEpCertificateNumber(text: String, withContext: Boolean) = regexDetector(
-    text,
-    EP_CERT_NUMBER_REGEX_ONLY.toRegex(setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE)),
-    withContext
-)
+    override val hyperPatterns: List<String> = listOf(
+        """(?<![\p{L}\d\p{S}\p{P}])(([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4})(?![\p{L}\d\p{S}\p{P}])"""
+    )
+    override val expressionOptions = setOf(
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
+    )
+
+    override fun check(value: String): Boolean = true
+
+    override fun toString() = name
+}

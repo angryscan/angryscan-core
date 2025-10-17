@@ -31,4 +31,3 @@ object Address : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-
