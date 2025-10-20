@@ -37,19 +37,7 @@ object UidContractBankBki : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """
-        (?<![\p{L}\d\p{S}\p{P}])
-        \{?
-        (
-          [0-9A-Fa-f]{8}[- ]?
-          [0-9A-Fa-f]{4}[- ]?
-          4[0-9A-Fa-f]{3}[- ]?
-          [89ABab][0-9A-Fa-f]{3}[- ]?
-          [0-9A-Fa-f]{12}
-        )
-        \}?[-]?[0-9A-Fa-f]?
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\{?[0-9A-Fa-f]{8}[- ]?[0-9A-Fa-f]{4}[- ]?4[0-9A-Fa-f]{3}[- ]?[89ABab][0-9A-Fa-f]{3}[- ]?[0-9A-Fa-f]{12}\}?"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

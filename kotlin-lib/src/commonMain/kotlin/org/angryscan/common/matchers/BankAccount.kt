@@ -24,7 +24,7 @@ object BankAccount : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(408\d{17})(?![\p{L}\d\p{S}\p{P}])"""
+        """\b408\d{17}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

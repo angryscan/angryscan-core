@@ -28,15 +28,7 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:
-          (\d{6}\s?\d{7})|
-          (\d{2}\s?[А-Я]{2}\s?\d{6,7})|
-          ([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6})
-        )
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """(?:\d{6}\s?\d{7}|\d{2}\s?[А-Я]{2}\s?\d{6,7}|[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

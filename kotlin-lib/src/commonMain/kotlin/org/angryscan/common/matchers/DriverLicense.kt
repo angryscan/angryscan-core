@@ -24,7 +24,7 @@ object DriverLicense : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(\d{2}\s?\d{2}\s\d{6})(?![\p{L}\d\p{S}\p{P}])"""
+        """\d{2}\s?\d{2}\s\d{6}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

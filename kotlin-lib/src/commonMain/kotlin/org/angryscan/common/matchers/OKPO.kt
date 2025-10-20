@@ -24,7 +24,7 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\p{N}])(\d{8})(?![\p{L}\p{N}])"""
+        """\b\d{8}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

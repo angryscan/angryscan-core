@@ -27,14 +27,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:
-          ([A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2})|
-          ([A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?)
-        )
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}|[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

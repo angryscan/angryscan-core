@@ -31,7 +31,7 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])([A-Z]{3}\s?(?:№\s?)?\s?\d{10})(?![\p{L}\d\p{S}\p{P}])"""
+        """[A-Z]{3}\s?(?:№\s?)?\s?\d{10}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

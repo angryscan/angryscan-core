@@ -29,7 +29,7 @@ object VIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])([A-HJ-NPR-Z0-9]{17})(?![\p{L}\d\p{S}\p{P}])"""
+        """\b[A-HJ-NPR-Z0-9]{17}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

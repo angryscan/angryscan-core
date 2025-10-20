@@ -29,7 +29,7 @@ object SocialUserId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(@[a-zA-Z0-9_]{3,32})(?![\p{L}\d\p{S}\p{P}])"""
+        """@[a-zA-Z0-9_]{3,32}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

@@ -30,7 +30,7 @@ object EpCertificateNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4})(?![\p{L}\d\p{S}\p{P}])"""
+        """([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

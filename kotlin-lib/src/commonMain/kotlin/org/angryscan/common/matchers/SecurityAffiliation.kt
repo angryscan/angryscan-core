@@ -32,19 +32,13 @@ object SecurityAffiliation : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """
-        (?<![\p{L}\d\p{S}\p{P}])
-        (
-          МВД|МО|СВР|ФСБ|ФСО|
-          Министерство\s+внутренних\s+дел|
-          Министерство\s+обороны|
-          Служба\s+внешней\s+разведки|
-          Федеральная\s+служба\s+безопасности|
-          Федеральная\s+служба\s+охраны
-        )
-        (?:\s+РФ|\s+России)?
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\bМВД\b""",
+        """\bСВР\b""",
+        """\bФСБ\b""",
+        """\bФСО\b""",
+        """Министерство\s+(?:внутренних\s+дел|обороны)""",
+        """Служба\s+внешней\s+разведки""",
+        """Федеральная\s+служба\s+(?:безопасности|охраны)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

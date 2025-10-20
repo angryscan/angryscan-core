@@ -26,7 +26,7 @@ object BirthCert : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2})[\s,;:№Nn]*(\d{6})(?![\p{L}\d\p{S}\p{P}])"""
+        """[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

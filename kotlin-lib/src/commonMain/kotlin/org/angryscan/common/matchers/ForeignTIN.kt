@@ -31,7 +31,7 @@ object ForeignTIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(?:(\d{3}[-\s]\d{2}[-\s]\d{4})|([A-Z0-9]{18}))(?![\p{L}\d\p{S}\p{P}])"""
+        """(?:\d{3}[-\s]\d{2}[-\s]\d{4}|[A-Z0-9]{18})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

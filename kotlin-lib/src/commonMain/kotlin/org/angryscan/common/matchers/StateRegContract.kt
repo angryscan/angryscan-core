@@ -27,7 +27,7 @@ object StateRegContract : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(\d{2}\s?[-:]\s?\d{2}\s?[-:]\s?\d{2}/\d{3,4}/\d{4}\s?[-:]\s?\d{1,3})"""
+        """\d{2}\s?[-:]\s?\d{2}\s?[-:]\s?\d{2}/\d{3,4}/\d{4}\s?[-:]\s?\d{1,3}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

@@ -29,7 +29,7 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])([34]\d{14})(?![\p{L}\d\p{S}\p{P}])"""
+        """\b[34]\d{14}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

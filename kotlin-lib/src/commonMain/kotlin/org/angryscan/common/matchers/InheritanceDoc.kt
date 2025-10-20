@@ -24,7 +24,7 @@ object InheritanceDoc : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(\d{2}\s?[А-Я]{2}\s?\d{6,7})(?![\p{L}\d\p{S}\p{P}])"""
+        """\d{2}\s?[А-Я]{2}\s?\d{6,7}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

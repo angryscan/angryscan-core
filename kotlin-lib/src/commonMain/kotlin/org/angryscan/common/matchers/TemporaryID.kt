@@ -24,7 +24,7 @@ object TemporaryID : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(\d{12})(?![\p{L}\d\p{S}\p{P}])"""
+        """\b\d{12}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

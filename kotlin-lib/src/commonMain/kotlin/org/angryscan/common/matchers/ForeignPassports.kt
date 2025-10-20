@@ -33,16 +33,7 @@ object ForeignPassports : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:
-          ([A-Z]\d{8})|
-          ([EG]\d{8})|
-          ([A-Z]{2}\d{7})|
-          ([A-Z]{1,2}[-]?\d{7,8})
-        )
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """(?:[A-Z]\d{8}|[EG]\d{8}|[A-Z]{2}\d{7}|[A-Z]{1,2}[-]?\d{7,8})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

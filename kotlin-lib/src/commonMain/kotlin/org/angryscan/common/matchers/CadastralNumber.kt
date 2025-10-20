@@ -30,7 +30,7 @@ object CadastralNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(\d{2}\s?:\s?\d{2}\s?:\s?\d{6,7}\s?:\s?\d{1,5})(?![\p{L}\d\p{S}\p{P}])"""
+        """\d{2}\s?:\s?\d{2}\s?:\s?\d{6,7}\s?:\s?\d{1,5}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

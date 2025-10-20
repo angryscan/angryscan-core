@@ -29,7 +29,7 @@ object EducationLicense : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|(?<=\s)|(?<=[\(\[\{«"']))([ЛL]\s*035\s*[-–—-]\s*\d{5}\s*[-–—-]\s*\d{2}\s*/\s*\d{8})(?:$|(?=\s)|(?=[\)\]\}»"'.,;:!?]))"""
+        """[ЛL]\s*035\s*[-–—-]\s*\d{5}\s*[-–—-]\s*\d{2}\s*/\s*\d{8}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

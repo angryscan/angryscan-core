@@ -24,7 +24,7 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])((?:82|83)\s*(?:№|N)?\s*\d{7})(?![\p{L}\d\p{S}\p{P}])"""
+        """(?:82|83)\s*(?:№|N)?\s*\d{7}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

@@ -29,7 +29,7 @@ object ExecDocNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])(?:№\s?)?(\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД))(?![\p{L}\d\p{S}\p{P}])"""
+        """(?:№\s?)?\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД)\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

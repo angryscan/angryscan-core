@@ -24,7 +24,7 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?<![\p{L}\d\p{S}\p{P}])([А-ЯA-Z]{2}\s*\d{7})(?![\p{L}\d\p{S}\p{P}])"""
+        """[А-ЯA-Z]{2}\s*\d{7}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
