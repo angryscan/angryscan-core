@@ -27,7 +27,7 @@ object RefugeeCert : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\d{2}\s*(?:№|N)?\s*\d{7}\b"""
+        """\b\d{2}\s(?:№|N)?\s*\d{7}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
