@@ -37,8 +37,8 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """[АВЕКМНОРСТУХ]\s?\d{3}\s?[АВЕКМНОРСТУХ]{2}""",
-        """\d{4}\s?[АВЕКМНОРСТУХ]{2}"""
+        """(?:^|[\s\r\n])[АВЕКМНОРСТУХ]\s?\d{3}\s?[АВЕКМНОРСТУХ]{2}\s?(?:$regionCodes)\b""",
+        """(?:^|[\s\r\n])\d{4}\s?[АВЕКМНОРСТУХ]{2}\s?(?:$regionCodes)\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

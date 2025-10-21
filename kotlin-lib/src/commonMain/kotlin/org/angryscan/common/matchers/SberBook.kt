@@ -14,7 +14,7 @@ object SberBook : IHyperMatcher, IKotlinMatcher {
         (?<![\p{L}\d\p{S}\p{P}])
         (?:номер\s+сберкнижки|номер\s+сберегательной\s+книжки\s+ФЛ|счет\s+сберкнижки)?
         \s*[:\-]?\s*
-        (423\d{2}(?:\.\d{3})?(?:\.\d{1})?(?:\.\d{4})?(?:\.\d{7})?)
+        (423\d{2}(?:\.?\d{3})?(?:\.?\d{1})?(?:\.?\d{4})?(?:\.?\d{7})?)
         (?![\p{L}\d\p{S}\p{P}])
         """.trimIndent()
     )
@@ -24,7 +24,7 @@ object SberBook : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b423\d{2}(?:\.\d{3})?(?:\.\d{1})?(?:\.\d{4})?(?:\.\d{7})?\b"""
+        """(?:^|[\s\r\n])423\d{2}(?:\.?\d{3})?(?:\.?\d{1})?(?:\.?\d{4})?(?:\.?\d{7})?(?:[\s\r\n]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
