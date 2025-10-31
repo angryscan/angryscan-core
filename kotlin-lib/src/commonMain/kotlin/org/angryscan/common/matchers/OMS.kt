@@ -17,7 +17,7 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[\s.,\-:"()>])(омс|полис|страховка|страхование)\s[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}(?:$|[ \t\r.,;()"<])"""
+        """(?:^|[\s.,\-:"()>])(омс|полис|страховка|страхование)\s[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}(?:$|[ \t\r\a.,;()"<])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
