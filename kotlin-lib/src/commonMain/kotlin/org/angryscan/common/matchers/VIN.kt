@@ -11,7 +11,7 @@ object VIN : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           VIN|ВИН|
           идентификационный\s+номер\s+транспортного\s+средства|
@@ -20,7 +20,7 @@ object VIN : IHyperMatcher, IKotlinMatcher {
         )?
         \s*[:\-]?\s*
         ([A-HJ-NPR-Z0-9]{17})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![A-HJ-NPR-Z0-9])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -29,7 +29,7 @@ object VIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b[A-HJ-NPR-Z0-9]{17}\b"""
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[A-HJ-NPR-Z0-9]{17}(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

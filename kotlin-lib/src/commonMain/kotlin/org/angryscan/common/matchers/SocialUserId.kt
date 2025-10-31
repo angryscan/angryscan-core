@@ -11,7 +11,7 @@ object SocialUserId : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           ID\s+в\s+(VK|Telegram|Instagram|Одноклассниках|Facebook)|
           username\s+в\s+(VK|Telegram|Instagram|Одноклассниках|Facebook)|
@@ -20,7 +20,7 @@ object SocialUserId : IHyperMatcher, IKotlinMatcher {
         )?
         \s*[:\-]?\s*
         (@[a-zA-Z0-9_]{3,32})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![a-zA-Z0-9_.\-])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -29,7 +29,7 @@ object SocialUserId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n])@[a-zA-Z0-9_]{3,32}\b"""
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])@[a-zA-Z0-9_]{3,32}(?:[\s\r\n\(\)\[\]\"',;:!?]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

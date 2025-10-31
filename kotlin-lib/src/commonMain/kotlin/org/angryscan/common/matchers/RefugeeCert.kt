@@ -11,14 +11,14 @@ object RefugeeCert : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           свидетельство\s+о\s+рассмотрении\s+ходатайства\s+о\s+признании\s+(?:лица\s+)?беженцем|
           свидетельство\s+беженца
         )?
         \s*[:\-]?\s*
         (\d{2}\s*(?:№|N)?\s*\d{7})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -27,7 +27,7 @@ object RefugeeCert : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b\d{2}\s(?:№|N)?\s*\d{7}\b"""
+        """\b\d{2}\s*(?:№|N)?\s*\d{7}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

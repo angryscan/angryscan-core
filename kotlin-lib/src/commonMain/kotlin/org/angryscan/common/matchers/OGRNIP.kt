@@ -11,7 +11,7 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           ОГРНИП|
           регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|
@@ -20,7 +20,7 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
         )?
         \s*[:\-]?\s*
         ([34]\d{14})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -29,7 +29,7 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b[34]\d{14}\b"""
+        """(?:^|[^\w])[34]\d{14}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

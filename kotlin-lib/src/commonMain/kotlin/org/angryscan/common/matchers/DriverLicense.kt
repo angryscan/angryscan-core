@@ -9,14 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object DriverLicense : IHyperMatcher, IKotlinMatcher {
     override val name = "Driver License"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:водительское\s+удостоверение|ВУ)?
-        \s*[:\-]?\s*
-        (\d{2}\s?\d{2}\s\d{6})
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\b\d{2}\s?\d{2}\s?\d{6}\b"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -24,7 +17,7 @@ object DriverLicense : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\d{2}\s?\d{2}\s\d{6}\b"""
+        """\b\d{2}\s?\d{2}\s?\d{6}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

@@ -11,11 +11,11 @@ object TemporaryID : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:временное\s+удостоверение\s+личности|ВУЛ)?
         \s*[:\-]?\s*
         (\d{12})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -24,7 +24,7 @@ object TemporaryID : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b\d{12}\b"""
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])\d{12}(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

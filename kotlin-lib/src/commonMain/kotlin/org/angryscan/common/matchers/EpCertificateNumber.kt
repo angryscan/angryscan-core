@@ -11,7 +11,6 @@ object EpCertificateNumber : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
         (?:
           серийный\s+номер\s+сертификата\s+ЭП|
           номер\s+сертификата\s+электронной\s+подписи|
@@ -20,8 +19,7 @@ object EpCertificateNumber : IHyperMatcher, IKotlinMatcher {
           уникальный\s+номер\s+сертификата
         )?
         \s*[:\-]?\s*
-        (([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4})
-        (?![\p{L}\d\p{S}\p{P}])
+        \b((?:[0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}(?:[0-9A-Fa-f]{2}\s?){0,4})\b
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -30,7 +28,7 @@ object EpCertificateNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4}\b"""
+        """\b([0-9A-Fa-f]{2}\s?){15}[0-9A-Fa-f]{2}([0-9A-Fa-f]{2}\s?){0,4}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

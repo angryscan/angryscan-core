@@ -9,17 +9,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     override val name = "Legal Entity ID"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:идентификатор\s+ЮЛ|код\s+LEI|LEI|SWIFT-код|BIC|идентификатор\s+юридического\s+лица)?
-        \s*[:\-]?\s*
-        (?:
-          ([A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2})|
-          ([A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?)
-        )
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])""",
+        """(?:^|\s|[\(\[\{«"'])\s*[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?:$|[\s\)\]\}»"'\.,;:!?])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -27,7 +18,8 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n])(?:[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}|[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?)(?:[\s\r\n]|$)"""
+        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])""",
+        """(?:^|\s|[\(\[\{«"'])\s*[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?:$|[\s\)\]\}»"'\.,;:!?])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -36,21 +28,30 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        if (value.any { it.isLetter() && it.isLowerCase() }) return false
+        // Normalize: strip leading/trailing non-alphanumeric wrappers (quotes, brackets, punctuation)
+        var s = value.trim()
+        while (s.isNotEmpty() && !s.first().isLetterOrDigit()) s = s.drop(1).trimStart()
+        while (s.isNotEmpty() && !s.last().isLetterOrDigit()) s = s.dropLast(1).trimEnd()
 
-        if (value.any { !it.isLetterOrDigit() && !it.isWhitespace() }) return false
-        
-        val cleanValue = value.trim().replace(" ", "")
+        if (s.any { it.isLetter() && it.isLowerCase() }) return false
+
+        val cleanValue = s.replace(" ", "")
         
         if (cleanValue.length == 20) {
-            var remainder = 0
-            for (ch in cleanValue) {
-                val token = if (ch.isDigit()) ch.toString() else ((ch - 'A') + 10).toString()
-                for (digitChar in token) {
-                    remainder = (remainder * 10 + (digitChar - '0')) % 97
+            val body = cleanValue.substring(0, 18)
+            val checkDigits = cleanValue.substring(18, 20)
+            fun mod97OfNumericString(snum: String): Int {
+                var rem = 0
+                for (ch in snum) {
+                    val token = if (ch.isDigit()) ch.toString() else ((ch - 'A') + 10).toString()
+                    for (d in token) rem = (rem * 10 + (d - '0')) % 97
                 }
+                return rem
             }
-            if (remainder == 1) return true
+            val remBody = mod97OfNumericString(body + "00")
+            val expected = (98 - remBody) % 97
+            val expectedStr = if (expected < 10) "0$expected" else expected.toString()
+            if (expectedStr == checkDigits) return true
         }
         
         if (cleanValue.length == 8 || cleanValue.length == 11) {

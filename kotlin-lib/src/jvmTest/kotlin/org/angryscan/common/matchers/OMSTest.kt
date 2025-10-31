@@ -15,117 +15,117 @@ internal class OMSTest {
 
     @Test
     fun testOMSAtStart() {
-        val text = "ОМС 1234567890123456 выдан"
+        val text = "ОМС 1234567890123452 выдан"
         assertEquals(1, scanText(text, OMS), "Полис ОМС в начале должен быть найден")
     }
 
     @Test
     fun testOMSAtEnd() {
-        val text = "Номер полиса ОМС 1234567890123456"
+        val text = "Номер полиса ОМС 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис ОМС в конце должен быть найден")
     }
 
     @Test
     fun testOMSInMiddle() {
-        val text = "Пациент имеет полис 1234567890123456 действующий"
+        val text = "Пациент имеет полис 1234567890123452 действующий"
         assertEquals(1, scanText(text, OMS), "Полис ОМС в середине должен быть найден")
     }
 
     @Test
     fun testOMSStandalone() {
-        val text = "полис 1234567890123456"
+        val text = "полис 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис ОМС отдельной строкой должен быть найден")
     }
 
     @Test
     fun testOMSWithoutSpaces() {
-        val text = "ОМС 1234567890123456"
+        val text = "ОМС 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис ОМС без пробелов должен быть найден")
     }
 
     @Test
     fun testOMSWithSpaces() {
-        val text = "ОМС 1234 5678 9012 3456"
+        val text = "ОМС 1234 5678 9012 3452"
         assertEquals(1, scanText(text, OMS), "Полис ОМС с пробелами должен быть найден")
     }
 
     @Test
     fun testOMSWithDashes() {
-        val text = "ОМС 1234-5678-9012-3456"
+        val text = "ОМС 1234-5678-9012-3452"
         assertEquals(1, scanText(text, OMS), "Полис ОМС с дефисами должен быть найден")
     }
 
     @Test
     fun testOMSWithTabs() {
-        val text = "ОМС\t1234\t5678\t9012\t3456"
+        val text = "ОМС\t1234\t5678\t9012\t3452"
         assertEquals(1, scanText(text, OMS), "Полис ОМС с табуляцией должен быть найден")
     }
 
     @Test
     fun testOMSPrefixOMS() {
-        val text = "ОМС 1234567890123456"
+        val text = "ОМС 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис с префиксом 'ОМС' должен быть найден")
     }
 
     @Test
     fun testOMSPrefixPolis() {
-        val text = "полис 1234567890123456"
+        val text = "полис 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис с префиксом 'полис' должен быть найден")
     }
 
     @Test
     fun testOMSPrefixStrakhovka() {
-        val text = "страховка 1234567890123456"
+        val text = "страховка 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис с префиксом 'страховка' должен быть найден")
     }
 
     @Test
     fun testOMSPrefixStrakhovanie() {
-        val text = "страхование 1234567890123456"
+        val text = "страхование 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис с префиксом 'страхование' должен быть найден")
     }
 
     @Test
     fun testOMSUpperCase() {
-        val text = "ОМС 1234567890123456"
+        val text = "ОМС 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис в верхнем регистре должен быть найден")
     }
 
     @Test
     fun testOMSLowerCase() {
-        val text = "омс 1234567890123456"
+        val text = "омс 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис в нижнем регистре должен быть найден")
     }
 
     @Test
     fun testOMSMixedCase() {
-        val text = "ОмС 1234567890123456"
+        val text = "ОмС 1234567890123452"
         assertEquals(1, scanText(text, OMS), "Полис в смешанном регистре должен быть найден")
     }
 
     @Test
     fun testOMSInParentheses() {
-        val text = "(ОМС 1234567890123456)"
+        val text = "(ОМС 1234567890123452)"
         assertEquals(1, scanText(text, OMS), "Полис в скобках должен быть найден")
     }
 
     @Test
     fun testOMSInQuotes() {
-        val text = "\"ОМС 1234567890123456\""
+        val text = "\"ОМС 1234567890123452\""
         assertEquals(1, scanText(text, OMS), "Полис в кавычках должен быть найден")
     }
 
     @Test
     fun testOMSWithPunctuation() {
-        val text = "ОМС: 1234567890123456."
+        val text = "ОМС: 1234567890123452."
         assertEquals(1, scanText(text, OMS), "Полис с пунктуацией должен быть найден")
     }
 
     @Test
     fun testMultipleOMS() {
         val text = """
-            Первый: ОМС 1234567890123456
-            Второй: полис 9876543210987654
+            Первый: ОМС 1234567890123452
+            Второй: полис 9876543210987658
         """.trimIndent()
         assertEquals(2, scanText(text, OMS), "Несколько полисов ОМС должны быть найдены")
     }

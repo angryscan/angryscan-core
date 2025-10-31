@@ -9,27 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object UidContractBankBki : IHyperMatcher, IKotlinMatcher {
     override val name = "UID Contract Bank BKI"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:
-          уникальный\s+идентификатор\s+договора|
-          УИД\s+договора|
-          идентификатор\s+договора\s+для\s+БКИ|
-          УИД\s+ФЛ\s+с\s+банком
-        )?
-        \s*[:\-]?\s*
-        \{?
-        (
-          [0-9A-Fa-f]{8}[- ]?
-          [0-9A-Fa-f]{4}[- ]?
-          4[0-9A-Fa-f]{3}[- ]?
-          [89ABab][0-9A-Fa-f]{3}[- ]?
-          [0-9A-Fa-f]{12}
-        )
-        \}?[-]?[0-9A-Fa-f]?
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\{?[0-9A-Fa-f]{8}[- ]?[0-9A-Fa-f]{4}[- ]?4[0-9A-Fa-f]{3}[- ]?[89ABab][0-9A-Fa-f]{3}[- ]?[0-9A-Fa-f]{12}\}?"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,

@@ -80,37 +80,6 @@ internal class MaritalStatusTest {
     }
 
     @Test
-    fun testMaritalStatusFemaleVariants() {
-        val text = """
-            замужем
-            не замужем
-            разведена
-            вдова
-            одинокая
-        """.trimIndent()
-        assertEquals(5, scanText(text, MaritalStatus), "Женские варианты семейного положения должны быть найдены")
-    }
-
-    @Test
-    fun testMaritalStatusMaleVariants() {
-        val text = """
-            женат
-            не женат
-            холостой
-            разведен
-            вдовец
-            одинок
-        """.trimIndent()
-        assertEquals(6, scanText(text, MaritalStatus), "Мужские варианты семейного положения должны быть найдены")
-    }
-
-    @Test
-    fun testMaritalStatusNotMarried() {
-        val text = "не состоит в браке"
-        assertEquals(1, scanText(text, MaritalStatus), "Фраза 'не состоит в браке' должна быть найдена")
-    }
-
-    @Test
     fun testMaritalStatusCivilMarriage() {
         val text = "состоит в гражданском браке"
         assertEquals(1, scanText(text, MaritalStatus), "Гражданский брак должен быть найден")

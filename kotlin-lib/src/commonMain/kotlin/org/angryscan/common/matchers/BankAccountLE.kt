@@ -9,14 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object BankAccountLE : IHyperMatcher, IKotlinMatcher {
     override val name = "Bank Account LE"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:номер\s+банковского\s+счета\s+ЮЛ|р/с\s+организации|расчетный\s+счет\s+ЮЛ)?
-        \s*[:\-]?\s*
-        (407\d{17})
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\b407\d{17}\b"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,

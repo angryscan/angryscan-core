@@ -24,6 +24,8 @@ object INN : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean {
         val inn = value.replace("[^0-9]".toRegex(), "")
+        if (inn.length != 12) return false
+        if (inn.all { it == inn.first() }) return false
         val firstSequence = listOf(7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
         val secondSequence = listOf(3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
         var summ1 = 0

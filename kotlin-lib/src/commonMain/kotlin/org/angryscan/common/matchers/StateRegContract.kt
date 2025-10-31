@@ -11,14 +11,15 @@ object StateRegContract : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           номер\s+государственной\s+регистрации\s+договора|
           номер\s+регистрации\s+договора\s+в\s+Росреестре|
           госрегистрационный\s+номер\s+договора\s+с\s+ФЛ
         )?
         \s*[:\-]?\s*
-        (\d{2}\s?[-:]\s?\d{2}\s?[-:]\s?\d{2}/\d{3,4}/\d{4}\s?[-:]\s?\d{1,3})
+        (\d{2}\s*[-:]\s*\d{2}\s*[-:]\s*\d{2}\s*/\s*\d{3,4}\s*/\s*\d{4}\s*[-:]\s*\d{1,3})
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -27,7 +28,7 @@ object StateRegContract : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\d{2}\s?[-:]\s?\d{2}\s?[-:]\s?\d{2}/\d{3,4}/\d{4}\s?[-:]\s?\d{1,3}\b"""
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])\d{2}\s*[-:]\s*\d{2}\s*[-:]\s*\d{2}\s*/\s*\d{3,4}\s*/\s*\d{4}\s*[-:]\s*\d{1,3}(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

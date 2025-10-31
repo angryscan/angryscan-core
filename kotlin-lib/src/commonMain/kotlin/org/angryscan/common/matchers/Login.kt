@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object Login : IHyperMatcher, IKotlinMatcher {
     override val name = "Login"
     override val javaPatterns = listOf(
-        """(логин|login):?\s*[a-z0-9_-]{3,25}"""
+        """(логин|login):?\s*[a-z0-9_-]{3,25}(?=$|[\s.,;()<"!?])(?![\w@]|\s\d)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object Login : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(логин|login):?\s*([a-z0-9_-]{3,25})($|[ \t\r.,;()<"])"""
+        """(логин|login):?\s*([a-z0-9_-]{3,25})($|[\t\r\n.,;()<"!?]|\s[а-яА-ЯёЁa-zA-Z])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,

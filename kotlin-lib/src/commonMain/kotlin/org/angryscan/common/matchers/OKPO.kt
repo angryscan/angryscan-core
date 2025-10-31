@@ -10,12 +10,12 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     override val name = "OKPO"
     override val javaPatterns = listOf(
         """
-        (?iux)
-        (?<![\p{L}\p{N}])
-        (?:ОКПО\s+ЮЛ|код\s+ОКПО|ОКПО\s+организации)?
-        [\p{Z}\p{Cf}\s]*[:\p{Pd}\-–—]?\s*
+        (?ix)
+        (?<!\d)
+        (?:ОКПО|код\s+ОКПО|ОКПО\s+ЮЛ|ОКПО\s+организации)?
+        \s*[:\-]?\s*
         (\d{8})
-        (?![\p{L}\p{N}])
+        (?!\d)
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -24,7 +24,7 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b\d{8}\b"""
+        """(?:ОКПО|код\s+ОКПО|ОКПО\s+ЮЛ|ОКПО\s+организации)?\s*[:\-]?\s*\d{8}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -33,7 +33,7 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val okpoClean = value.replace(Regex("[\\p{Z}\\s\\-–—]+"), "")
+        val okpoClean = value.replace(Regex("[^\\d]"), "")
         if (okpoClean.length != 8) return false
         val digits = okpoClean.map { it.toString().toInt() }
         val weights1 = intArrayOf(1, 2, 3, 4, 5, 6, 7)

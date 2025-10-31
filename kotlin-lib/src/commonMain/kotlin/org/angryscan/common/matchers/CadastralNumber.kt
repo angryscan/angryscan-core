@@ -9,20 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object CadastralNumber : IHyperMatcher, IKotlinMatcher {
     override val name = "Cadastral Number"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:
-          кадастровый\s+номер|
-          кадастровый\s+номер\s+объекта\s+недвижимости|
-          КН|
-          кадастровый\s+номер\s+земельного\s+участка|
-          кадастровый\s+номер\s+квартиры
-        )?
-        \s*[:\-]?\s*
-        (\d{2}\s?:\s?\d{2}\s?:\s?\d{6,7}\s?:\s?\d{1,5})
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\b\d{2}\s?:\s?\d{2}\s?:\s?\d{6,7}\s?:\s?\d{1,5}\b"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -30,7 +17,7 @@ object CadastralNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\d{2}\s?:\s?\d{2}\s?:\s?\d{6,7}\s?:\s?\d{1,5}\b"""
+        """\b\d{2}\s?:\s?\d{2}\s?:\s?\d{6,7}\s?:\s?\d{1,5}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

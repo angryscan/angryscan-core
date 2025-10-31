@@ -11,11 +11,11 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:вид\s+на\s+жительство|ВНЖ)?
         \s*[:\-]?\s*
         ((?:82|83)\s*(?:№|N)?\s*\d{7})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(

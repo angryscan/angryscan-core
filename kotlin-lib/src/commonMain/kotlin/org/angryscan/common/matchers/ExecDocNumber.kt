@@ -11,7 +11,7 @@ object ExecDocNumber : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           номер\s+исполнительного\s+документа|
           номер\s+исполнительного\s+производства|
@@ -20,7 +20,7 @@ object ExecDocNumber : IHyperMatcher, IKotlinMatcher {
         \s*[:\-]?\s*
         (?:№\s?)?
         (\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД))
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -29,10 +29,8 @@ object ExecDocNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """номер\s+исполнительного\s+документа""",
-        """номер\s+исполнительного\s+производства""",
-        """исполнительный\s+лист""",
-        """\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД)"""
+        """\A\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД)""",
+        """[^0-9]\d{4,5}/\d{2}/\d{5}-(?:ИП|СВ|ФС|УД|АП|СД|МС|ПД|АС|ИД)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

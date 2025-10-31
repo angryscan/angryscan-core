@@ -16,25 +16,25 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdLEIAtStart() {
-        val text = " 549300JE6S2CRWR4OK83 это LEI код"
+        val text = " 529900T8BM49AURSDO55 это LEI код"
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в начале должен быть найден")
     }
 
     @Test
     fun testLegalEntityIdLEIAtEnd() {
-        val text = "LEI организации: 549300JE6S2CRWR4OK83 "
+        val text = "Код LEI организации: 529900T8BM49AURSDO55 "
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в конце должен быть найден")
     }
 
     @Test
     fun testLegalEntityIdLEIInMiddle() {
-        val text = "Компания с LEI 549300JE6S2CRWR4OK83 зарегистрирована"
+        val text = "Компания с кодом LEI 529900T8BM49AURSDO55 зарегистрирована"
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в середине должен быть найден")
     }
 
     @Test
     fun testLegalEntityIdLEIStandalone() {
-        val text = " 549300JE6S2CRWR4OK83 "
+        val text = " 529900T8BM49AURSDO55 "
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI отдельно должен быть найден")
     }
 
@@ -64,7 +64,7 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdWithLabelLEI() {
-        val text = "LEI: 549300JE6S2CRWR4OK83 "
+        val text = " LEI: 529900T8BM49AURSDO55 "
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI с меткой должен быть найден")
     }
 
@@ -82,7 +82,7 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdLEIUpperCase() {
-        val text = " 549300JE6S2CRWR4OK83 "
+        val text = " 529900T8BM49AURSDO55 "
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в верхнем регистре должен быть найден")
     }
 
@@ -94,7 +94,7 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdInParentheses() {
-        val text = "(549300JE6S2CRWR4OK83)"
+        val text = "(529900T8BM49AURSDO55)"
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в скобках должен быть найден")
     }
 
@@ -106,14 +106,14 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdWithPunctuation() {
-        val text = "LEI: 549300JE6S2CRWR4OK83."
+        val text = " Код LEI: 529900T8BM49AURSDO55."
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI с точкой должен быть найден")
     }
 
     @Test
     fun testMultipleLegalEntityIds() {
         val text = """
-            Первый: 549300JE6S2CRWR4OK83
+            Код первый: 529900T8BM49AURSDO55
             Второй: SABRRUMM
             Третий: DEUTDEFF
         """.trimIndent()
@@ -132,13 +132,13 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdLEIInvalidChecksum() {
-        val text = " 549300JE6S2CRWR4OK84 "
+        val text = " Код LEI: 529900T8BM49AURSDO56 "
         assertEquals(0, scanText(text, LegalEntityId), "LEI с неверной контрольной суммой не должен быть найден")
     }
 
     @Test
     fun testLegalEntityIdLEILowerCase() {
-        val text = " 549300je6s2crwr4ok83 "
+        val text = " Код LEI: 529900t8bm49aursdo55 "
         assertEquals(0, scanText(text, LegalEntityId), "LEI в нижнем регистре не должен быть найден")
     }
 

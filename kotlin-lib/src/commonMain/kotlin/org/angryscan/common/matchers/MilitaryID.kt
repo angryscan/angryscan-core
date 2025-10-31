@@ -11,11 +11,10 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:удостоверение\s+личности\s+военнослужащего)?
-        \s*[:\-]?\s*
-        ([А-ЯA-Z]{2}\s*\d{7})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:])
+        (?:удостоверение\s+личности\s+военнослужащего\s*[:\-]?\s*)?
+        ([А-ЯA-Z]{2}[\s№\-]*\d{7})
+        \b
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -24,7 +23,7 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n])[А-ЯA-Z]{2}[\s№\-]*\d{7}"""
+        """(?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:\.!?])[А-ЯA-Z]{2}[\s№\-]*\d{7}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

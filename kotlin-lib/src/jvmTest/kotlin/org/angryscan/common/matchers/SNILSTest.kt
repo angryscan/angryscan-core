@@ -89,8 +89,8 @@ internal class SNILSTest {
     fun testMultipleSNILS() {
         val text = """
             Первый: 112-233-445 95
-            Второй: 123-456-789 00
-            Третий: 987-654-321 01
+            Второй: 123-456-789 64
+            Третий: 111-111-111 45
         """.trimIndent()
         assertEquals(3, scanText(text, SNILS), "Несколько СНИЛС должны быть найдены")
     }

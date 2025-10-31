@@ -9,18 +9,9 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object EducationDoc : IHyperMatcher, IKotlinMatcher {
     override val name = "Education Document"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:документ\s+об\s+образовании|диплом|аттестат|приложение\s+к\s+диплому)?
-        \s*[:\-]?\s*
-        (?:
-          (\d{6}\s?\d{7})|
-          (\d{2}\s?[А-Я]{2}\s?\d{6,7})|
-          ([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6})
-        )
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """\b\d{6}\s+\d{7}\b""",
+        """\b\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7}\b""",
+        """\b[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6}\b"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -28,8 +19,8 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b\d{6}\s\d{7}\b""",
-        """\b\d{2}\s[А-Я]{2}\s\d{6,7}\b""",
+        """\b\d{6}\s+\d{7}\b""",
+        """\b\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7}\b""",
         """\b[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6}\b"""
     )
     override val expressionOptions = setOf(

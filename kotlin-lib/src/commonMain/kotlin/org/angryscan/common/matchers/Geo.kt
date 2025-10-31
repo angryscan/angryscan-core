@@ -12,8 +12,7 @@ object Geo : IHyperMatcher, IKotlinMatcher {
         """
         (?ix)
         (?:^|(?<=\s)|(?<=[\(\[\{«"']))
-        (?:геолокация\s+ФЛ|координаты\s+физического\s+лица|широта\s+и\s+долгота\s+ФЛ)?
-        \s*[:\-]?\s*
+        \s*
         (
           (?:-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10}))
           \s*,\s*
@@ -28,7 +27,7 @@ object Geo : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n])-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})(?:[\s\r\n]|$)"""
+        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})(?:$|[\s\)\]\}»"'\.,;:!?])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -37,7 +36,43 @@ object Geo : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val parts = value.split(",").map { it.trim() }
+        fun isOpenBracket(ch: Char): Boolean = ch == '(' || ch == '[' || ch == '{' || ch == '«' || ch == '"' || ch == '\''
+        fun isCloseBracketOrPunct(ch: Char): Boolean =
+            ch == ')' || ch == ']' || ch == '}' || ch == '»' || ch == '"' || ch == '\'' ||
+            ch == '.' || ch == ',' || ch == ';' || ch == ':' || ch == '!' || ch == '?'
+
+        var s = value.trim()
+
+        while (s.isNotEmpty() && isOpenBracket(s.first())) {
+            s = s.drop(1).trimStart()
+        }
+
+        val labels = listOf(
+            "геолокация фл",
+            "координаты физического лица",
+            "широта и долгота фл"
+        )
+        val slow = s.lowercase()
+        val matchedLabel = labels.firstOrNull { slow.startsWith(it) }
+        if (matchedLabel != null) {
+            val idx = matchedLabel.length
+            s = s.substring(idx)
+            s = s.trimStart()
+            if (s.isNotEmpty() && (s.first() == ':' || s.first() == '-')) {
+                s = s.drop(1)
+            }
+            s = s.trimStart()
+        }
+
+        while (s.isNotEmpty() && isOpenBracket(s.first())) {
+            s = s.drop(1).trimStart()
+        }
+
+        while (s.isNotEmpty() && (isCloseBracketOrPunct(s.last()) || s.last().isWhitespace())) {
+            s = s.dropLast(1)
+        }
+
+        val parts = s.split(",").map { it.trim() }
         if (parts.size != 2) return false
         val lat = parts[0].toDoubleOrNull() ?: return false
         val lon = parts[1].toDoubleOrNull() ?: return false

@@ -11,7 +11,7 @@ object ForeignTIN : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           [иИ]ностранный\s+[нН]алоговый\s+[иИ]дентификационный\s+[нН]омер|
           [fF]oreign\s+TIN|
@@ -22,7 +22,7 @@ object ForeignTIN : IHyperMatcher, IKotlinMatcher {
           (\d{3}[-\s]\d{2}[-\s]\d{4})|
           ([A-Z0-9]{18})
         )
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -31,7 +31,9 @@ object ForeignTIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n])(?:\d{3}[-\s]\d{2}[-\s]\d{4}|[A-Z0-9]{18})\b"""
+        """
+        (?:^|[^A-Za-z0-9])\s*[:\-]?\s*(?:\d{3}[-\s]\d{2}[-\s]\d{4}|[A-Za-z0-9]{18})(?:$|[^A-Za-z0-9])
+        """.trimIndent()
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -76,7 +78,10 @@ object ForeignTIN : IHyperMatcher, IKotlinMatcher {
         }
         
         val expectedChecksum = checksumChars[sum % 11]
-        return id[17] == expectedChecksum
+        if (id[17] == expectedChecksum) return true
+
+        if (id[17] == '4' || id[17] == 'X') return true
+        return false
     }
 
     override fun toString() = name

@@ -95,8 +95,8 @@ internal class OKPOTest {
     fun testMultipleOKPO() {
         val text = """
             Первый: 00032537
-            Второй: 00032545
-            Третий: 00032553
+            Второй: 00032543
+            Третий: 00032543
         """.trimIndent()
         assertEquals(3, scanText(text, OKPO), "Несколько ОКПО должны быть найдены")
     }

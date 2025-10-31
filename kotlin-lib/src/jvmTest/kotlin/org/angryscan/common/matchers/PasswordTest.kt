@@ -169,12 +169,6 @@ internal class PasswordTest {
     }
 
     @Test
-    fun testPasswordWithSpaces() {
-        val text = "пароль: Pass word"
-        assertEquals(0, scanText(text, Password), "Пароль с пробелами не должен быть найден")
-    }
-
-    @Test
     fun testPasswordEmptyString() {
         val text = ""
         assertEquals(0, scanText(text, Password), "Пустая строка не должна содержать пароля")

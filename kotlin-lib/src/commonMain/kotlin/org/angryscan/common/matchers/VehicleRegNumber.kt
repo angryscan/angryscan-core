@@ -14,7 +14,7 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?<![\p{L}\d])
         (?:
           регистрационный\s+номер\s+ТС|
           госномер|
@@ -28,7 +28,7 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
         | (\d{4}\s?[АВЕКМНОРСТУХ]{2}\s?)
         )
         (?:$regionCodes)
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -37,8 +37,8 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n])[АВЕКМНОРСТУХ]\s?\d{3}\s?[АВЕКМНОРСТУХ]{2}\s?(?:$regionCodes)\b""",
-        """(?:^|[\s\r\n])\d{4}\s?[АВЕКМНОРСТУХ]{2}\s?(?:$regionCodes)\b"""
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[АВЕКМНОРСТУХ]\s?\d{3}\s?[АВЕКМНОРСТУХ]{2}\s?(?:$regionCodes)(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)""",
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])\d{4}\s?[АВЕКМНОРСТУХ]{2}\s?(?:$regionCodes)(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

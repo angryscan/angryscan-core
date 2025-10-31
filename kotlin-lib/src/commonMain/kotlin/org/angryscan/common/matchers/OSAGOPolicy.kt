@@ -9,21 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     override val name = "OSAGO Policy"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:
-          полис\s+ОСАГО|
-          ОСАГО|
-          номер\s+полиса\s+ОСАГО|
-          е-ОСАГО|
-          электронный\s+полис\s+ОСАГО|
-          страховка\s+ОСАГО
-        )?
-        \s*[:\-]?\s*
-        ([A-Z]{3}\s?(?:№\s?)?\s?\d{10})
-        (?![\p{L}\d\p{S}\p{P}])
-        """.trimIndent()
+        """(?<![A-ZА-Яa-zа-я])[A-ZА-Я]{3}\s?№?\s?\d{10}(?!\d)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -31,7 +17,7 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """[A-Z]{3}\s?(?:№\s?)?\s?\d{10}\b"""
+        """(?:^|[^A-ZА-Яa-zа-я0-9])[A-ZА-Я]{3}\s?№?\s?\d{10}(?:$|[^0-9])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

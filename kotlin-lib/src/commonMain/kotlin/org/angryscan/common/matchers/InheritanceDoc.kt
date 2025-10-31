@@ -11,11 +11,10 @@ object InheritanceDoc : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
-        (?:свидетельство\s+о\s+праве\s+на\s+наследство)?
-        \s*[:\-]?\s*
+        (?:^|(?<=\s)|(?<=[\(\[\{«"']))
+        \s*
         (\d{2}\s?[А-Я]{2}\s?\d{6,7})
-        (?![\p{L}\d\p{S}\p{P}])
+        (?:$|(?=\s)|(?=[\)\]\}»"'\.,;:!?]))
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -24,7 +23,7 @@ object InheritanceDoc : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\d{2}\s?[А-Я]{2}\s?\d{6,7}\b"""
+        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?\d{2}\s?[А-Я]{2}\s?\d{6,7}(?:$|[\s\)\]\}»"'\.,;:!?])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
