@@ -5,7 +5,7 @@ import org.angryscan.common.engine.hyperscan.HyperScanEngine
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 import org.angryscan.common.engine.kotlin.KotlinEngine
-import org.angryscan.common.extensions.MatchersRegister
+import org.angryscan.common.extensions.Matchers
 import org.angryscan.common.extensions.ProgressBar
 import java.io.File
 import kotlin.system.measureTimeMillis
@@ -20,21 +20,21 @@ internal class LongScanTest {
         assertEquals(true, file.exists())
         val text = file.readText()
             .let { t ->
-                (0..100).joinToString { t + "\r\n" }
+                (0..99).joinToString { t + "\r\n" }
             }
 
         var foundCount = 0
-        val repeatCount = 100
-        val progressBar = ProgressBar(repeatCount, "Scanning")
+        val progressBar = ProgressBar(100, "Scanning")
         val multipleScanTime: MutableList<Long> = mutableListOf()
-        for (i in 0..repeatCount) {
+
+        repeat(100) { i ->
             multipleScanTime.add(
                 measureTimeMillis {
                     print("")
                     foundCount += engine.scan(text).count()
                 }
             )
-            progressBar.update(i)
+            progressBar.update(i + 1)
         }
         println("Scan count: $foundCount")
         println("Multiple scan time: ${multipleScanTime.sumOf { it }}ms")
@@ -52,8 +52,8 @@ internal class LongScanTest {
         assertNotNull(filePath)
 
         println("##### Kotlin Engine #####")
-        val kotlinEngine = KotlinEngine(MatchersRegister.matchers.filterIsInstance<IKotlinMatcher>())
-        assertEquals(224422, longScan(kotlinEngine, filePath))
+        val kotlinEngine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
+        assertEquals(220000, longScan(kotlinEngine, filePath))
     }
 
 
@@ -61,8 +61,8 @@ internal class LongScanTest {
     fun longScanHS() {
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
-        val hyperEngine = HyperScanEngine(MatchersRegister.matchers.filterIsInstance<IHyperMatcher>())
+        val hyperEngine = HyperScanEngine(Matchers.filterIsInstance<IHyperMatcher>())
         println("##### Hyper Scan #####")
-        assertEquals(224422, longScan(hyperEngine, filePath))
+        assertEquals(220000, longScan(hyperEngine, filePath))
     }
 }

@@ -23,6 +23,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
             }.mapIndexed { index, pair ->
                 //Конвертируем набор опций
                 val es = EnumSet.of(ExpressionFlag.SOM_LEFTMOST)
+
                 pair.second.expressionOptions.forEach {
                     es.add(it.toExpressionFlag())
                 }
@@ -49,6 +50,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
     override fun scan(text: String): List<Match> {
         val scanner = Scanner()
         scanner.allocScratch(database)
+
         val res = scanner
             .scan(
                 database,
@@ -57,6 +59,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
             .filter {
                 expressions[it.matchedExpression]!!.check(it.matchedString)
             }.toMutableList()
+
         scanner.close()
 
         return res.map {
