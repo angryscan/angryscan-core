@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     // Multiplatform artifact; usable from JVM or MPP projects
-    implementation("org.angryscan:core:1.3.3")
+    implementation("org.angryscan:core:1.3.5")
 }
 ```
 
@@ -35,14 +35,14 @@ dependencies {
 <dependency>
     <groupId>org.angryscan</groupId>
     <artifactId>core</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.5</version>
 </dependency>
 ```
 
 ### Kotlin/JS (Gradle)
 ```kotlin
 dependencies {
-    implementation("org.angryscan:core-js:1.3.3")
+    implementation("org.angryscan:core-js:1.3.5")
 }
 ```
 
