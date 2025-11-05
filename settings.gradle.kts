@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AngryData"
+rootProject.name = "AngryCore"
 include(":kotlin-lib")
 include(":native-lib")
