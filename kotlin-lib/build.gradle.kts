@@ -84,8 +84,14 @@ kotlin {
         jvmTest {
             dependencies {
                 when {
-                    org.gradle.internal.os.OperatingSystem.current().isWindows -> implementation(libs.hyperscan.windows)
-                    else -> implementation(libs.hyperscan.default)
+                    org.gradle.internal.os.OperatingSystem.current().isWindows -> {
+                        println("Set hyperscan windows")
+                        implementation(libs.hyperscan.windows)
+                    }
+                    else -> {
+                        println("Set hyperscan default")
+                        implementation(libs.hyperscan.default)
+                    }
                 }
             }
         }
