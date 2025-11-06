@@ -78,7 +78,15 @@ kotlin {
         }
         jvmMain {
             dependencies {
-                compileOnly(libs.hyperscan)
+                compileOnly(libs.hyperscan.default)
+            }
+        }
+        jvmTest {
+            dependencies {
+                when {
+                    "win" in System.getProperty("os.name").lowercase() -> implementation(libs.hyperscan.windows)
+                    else -> implementation(libs.hyperscan.default)
+                }
             }
         }
     }
