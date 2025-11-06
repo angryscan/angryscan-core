@@ -1,10 +1,8 @@
 package detectfunctions
 
 import org.angryscan.common.engine.kotlin.KotlinEngine
-import org.angryscan.common.matchers.AccountNumber
 import org.angryscan.common.matchers.Address
 import org.angryscan.common.matchers.CVV
-import org.angryscan.common.matchers.CarNumber
 import org.angryscan.common.matchers.CardNumber
 import org.angryscan.common.matchers.Email
 import org.angryscan.common.matchers.FullName
@@ -34,11 +32,6 @@ fun detectCardNumbers(text: String): Int {
 }
 
 @Suppress("Unused")
-fun detectCarNumber(text: String): Int {
-    return KotlinEngine(listOf(CarNumber)).scan(text).count()
-}
-
-@Suppress("Unused")
 fun detectSINLS(text: String): Int {
     return KotlinEngine(listOf(SNILS)).scan(text).count()
 }
@@ -56,11 +49,6 @@ fun detectOMS(text: String): Int {
 @Suppress("Unused")
 fun detectINN(text: String): Int {
     return KotlinEngine(listOf(INN)).scan(text).count()
-}
-
-@Suppress("Unused")
-fun detectAccountNumber(text: String): Int {
-    return KotlinEngine(listOf(AccountNumber)).scan(text).count()
 }
 
 @Suppress("Unused")

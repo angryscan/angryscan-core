@@ -4,7 +4,6 @@ import org.angryscan.common.engine.IMatcher
 import org.angryscan.common.matchers.*
 
 object Matchers: List<IMatcher> by listOf<IMatcher>(
-    AccountNumber,
     Address,
     BankAccount,
     BankAccountLE,
@@ -12,7 +11,6 @@ object Matchers: List<IMatcher> by listOf<IMatcher>(
     Birthday,
     CadastralNumber,
     CardNumber(),
-    CarNumber,
     CVV,
     DeathDate,
     DriverLicense,

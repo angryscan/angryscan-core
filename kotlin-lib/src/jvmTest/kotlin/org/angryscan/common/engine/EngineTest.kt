@@ -23,10 +23,6 @@ internal class EngineTest {
             assertEquals(1, scanResult.count { it.matcher is CardNumber }, "Card number check")
             //Check Phone
             assertEquals(2, scanResult.count { it.matcher is Phone }, "Phone check")
-            //Check AccountNscanResulter
-            assertEquals(1, scanResult.count { it.matcher is AccountNumber }, "Account number check")
-            //Check CarNumbescanResult
-            assertEquals(2, scanResult.count { it.matcher is CarNumber }, "Car number check")
             //Check SNILS
             assertEquals(1, scanResult.count { it.matcher is SNILS }, "SNILS check")
             //Check Passport
