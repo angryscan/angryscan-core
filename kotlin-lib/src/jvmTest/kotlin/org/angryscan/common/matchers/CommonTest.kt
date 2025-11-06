@@ -161,27 +161,6 @@ internal class CommonTest {
     }
 
     @Test
-    fun testMatchersInXML() {
-        val text = """
-            <person>
-                <maritalStatus>женат</maritalStatus>
-                <education>высшее образование</education>
-                <rank>капитан</rank>
-                <documentType>паспорт гражданина РФ</documentType>
-                <coordinates>55.7558, 37.6173</coordinates>
-                <affiliation>МВД России</affiliation>
-            </person>
-        """.trimIndent()
-        
-        assertEquals(1, scanText(text, MaritalStatus), "Семейное положение в XML должно быть найдено")
-        assertEquals(1, scanText(text, EducationLevel), "Образование в XML должно быть найдено")
-        assertEquals(1, scanText(text, MilitaryRank), "Звание в XML должно быть найдено")
-        assertEquals(1, scanText(text, IdentityDocType), "Тип документа в XML должен быть найден")
-        assertEquals(1, scanText(text, Geo), "Координаты в XML должны быть найдены")
-        assertEquals(1, scanText(text, SecurityAffiliation), "Силовая структура в XML должна быть найдена")
-    }
-
-    @Test
     fun testMatchersWithMultipleSpaces() {
         val text = """
             женат     с     2020

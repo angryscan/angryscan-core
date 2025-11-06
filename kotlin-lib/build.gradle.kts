@@ -81,6 +81,11 @@ kotlin {
                 compileOnly(libs.hyperscan)
             }
         }
+        jvmTest {
+            dependencies {
+                implementation(libs.hyperscan)
+            }
+        }
     }
 }
 
