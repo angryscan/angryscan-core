@@ -89,11 +89,6 @@ kotlin {
                 }
             }
         }
-        jvmTest {
-            dependencies {
-                implementation(libs.hyperscan)
-            }
-        }
     }
 }
 
