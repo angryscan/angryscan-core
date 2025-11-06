@@ -24,7 +24,7 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:ОКПО|код\s+ОКПО|ОКПО\s+ЮЛ|ОКПО\s+организации)?\s*[:\-]?\s*\d{8}\b"""
+        """(^|[^\d])(?:ОКПО|код\s+ОКПО|ОКПО\s+ЮЛ|ОКПО\s+организации)?\s*[:\-]?\s*\d{8}($|[^\d])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

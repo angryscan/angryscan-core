@@ -9,14 +9,14 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
     override val javaPatterns = listOf(
-        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b(?![-0-9])"""
+        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b(?![0-9-])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
+        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[^0-9-]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE
@@ -27,6 +27,10 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
             return false
         var summ = 0
         val snils = value.replace(Regex("[^0-9 -]"), "").replace(" ", "").replace("-", "").trim()
+
+        // SNILS должен содержать ровно 11 цифр
+        if (snils.length != 11)
+            return false
 
         for (index in 0 until snils.length - 2) {
             summ += snils[index].digitToInt() * (9 - index)
