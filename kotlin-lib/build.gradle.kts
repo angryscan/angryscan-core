@@ -84,7 +84,7 @@ kotlin {
         jvmTest {
             dependencies {
                 when {
-                    "win" in System.getProperty("os.name").lowercase() -> implementation(libs.hyperscan.windows)
+                    org.gradle.internal.os.OperatingSystem.current().isWindows -> implementation(libs.hyperscan.windows)
                     else -> implementation(libs.hyperscan.default)
                 }
             }
