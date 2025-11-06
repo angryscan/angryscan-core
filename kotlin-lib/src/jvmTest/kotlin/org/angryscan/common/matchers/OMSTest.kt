@@ -166,14 +166,14 @@ internal class OMSTest {
 
         val kotlinRes = kotlinEngine.scan(text)
         val hyperRes = hyperEngine.scan(text)
-        
+
         assertEquals(
             kotlinRes.count(),
             hyperRes.count(),
             "Количество совпадений для ${matcher.name} должно быть одинаковым для обоих движков. " +
             "Kotlin: ${kotlinRes.count()}, Hyper: ${hyperRes.count()}\nText: $text"
         )
-        
+
         return kotlinRes.count()
     }
 }

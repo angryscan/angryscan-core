@@ -20,6 +20,7 @@ object IPv4 : IHyperMatcher, IKotlinMatcher {
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
+        ExpressionOption.UTF8
     )
 
     override fun check(value: String) = true

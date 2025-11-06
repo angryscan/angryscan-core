@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.angryscan"
-version = "1.2.3-alpha-1"
+version = "1.3.6"
 description = "Data Scanner Library"
 
 
@@ -78,7 +78,7 @@ kotlin {
         }
         jvmMain {
             dependencies {
-                implementation(libs.hyperscan)
+                compileOnly(libs.hyperscan)
             }
         }
     }
@@ -150,5 +150,5 @@ mavenPublishing {
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-//    signAllPublications()
+    signAllPublications()
 }

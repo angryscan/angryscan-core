@@ -25,9 +25,7 @@ object Password : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean {
-        return true
-    }
+    override fun check(value: String) = true
 
     override fun toString() = name
 }

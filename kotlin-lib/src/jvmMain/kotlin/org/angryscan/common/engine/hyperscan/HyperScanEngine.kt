@@ -54,7 +54,9 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
         val res = scanner
             .scan(
                 database,
-                text.replace("\u0000", "")
+                text
+                    .replace("\u0000", "")
+                    .replace('\u000B', '\n')
             )
             .filter {
                 expressions[it.matchedExpression]!!.check(it.matchedString)
