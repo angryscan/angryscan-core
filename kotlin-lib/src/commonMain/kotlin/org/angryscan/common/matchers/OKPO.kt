@@ -11,11 +11,10 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<!\d)
-        (?:ОКПО|код\s+ОКПО|ОКПО\s+ЮЛ|ОКПО\s+организации)?
+        (?:^|(?<=[ \n(\[{\"'«“]))
         \s*[:\-]?\s*
-        (\d{8})
-        (?!\d)
+        (\d{8}|\d{10})
+        (?=\.\s|[\)\]}\"'»”]\s|\s|$)
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -24,7 +23,14 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(^|[^\d])(?:ОКПО|код\s+ОКПО|ОКПО\s+ЮЛ|ОКПО\s+организации)?\s*[:\-]?\s*\d{8}($|[^\d])"""
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}\.\s""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}[\)\]}\"'»”]\s""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}\s""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}$""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}\.\s""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}[\)\]}\"'»”]\s""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}\s""",
+        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}$"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -34,18 +40,37 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean {
         val okpoClean = value.replace(Regex("[^\\d]"), "")
-        if (okpoClean.length != 8) return false
+        val length = okpoClean.length
+        if (length != 8 && length != 10) return false
+        if (okpoClean.all { it == '0' }) return false
+        if (okpoClean.all { it in "01" }) return false
+        if (length == 8 && okpoClean == "12345678") return false
+        if (length == 10 && okpoClean == "1234567890") return false
+        if (length == 10 && okpoClean == "0123456789") return false
         val digits = okpoClean.map { it.toString().toInt() }
-        val weights1 = intArrayOf(1, 2, 3, 4, 5, 6, 7)
-        val sum1 = weights1.indices.sumOf { weights1[it] * digits[it] }
-        var check = sum1 % 11
-        if (check > 9) {
-            val weights2 = intArrayOf(3, 4, 5, 6, 7, 8, 9)
-            val sum2 = weights2.indices.sumOf { weights2[it] * digits[it] }
-            check = sum2 % 11
+        if (length == 8) {
+            val weights1 = intArrayOf(1, 2, 3, 4, 5, 6, 7)
+            val sum1 = weights1.indices.sumOf { weights1[it] * digits[it] }
+            var check = sum1 % 11
+            if (check > 9) {
+                val weights2 = intArrayOf(3, 4, 5, 6, 7, 8, 9)
+                val sum2 = weights2.indices.sumOf { weights2[it] * digits[it] }
+                check = sum2 % 11
+            }
+            if (check == 10) check = 0
+            return check == digits[7]
+        } else {
+            val weights1 = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
+            val sum1 = weights1.indices.sumOf { weights1[it] * digits[it] }
+            var check = sum1 % 11
+            if (check > 9) {
+                val weights2 = intArrayOf(3, 4, 5, 6, 7, 8, 9, 10, 11)
+                val sum2 = weights2.indices.sumOf { weights2[it] * digits[it] }
+                check = sum2 % 11
+            }
+            if (check == 10) check = 0
+            return check == digits[9]
         }
-        if (check == 10) check = 0
-        return check == digits[7]
     }
 
     override fun toString() = name

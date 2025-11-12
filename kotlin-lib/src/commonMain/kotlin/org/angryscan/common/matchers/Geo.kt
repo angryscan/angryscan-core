@@ -74,9 +74,54 @@ object Geo : IHyperMatcher, IKotlinMatcher {
 
         val parts = s.split(",").map { it.trim() }
         if (parts.size != 2) return false
+        
+        val originalValue = value.trim()
+        val originalLower = originalValue.lowercase()
+        
+        if (originalValue.contains("~N(") || originalValue.contains("N(")) return false
+        if (originalValue.contains("]") || originalValue.contains("[")) return false
+        if (originalValue.contains("λ") || originalValue.contains("∪") || originalValue.contains("∩")) return false
+        
+        if (originalLower.contains("iter") || originalLower.contains("k-mea") || 
+            originalLower.contains("ewma") || originalLower.contains("unifo")) return false
+        
         val lat = parts[0].toDoubleOrNull() ?: return false
         val lon = parts[1].toDoubleOrNull() ?: return false
-        return lat in -90.0..90.0 && lon in -180.0..180.0
+        
+        if (lat !in -90.0..90.0 || lon !in -180.0..180.0) return false
+        
+        if (lat == 0.0 && lon == 0.0) return false
+        
+        if (matchedLabel == null) {
+            val isLatInteger = lat == lat.toInt().toDouble()
+            val isLonInteger = lon == lon.toInt().toDouble()
+            
+            if (isLatInteger && isLonInteger && kotlin.math.abs(lat) < 100.0 && kotlin.math.abs(lon) < 100.0) {
+                val diff = kotlin.math.abs(lat - lon)
+                if (diff < 10.0) return false
+            }
+        }
+        
+        if (matchedLabel == null) {
+            val latStr = parts[0]
+            val lonStr = parts[1]
+            val hasLatDecimals = latStr.contains(".") && latStr.substringAfter(".").length >= 3
+            val hasLonDecimals = lonStr.contains(".") && lonStr.substringAfter(".").length >= 3
+            
+            if (!hasLatDecimals || !hasLonDecimals) {
+                return false
+            }
+        }
+        
+        if (matchedLabel == null) {
+            if (kotlin.math.abs(lat) < 2.0 && kotlin.math.abs(lon) < 2.0) {
+                if (kotlin.math.abs(lat) < 1.0 || kotlin.math.abs(lon) < 1.0) {
+                    return false
+                }
+            }
+        }
+        
+        return true
     }
 
     override fun toString() = name

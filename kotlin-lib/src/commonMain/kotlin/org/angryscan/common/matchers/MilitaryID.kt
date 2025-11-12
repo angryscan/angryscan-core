@@ -31,7 +31,28 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean = true
+    override fun check(value: String): Boolean {
+        val cleaned = value.replace(Regex("[^А-Яа-я0-9]"), "").uppercase()
+        
+        if (cleaned.length != 9)
+            return false
+        
+        val letters = cleaned.substring(0, 2)
+        if (letters.length != 2 || !letters.all { it in 'А'..'Я' })
+            return false
+        
+        val digits = cleaned.substring(2)
+        if (digits.length != 7 || !digits.all { it.isDigit() })
+            return false
+        
+        if (digits == "0000000")
+            return false
+        
+        if (digits.all { it == digits[0] })
+            return false
+        
+        return true
+    }
 
     override fun toString() = name
 }

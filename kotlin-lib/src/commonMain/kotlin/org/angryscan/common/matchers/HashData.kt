@@ -9,13 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object HashData : IHyperMatcher, IKotlinMatcher {
     override val name = "Hash Data"
     override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?:^|(?<=\s)|(?<=[\(\[\{«"']))
-        \s*
-        ([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})
-        (?:$|(?=\s)|(?=[\)\]\}»"'\.,;:!?]))
-        """.trimIndent()
+        """(?ix)(?:^|[^\w\s]\s|[\s({\["'«»])(?<![\p{L}\d])([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?![\p{L}\d])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -23,7 +17,7 @@ object HashData : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?\s*(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«»])(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -45,7 +39,27 @@ object HashData : IHyperMatcher, IKotlinMatcher {
             s = s.dropLast(1)
         }
 
-        return s.length in listOf(32, 40, 64, 96, 128) && s.all { it.isDigit() || it in 'a'..'f' || it in 'A'..'F' }
+        if (s.length !in listOf(32, 40, 64, 96, 128)) return false
+        if (!s.all { it.isDigit() || it in 'a'..'f' || it in 'A'..'F' }) return false
+        
+        val cleaned = s.lowercase()
+        
+        if (cleaned.all { it == '0' }) return false
+        if (cleaned.all { it == 'f' }) return false
+        if (cleaned.all { it == cleaned[0] }) return false
+        
+        if (cleaned.all { it.isDigit() }) return false
+        
+        val uniqueChars = cleaned.toSet().size
+        if (uniqueChars < 4) return false
+        
+        val pattern1 = "0123456789abcdef".repeat(8).take(cleaned.length)
+        if (cleaned == pattern1) return false
+        
+        val pattern2 = "fedcba9876543210".repeat(8).take(cleaned.length)
+        if (cleaned == pattern2) return false
+        
+        return true
     }
 
     override fun toString() = name

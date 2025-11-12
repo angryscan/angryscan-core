@@ -9,8 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     override val name = "Legal Entity ID"
     override val javaPatterns = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])""",
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,8 +17,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])""",
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

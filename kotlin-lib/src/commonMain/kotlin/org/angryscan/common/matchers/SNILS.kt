@@ -9,17 +9,18 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
     override val javaPatterns = listOf(
-        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b(?![0-9-])"""
+        """(?:^|[^\p{L}\d]\s|[\s({\["'«»])(?<![\p{L}\d])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?![\p{L}\d])(?:\.\s|\s|\r?\n|[)\]}\s|["'«»]\s|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[^0-9-]|$)"""
+        """(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«»])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
     )
     override val expressionOptions = setOf(
-        ExpressionOption.MULTILINE
+        ExpressionOption.MULTILINE,
+        ExpressionOption.UTF8
     )
 
     override fun check(value: String): Boolean {

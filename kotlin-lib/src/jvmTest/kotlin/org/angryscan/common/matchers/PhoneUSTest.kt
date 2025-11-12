@@ -74,17 +74,6 @@ internal class PhoneUSTest {
         assertTrue(scanText(text, PhoneUS) >= 1, "US phone with parentheses should be found")
     }
 
-    @Test
-    fun testPhoneUSWithoutSpaces() {
-        val text = "+14155551234"
-        assertTrue(scanText(text, PhoneUS) >= 1, "US phone without spaces should be found")
-    }
-
-    @Test
-    fun testPhoneUSWithoutSpacesNoCountryCode() {
-        val text = "4155551234"
-        assertTrue(scanText(text, PhoneUS) >= 1, "US phone without spaces and country code should be found")
-    }
 
     @Test
     fun testPhoneUSAreaCode415() {
@@ -134,17 +123,6 @@ internal class PhoneUSTest {
         assertTrue(scanText(text, PhoneUS) >= 1, "US phone with punctuation should be found")
     }
 
-    @Test
-    fun testPhoneUSWithEquals() {
-        val text = "phone=+14155551234"
-        assertTrue(scanText(text, PhoneUS) >= 1, "US phone after equals sign should be found")
-    }
-
-    @Test
-    fun testPhoneUSWithAsterisk() {
-        val text = "*+14155551234"
-        assertTrue(scanText(text, PhoneUS) >= 1, "US phone after asterisk should be found")
-    }
 
     @Test
     fun testMultiplePhoneUS() {
@@ -202,6 +180,24 @@ internal class PhoneUSTest {
     fun testPhoneUSEmptyString() {
         val text = ""
         assertEquals(0, scanText(text, PhoneUS), "Empty string should not contain US phone number")
+    }
+
+    @Test
+    fun testPhoneUSWithoutSeparators() {
+        val text = "4155551234"
+        assertEquals(0, scanText(text, PhoneUS), "US phone without separators should not be found")
+    }
+
+    @Test
+    fun testPhoneUSWithoutSeparatorsWithCountryCode() {
+        val text = "+14155551234"
+        assertEquals(0, scanText(text, PhoneUS), "US phone without separators (even with country code) should not be found")
+    }
+
+    @Test
+    fun testPhoneUSInLongNumber() {
+        val text = "123456789012344155551234567890"
+        assertEquals(0, scanText(text, PhoneUS), "US phone pattern inside long number should not be found")
     }
 
     @Test

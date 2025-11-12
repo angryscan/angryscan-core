@@ -37,7 +37,15 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean = true
+    override fun check(value: String): Boolean {
+        val ogrnipClean = value.replace(Regex("[^\\d]"), "")
+        if (ogrnipClean.length != 15) return false
+        val digits = ogrnipClean.map { it.toString().toInt() }
+        val bigNum = ogrnipClean.substring(0, 14).toLong()
+        var check = (bigNum % 13).toInt()
+        if (check >= 10) check = 0
+        return check == digits[14]
+    }
 
     override fun toString() = name
 }

@@ -33,10 +33,36 @@ object MedicareUS : IHyperMatcher, IKotlinMatcher {
         if (mbi.length != 11)
             return false
 
+        val excludedLetters = setOf('S', 'L', 'O', 'I', 'B', 'Z')
+        
+        if (mbi.any { it.isLetter() && it in excludedLetters })
+            return false
+
         if (!mbi[0].isDigit() || mbi[0] == '0')
             return false
 
         if (!mbi[1].isLetter())
+            return false
+
+        if (!mbi[3].isDigit())
+            return false
+
+        if (!mbi[4].isLetter())
+            return false
+
+        if (!mbi[6].isDigit())
+            return false
+
+        if (!mbi[7].isLetter())
+            return false
+
+        if (!mbi[8].isLetter())
+            return false
+
+        if (!mbi[9].isDigit())
+            return false
+
+        if (!mbi[10].isDigit())
             return false
 
         val letterCount = mbi.count { it.isLetter() }

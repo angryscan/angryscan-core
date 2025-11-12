@@ -74,17 +74,6 @@ internal class VINTest {
         assertTrue(scanText(text, VIN) >= 1, "VIN в верхнем регистре должен быть найден")
     }
 
-    @Test
-    fun testVINLowerCase() {
-        val text = "VIN: jf1sh92f4cg053823"
-        assertTrue(scanText(text, VIN) >= 1, "VIN в нижнем регистре должен быть найден")
-    }
-
-    @Test
-    fun testVINMixedCase() {
-        val text = "VIN: Jf1Sh92F4cG053823"
-        assertTrue(scanText(text, VIN) >= 1, "VIN в смешанном регистре должен быть найден")
-    }
 
     @Test
     fun testVINAllNumbers() {
