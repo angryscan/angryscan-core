@@ -4,13 +4,14 @@ import kotlinx.serialization.Serializable
 import org.angryscan.common.constants.CardBins
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.IMask
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 @Serializable
-class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher {
+class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher, IMask {
     override val name = "Card number"
     override val javaPatterns = listOf(
-        """(?<=[\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"<])"""
+        """(?<=^|[\s.,\-:;"()'])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"<])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
@@ -34,7 +35,7 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     }
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
+        """(?:^|[\s.,\-:;"()'])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE
@@ -56,6 +57,23 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
         var result = name.hashCode()
         result = 31 * result + checkCardBins.hashCode()
         return result
+    }
+
+    override fun mask(value: String): String {
+        val resValue = StringBuilder()
+        var i = 0
+        value.forEach { c ->
+            if (c.isDigit()) {
+                if(i < 6 || i > 11)
+                    resValue.append(c)
+                else
+                    resValue.append('*')
+                i++
+            } else {
+                resValue.append(c)
+            }
+        }
+        return resValue.toString()
     }
 }
 
