@@ -95,7 +95,7 @@ internal class EngineTest {
     fun testCardEdge() {
         val file = javaClass.getResource("/testFiles/cardNumber/edge.txt")?.file
         assertNotNull(file)
-        assertEquals(5, getCountOfAttribute(file, CardNumber()))
+        assertEquals(7, getCountOfAttribute(file, CardNumber()))
     }
 
     @Test

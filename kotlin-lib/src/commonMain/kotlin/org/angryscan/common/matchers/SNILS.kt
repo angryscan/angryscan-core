@@ -9,14 +9,14 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
     override val javaPatterns = listOf(
-        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
+        """(?<=^|[\s.,\-:;"()'\/\\*])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
+        """(?:^|[\s.,\-:;"()'\/\\*])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE
@@ -26,7 +26,7 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
         if(value.length <= 2)
             return false
         var summ = 0
-        val snils = value.replace(" ", "").replace("-", "").trim()
+        val snils = value.replace("\\D".toRegex(), "")
 
         for (index in 0 until snils.length - 2) {
             summ += snils[index].digitToInt() * (9 - index)
