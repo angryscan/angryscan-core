@@ -60,20 +60,17 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     }
 
     override fun mask(value: String): String {
-        val resValue = StringBuilder()
         var i = 0
-        value.forEach { c ->
+        return value.map { c ->
             if (c.isDigit()) {
-                if(i < 6 || i > 11)
-                    resValue.append(c)
-                else
-                    resValue.append('*')
                 i++
-            } else {
-                resValue.append(c)
-            }
-        }
-        return resValue.toString()
+                if(i in 7..<13)
+                    '*'
+                else
+                    c
+            } else
+                c
+        }.joinToString(separator = "")
     }
 }
 
