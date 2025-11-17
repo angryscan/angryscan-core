@@ -10,9 +10,11 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher, IMask {
     override val name = "Card number"
+
     override val javaPatterns = listOf(
         """(?<=^|[\s.,\-:;"()'])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"<])"""
     )
+
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
@@ -22,21 +24,28 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     }
 
     private fun isCardValid(card: String): Boolean {
-        var controlSum = 0
-        for (index in card.indices) {
-            controlSum += if ((index % 2) == 0) {
-                val count = 2 * card[index].digitToInt()
-                if (count <= 9) count else count - 9
-            } else {
-                card[index].digitToInt()
+        fun luhn(withFirstDouble: Boolean): Boolean {
+            var sum = 0
+            var shouldDouble = withFirstDouble
+            for (i in card.lastIndex downTo 0) {
+                var digit = card[i].digitToInt()
+                if (shouldDouble) {
+                    digit *= 2
+                    if (digit > 9) digit -= 9
+                }
+                sum += digit
+                shouldDouble = !shouldDouble
             }
+            return sum % 10 == 0
         }
-        return controlSum % 10 == 0
+
+        return luhn(false) || luhn(true)
     }
 
     override val hyperPatterns: List<String> = listOf(
         """(?:^|[\s.,\-:;"()'])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
     )
+
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE
     )
@@ -49,10 +58,11 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     }
 
     override fun toString() = name + if (!checkCardBins) "(w/o BINs)" else ""
+
     override fun equals(other: Any?): Boolean {
         return other is CardNumber && other.checkCardBins == checkCardBins
     }
-    
+
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + checkCardBins.hashCode()

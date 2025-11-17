@@ -16,7 +16,7 @@ class KotlinEngine(@Serializable override val matchers: List<IKotlinMatcher>) : 
     }
 
     fun regexDetector(text: String, pattern: IKotlinMatcher): List<Match> {
-        return pattern
+        val matches = pattern
             .javaPatterns
             .flatMap { str ->
                 str.toRegex(
@@ -40,6 +40,9 @@ class KotlinEngine(@Serializable override val matchers: List<IKotlinMatcher>) : 
                         )
                     }
             }
-
+        // Deduplicate overlapping matches that start at the same position for this matcher; pick the longest
+        return matches
+            .groupBy { it.startPosition }
+            .map { (_, group) -> group.maxBy { it.endPosition } }
     }
 }

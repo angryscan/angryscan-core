@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object CVV : IHyperMatcher, IKotlinMatcher {
     override val name = "CVV"
     override val javaPatterns = listOf(
-        """([.\s>"]|^)(cvc|cvv|cav|cvc2|cvv2|cav2)(:|\s|:\s)[0-9]{3}([ \t\r\a.,;()"'<]|$)"""
+        """([.\s>"]|^)(cvc|cvv|cav|cvc2|cvv2|cav2)(:|\s|:\s)[0-9]{3}([ \t\r.,;()"'<]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object CVV : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """([.\s>"]|^)(cvc|cvv|cav|cvc2|cvv2|cav2)(:|\s|:\s)[0-9]{3}([ \t\r\a.,;()"'<]|$)"""
+        """([.\s>"]|^)(cvc|cvv|cav|cvc2|cvv2|cav2)(:|\s|:\s)[0-9]{3}([ \t\r.,;()"'<]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,
@@ -28,4 +28,3 @@ object CVV : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

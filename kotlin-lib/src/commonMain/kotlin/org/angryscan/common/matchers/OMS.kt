@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object OMS : IHyperMatcher, IKotlinMatcher {
     override val name = "OMS"
     override val javaPatterns = listOf(
-        """(?<=\D|^)(?<=(омс|полис|страховка|страхование))(\s)[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}[ \t-]*?[0-9]{4}(?=\D|$)"""
+        """(?i)(?:омс|полис|страховка|страхование)\s*[:\-]?\s*([0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4})"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[\s.,\-:"()>])(омс|полис|страховка|страхование)\s[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}[ \t-]*[0-9]{4}(?:$|[ \t\r\a.,;()"<])"""
+        """(?:омс|полис|страховка|страхование)\s*[:\-]?\s*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -28,8 +28,8 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     override fun check(value: String): Boolean {
         val oms = value.replace("""\D""".toRegex(), "")
         val key = oms.last().digitToInt()
-        val odd = mutableListOf<Char>()  // nechet
-        val even = mutableListOf<Char>() // chet
+        val odd = mutableListOf<Char>()
+        val even = mutableListOf<Char>()
         oms.substring(0 until oms.length - 1).reversed().forEachIndexed { index, digit ->
             // it's odd because starts with index = 0
             if (index % 2 == 0) {
@@ -52,5 +52,3 @@ object OMS : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-
-

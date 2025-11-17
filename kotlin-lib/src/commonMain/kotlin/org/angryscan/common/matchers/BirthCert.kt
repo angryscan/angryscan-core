@@ -6,10 +6,10 @@ import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 @Serializable
-object CarNumber : IHyperMatcher, IKotlinMatcher {
-    override val name = "Car number"
+object BirthCert : IHyperMatcher, IKotlinMatcher {
+    override val name = "Birth Certificate"
     override val javaPatterns = listOf(
-        """(гос|номер|авто|рег).{0,15}([авекмнорстухabekmhopctyx][ \t]?[0-9]{3}[ \t]?[авекмнорстухabekmhopctyx]{2}[ \t]?[0-9]{2,3})"""
+        """\b[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}\b"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object CarNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(гос|номер|авто|рег).{0,15}([авекмнорстухabekmhopctyx][ \t]?[0-9]{3}[ \t]?[авекмнорстухabekmhopctyx]{2}[ \t]?[0-9]{2,3})\b"""
+        """\b[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}\b"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -29,4 +29,3 @@ object CarNumber : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

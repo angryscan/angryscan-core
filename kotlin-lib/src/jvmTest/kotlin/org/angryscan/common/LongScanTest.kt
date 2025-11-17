@@ -5,8 +5,8 @@ import org.angryscan.common.engine.hyperscan.HyperScanEngine
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 import org.angryscan.common.engine.kotlin.KotlinEngine
-import org.angryscan.common.extensions.Matchers
 import org.angryscan.common.extensions.ProgressBar
+import org.angryscan.common.matchers.*
 import java.io.File
 import kotlin.system.measureTimeMillis
 import kotlin.test.Test
@@ -52,7 +52,25 @@ internal class LongScanTest {
         assertNotNull(filePath)
 
         println("##### Kotlin Engine #####")
-        val kotlinEngine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
+        val matchers = listOf<IKotlinMatcher>(
+            Email,
+            CardNumber(),
+            Phone,
+            SNILS,
+            Passport,
+            OMS,
+            INN,
+            Address,
+            Login,
+            BankAccount,
+            VehicleRegNumber,
+            Password,
+            CVV,
+            FullName,
+            IPv4,
+            IPv6
+        )
+        val kotlinEngine = KotlinEngine(matchers)
         assertEquals(220000, longScan(kotlinEngine, filePath))
     }
 
@@ -61,7 +79,25 @@ internal class LongScanTest {
     fun longScanHS() {
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
-        val hyperEngine = HyperScanEngine(Matchers.filterIsInstance<IHyperMatcher>())
+        val matchers = listOf<IHyperMatcher>(
+            Email,
+            CardNumber(),
+            Phone,
+            SNILS,
+            Passport,
+            OMS,
+            INN,
+            Address,
+            Login,
+            BankAccount,
+            VehicleRegNumber,
+            Password,
+            CVV,
+            FullName,
+            IPv4,
+            IPv6
+        )
+        val hyperEngine = HyperScanEngine(matchers)
         println("##### Hyper Scan #####")
         assertEquals(220000, longScan(hyperEngine, filePath))
     }

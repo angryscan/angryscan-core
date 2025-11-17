@@ -9,7 +9,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object Address : IHyperMatcher, IKotlinMatcher {
     override val name = "Address"
     override val javaPatterns = listOf(
-        """(г\.|р-н|обл\.|ул\.|гор\.).{4,70}(д\.|дом)"""
+        """(г\.|р-н|обл\.)[а-яё ,.-]{4,55}(д\.|дом)""",
+        """(ул\.|гор\.)[а-яё ,.-]{4,55}(д\.|дом)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,8 +18,8 @@ object Address : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(г\.|р-н|обл\.)[а-я ,.-]{4,55}(д\.|дом)""",
-        """(ул\.|гор\.)[а-я ,.-]{4,55}(д\.|дом)"""
+        """(г\.|р-н|обл\.)[а-яё ,.-]{4,55}(д\.|дом)""",
+        """(ул\.|гор\.)[а-яё ,.-]{4,55}(д\.|дом)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -31,4 +32,3 @@ object Address : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

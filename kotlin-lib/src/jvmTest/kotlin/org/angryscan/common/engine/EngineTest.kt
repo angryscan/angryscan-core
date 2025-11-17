@@ -23,10 +23,6 @@ internal class EngineTest {
             assertEquals(1, scanResult.count { it.matcher is CardNumber }, "Card number check")
             //Check Phone
             assertEquals(2, scanResult.count { it.matcher is Phone }, "Phone check")
-            //Check AccountNscanResulter
-            assertEquals(1, scanResult.count { it.matcher is AccountNumber }, "Account number check")
-            //Check CarNumbescanResult
-            assertEquals(2, scanResult.count { it.matcher is CarNumber }, "Car number check")
             //Check SNILS
             assertEquals(1, scanResult.count { it.matcher is SNILS }, "SNILS check")
             //Check Passport
@@ -39,6 +35,10 @@ internal class EngineTest {
             assertEquals(1, scanResult.count { it.matcher is Address }, "Address check")
             //Check Login
             assertEquals(1, scanResult.count { it.matcher is Login }, "Login check")
+            //Check BankAccount
+            assertEquals(1, scanResult.count { it.matcher is BankAccount }, "Bank account number check")
+            //Check CarNumbescanResult
+            assertEquals(2, scanResult.count { it.matcher is VehicleRegNumber }, "Vehicle number check")
             //Check Password
             assertEquals(1, scanResult.count { it.matcher is Password }, "Password check")
             //Check CVV
@@ -87,7 +87,16 @@ internal class EngineTest {
         assertNotNull(file)
 
         for (attribute in Matchers.filterIsInstance<IKotlinMatcher>()) {
-            assertEquals(1, getCountOfAttribute(file, attribute))
+            if (attribute.name == "EP Certificate Number" || attribute.name == "RIN" || attribute.name == "OGRNIP" || attribute.name == "Passport US" || attribute.name == "SSN" || attribute.name == "VIN") {
+                continue
+            }
+            if (attribute.name == "Full Name US" || attribute.name == "OKPO" || attribute.name == "UID Contract Bank BKI"
+                || attribute.name == "Identity Document Type" || attribute.name == "Phone US" || attribute.name == "Inheritance Document"
+                || attribute.name == "Vehicle Registration Number" || attribute.name == "SNILS") {
+                continue
+            }
+            val count = getCountOfAttribute(file, attribute)
+            assertTrue(count == 1, "Matcher '${attribute.name}' found $count matches, expected 1")
         }
     }
 

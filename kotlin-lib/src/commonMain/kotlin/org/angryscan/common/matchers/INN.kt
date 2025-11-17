@@ -16,7 +16,7 @@ object INN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[\s.,\-:"()>])([0-9]{12}|([0-9]{2} [0-9]{2}|[0-9]{4}) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?:$|[ \t\r\a.,;()"<])"""
+        """(?:^|[\s.,\-:"()>])([0-9]{12}|([0-9]{2} [0-9]{2}|[0-9]{4}) ([0-9]{6} [0-9]{2}|[0-9]{8}))(?:$|[ \t\r.,;()"<])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -24,15 +24,14 @@ object INN : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean {
         val inn = value.replace("[^0-9]".toRegex(), "")
-        // control sequences
+        if (inn.length != 12) return false
+        if (inn.all { it == inn.first() }) return false
         val firstSequence = listOf(7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
         val secondSequence = listOf(3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8)
-        // first control sum
         var summ1 = 0
         for (index in firstSequence.indices)
             summ1 += firstSequence[index] * inn[index].digitToInt()
         val key1 = (summ1 % 11).toString().last()
-        // second control sum
         var summ2 = 0
         for (index in secondSequence.indices)
             summ2 += secondSequence[index] * inn[index].digitToInt()

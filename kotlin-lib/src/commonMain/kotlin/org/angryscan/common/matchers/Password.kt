@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object Password : IHyperMatcher, IKotlinMatcher {
     override val name = "Password"
     override val javaPatterns = listOf(
-        """(((password|пароль)\s((?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@$}{'?;,:=+_\-]*))\S{3,25})|((password|пароль):\s?\S{3,25}))"""
+        """(password|пароль):?\s*\S{3,25}(?:$|[\s<"])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object Password : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(password|пароль):?\s*[a-zA-Z0-9,.\/\\\-|_=`~!@#$%^&*()+{}[\]]{3,25}($|[ \t\r\a<"])"""
+        """(password|пароль):?\s*\S{3,25}(?:$|[\s<"])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,
@@ -29,4 +29,3 @@ object Password : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-
