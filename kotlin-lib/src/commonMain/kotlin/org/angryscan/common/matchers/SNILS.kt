@@ -31,7 +31,6 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
         var summ = 0
         val snils = value.replace(Regex("[^0-9 -]"), "").replace(" ", "").replace("-", "").trim()
 
-        // SNILS должен содержать ровно 11 цифр
         if (snils.length != 11)
             return false
 
@@ -51,3 +50,4 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
+

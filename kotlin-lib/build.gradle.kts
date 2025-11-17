@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.angryscan"
-version = "1.3.6-test-102"
+version = "1.3.7"
 description = "Data Scanner Library"
 
 
@@ -158,5 +158,5 @@ mavenPublishing {
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-//    signAllPublications()
+    signAllPublications()
 }

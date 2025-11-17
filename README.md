@@ -79,6 +79,41 @@ val engine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
 val matches = engine.scan(text)
 ```
 
+### Masking card numbers
+You can mask card numbers using the matcher's `IMask` API to keep only the first 6 and last 4 digits visible.
+
+```kotlin
+import org.angryscan.common.matchers.CardNumber
+
+val masked = CardNumber().mask("1234 5678 9012 3456")
+// masked == "1234 56** **** 3456"
+```
+
+To redact card numbers inside a larger text using scan results:
+
+```kotlin
+import org.angryscan.common.engine.kotlin.IKotlinMatcher
+import org.angryscan.common.engine.kotlin.KotlinEngine
+import org.angryscan.common.extensions.Matchers
+import org.angryscan.common.engine.IMask
+import org.angryscan.common.matchers.CardNumber
+
+val text = "Card 4276 8070 1492 7948 and 1234567890123456"
+val engine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
+val matches = engine.scan(text)
+
+val sb = StringBuilder(text)
+matches
+    .filter { it.matcher is CardNumber }
+    .sortedByDescending { it.startPosition }
+    .forEach { m ->
+        val masked = (m.matcher as IMask).mask(m.value)
+        sb.replace(m.startPosition, m.endPosition, masked)
+    }
+val redacted = sb.toString()
+// e.g. "Card 4276 80** **** 7948 and 123456******3456"
+```
+
 ### Customising the matcher set
 ```kotlin
 import org.angryscan.common.matchers.CardNumber

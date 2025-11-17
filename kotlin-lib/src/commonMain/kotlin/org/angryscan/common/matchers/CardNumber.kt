@@ -4,10 +4,11 @@ import kotlinx.serialization.Serializable
 import org.angryscan.common.constants.CardBins
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
+import org.angryscan.common.engine.IMask
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 @Serializable
-class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher {
+class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher, IMask {
     override val name = "Card number"
 
     override val javaPatterns = listOf(
@@ -66,6 +67,20 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
         var result = name.hashCode()
         result = 31 * result + checkCardBins.hashCode()
         return result
+    }
+
+    override fun mask(value: String): String {
+        var i = 0
+        return value.map { c ->
+            if (c.isDigit()) {
+                i++
+                if(i in 7..<13)
+                    '*'
+                else
+                    c
+            } else
+                c
+        }.joinToString(separator = "")
     }
 }
 
