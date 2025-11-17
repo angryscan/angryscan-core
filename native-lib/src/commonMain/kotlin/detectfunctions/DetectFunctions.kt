@@ -1,20 +1,7 @@
 package detectfunctions
 
 import org.angryscan.common.engine.kotlin.KotlinEngine
-import org.angryscan.common.matchers.Address
-import org.angryscan.common.matchers.CVV
-import org.angryscan.common.matchers.CardNumber
-import org.angryscan.common.matchers.Email
-import org.angryscan.common.matchers.FullName
-import org.angryscan.common.matchers.INN
-import org.angryscan.common.matchers.IPv4
-import org.angryscan.common.matchers.IPv6
-import org.angryscan.common.matchers.Login
-import org.angryscan.common.matchers.OMS
-import org.angryscan.common.matchers.Passport
-import org.angryscan.common.matchers.Password
-import org.angryscan.common.matchers.Phone
-import org.angryscan.common.matchers.SNILS
+import org.angryscan.common.matchers.*
 
 @Suppress("Unused")
 fun detectEmails(text: String): Int {
@@ -84,4 +71,204 @@ fun detectIP(text: String): Int {
 @Suppress("Unused")
 fun detectIPv6(text: String): Int {
     return KotlinEngine(listOf(IPv6)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectBankAccount(text: String): Int {
+    return KotlinEngine(listOf(BankAccount)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectBankAccountLE(text: String): Int {
+    return KotlinEngine(listOf(BankAccountLE)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectBirthCert(text: String): Int {
+    return KotlinEngine(listOf(BirthCert)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectBirthday(text: String): Int {
+    return KotlinEngine(listOf(Birthday)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectCadastralNumber(text: String): Int {
+    return KotlinEngine(listOf(CadastralNumber)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectDeathDate(text: String): Int {
+    return KotlinEngine(listOf(DeathDate)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectDriverLicense(text: String): Int {
+    return KotlinEngine(listOf(DriverLicense)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectEducationDoc(text: String): Int {
+    return KotlinEngine(listOf(EducationDoc)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectEducationLevel(text: String): Int {
+    return KotlinEngine(listOf(EducationLevel)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectEducationLicense(text: String): Int {
+    return KotlinEngine(listOf(EducationLicense)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectEpCertificateNumber(text: String): Int {
+    return KotlinEngine(listOf(EpCertificateNumber)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectExecDocNumber(text: String): Int {
+    return KotlinEngine(listOf(ExecDocNumber)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectRIN(text: String): Int {
+    return KotlinEngine(listOf(RIN)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectFullNameUS(text: String): Int {
+    return KotlinEngine(listOf(FullNameUS)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectGeo(text: String): Int {
+    return KotlinEngine(listOf(Geo)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectHashData(text: String): Int {
+    return KotlinEngine(listOf(HashData)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectIdentityDocType(text: String): Int {
+    return KotlinEngine(listOf(IdentityDocType)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectInheritanceDoc(text: String): Int {
+    return KotlinEngine(listOf(InheritanceDoc)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectLegalEntityId(text: String): Int {
+    return KotlinEngine(listOf(LegalEntityId)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectLegalEntityName(text: String): Int {
+    return KotlinEngine(listOf(LegalEntityName)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectMaritalStatus(text: String): Int {
+    return KotlinEngine(listOf(MaritalStatus)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectMarriageCert(text: String): Int {
+    return KotlinEngine(listOf(MarriageCert)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectMedicareUS(text: String): Int {
+    return KotlinEngine(listOf(MedicareUS)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectMilitaryID(text: String): Int {
+    return KotlinEngine(listOf(MilitaryID)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectMilitaryRank(text: String): Int {
+    return KotlinEngine(listOf(MilitaryRank)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectOGRNIP(text: String): Int {
+    return KotlinEngine(listOf(OGRNIP)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectOKPO(text: String): Int {
+    return KotlinEngine(listOf(OKPO)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectOSAGOPolicy(text: String): Int {
+    return KotlinEngine(listOf(OSAGOPolicy)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectPassportUS(text: String): Int {
+    return KotlinEngine(listOf(PassportUS)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectPhoneUS(text: String): Int {
+    return KotlinEngine(listOf(PhoneUS)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectResidencePermit(text: String): Int {
+    return KotlinEngine(listOf(ResidencePermit)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectSberBook(text: String): Int {
+    return KotlinEngine(listOf(SberBook)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectSecurityAffiliation(text: String): Int {
+    return KotlinEngine(listOf(SecurityAffiliation)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectSocialUserId(text: String): Int {
+    return KotlinEngine(listOf(SocialUserId)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectSSN(text: String): Int {
+    return KotlinEngine(listOf(SSN)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectStateRegContract(text: String): Int {
+    return KotlinEngine(listOf(StateRegContract)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectTemporaryID(text: String): Int {
+    return KotlinEngine(listOf(TemporaryID)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectUidContractBankBki(text: String): Int {
+    return KotlinEngine(listOf(UidContractBankBki)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectVIN(text: String): Int {
+    return KotlinEngine(listOf(VIN)).scan(text).count()
+}
+
+@Suppress("Unused")
+fun detectVehicleRegNumber(text: String): Int {
+    return KotlinEngine(listOf(VehicleRegNumber)).scan(text).count()
 }
