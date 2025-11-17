@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object DriverLicense : IHyperMatcher, IKotlinMatcher {
     override val name = "Driver License"
     override val javaPatterns = listOf(
-        """(?<!\w)(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*\d{2}\s?\d{2}\s\d{6}(?:\.\s|\s|\n|[)\]}\s|["'»]\s)"""
+        """(?<!\w)(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*\d{2}\s?\d{2}\s\d{6}(?:\.\s|\s|\n|[)\]}"'»]\s|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object DriverLicense : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*\d{2}\s?\d{2}\s\d{6}(?:\.\s|\s|\n|[)\]}\s|["'»]\s)"""
+        """(?:^|[^\w])(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*\d{2}\s?\d{2}\s\d{6}(?:\.\s|\s|\n|[)\]}"'»]\s|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

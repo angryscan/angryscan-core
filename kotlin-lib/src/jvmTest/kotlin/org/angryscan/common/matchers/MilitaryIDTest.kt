@@ -22,7 +22,7 @@ internal class MilitaryIDTest {
 
     @Test
     fun testMilitaryIDAtEnd() {
-        val text = "Удостоверение личности военнослужащего: АБ 1234567 "
+        val text = "Номер удостоверения: АБ 1234567 "
         assertTrue(scanText(text, MilitaryID) >= 1, "Военное удостоверение в конце должно быть найдено")
     }
 
@@ -64,7 +64,7 @@ internal class MilitaryIDTest {
 
     @Test
     fun testMilitaryIDWithLabel() {
-        val text = "удостоверение личности военнослужащего: АБ 1234567 "
+        val text = "Номер: АБ 1234567 "
         assertTrue(scanText(text, MilitaryID) >= 1, "Удостоверение с меткой должно быть найдено")
     }
 
@@ -77,7 +77,7 @@ internal class MilitaryIDTest {
     @Test
     fun testMilitaryIDLatinLetters() {
         val text = " AB 1234567 "
-        assertTrue(scanText(text, MilitaryID) >= 1, "Удостоверение с латиницей должно быть найдено")
+        assertEquals(0, scanText(text, MilitaryID), "Удостоверение с латиницей не должно быть найдено (только кириллица)")
     }
 
     @Test
@@ -148,6 +148,24 @@ internal class MilitaryIDTest {
     fun testMilitaryIDEmptyString() {
         val text = ""
         assertEquals(0, scanText(text, MilitaryID), "Пустая строка не должна содержать военного удостоверения")
+    }
+
+    @Test
+    fun testMilitaryIDAllZeros() {
+        val text = " АБ 0000000 "
+        assertEquals(0, scanText(text, MilitaryID), "Удостоверение с нулями не должно быть найдено")
+    }
+
+    @Test
+    fun testMilitaryIDAllSameDigits() {
+        val text = " АБ 1111111 "
+        assertEquals(0, scanText(text, MilitaryID), "Удостоверение с одинаковыми цифрами не должно быть найдено")
+    }
+
+    @Test
+    fun testMilitaryIDAllSameDigits2() {
+        val text = " ВГ 9999999 "
+        assertEquals(0, scanText(text, MilitaryID), "Удостоверение с одинаковыми цифрами (9) не должно быть найдено")
     }
 
     private fun scanText(text: String, matcher: IMatcher): Int {

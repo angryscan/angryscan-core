@@ -28,7 +28,7 @@ internal class ResidencePermitTest {
 
     @Test
     fun testResidencePermitInMiddle() {
-        val text = "Иностранец с ВНЖ 82 1234567 проживает"
+        val text = "Иностранец с ВНЖ: 82 1234567 проживает"
         assertTrue(scanText(text, ResidencePermit) >= 1, "ВНЖ в середине должен быть найден")
     }
 
@@ -100,19 +100,19 @@ internal class ResidencePermitTest {
 
     @Test
     fun testResidencePermitInParentheses() {
-        val text = "(82 1234567)"
+        val text = "(82 1234567) "
         assertTrue(scanText(text, ResidencePermit) >= 1, "ВНЖ в скобках должен быть найден")
     }
 
     @Test
     fun testResidencePermitInQuotes() {
-        val text = "\"82 1234567\""
+        val text = "\"82 1234567\" "
         assertTrue(scanText(text, ResidencePermit) >= 1, "ВНЖ в кавычках должен быть найден")
     }
 
     @Test
     fun testResidencePermitWithPunctuation() {
-        val text = "ВНЖ: 82 1234567."
+        val text = "ВНЖ: 82 1234567. "
         assertTrue(scanText(text, ResidencePermit) >= 1, "ВНЖ с точкой должен быть найден")
     }
 

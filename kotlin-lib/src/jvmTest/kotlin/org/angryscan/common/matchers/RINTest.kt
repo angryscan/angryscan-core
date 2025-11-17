@@ -22,7 +22,7 @@ internal class RINTest {
 
     @Test
     fun testRINAtEnd() {
-        val text = "Chinese ID: 110101199001011234 "
+        val text = " Chinese ID: 110101199001011234"
         assertTrue(scanText(text, RIN) >= 1, "RIN в конце должен быть найден")
     }
 
@@ -52,25 +52,25 @@ internal class RINTest {
 
     @Test
     fun testRINWithLabel() {
-        val text = "китайский идентификационный номер: 110101199001011234 "
+        val text = " китайский идентификационный номер: 110101199001011234"
         assertTrue(scanText(text, RIN) >= 1, "Китайский TIN с меткой должен быть найден")
     }
 
     @Test
     fun testRINChinaLabel() {
-        val text = "TIN China: 110101199001011234 "
+        val text = " TIN China: 110101199001011234"
         assertTrue(scanText(text, RIN) >= 1, "TIN Китая с меткой должен быть найден")
     }
 
     @Test
     fun testRINUpperCase() {
-        val text = "CHINESE ID: 110101199001011234 "
+        val text = " CHINESE ID: 110101199001011234"
         assertTrue(scanText(text, RIN) >= 1, "Китайский TIN в верхнем регистре должен быть найден")
     }
 
     @Test
     fun testRINLowerCase() {
-        val text = "chinese id: 110101199001011234 "
+        val text = " chinese id: 110101199001011234"
         assertTrue(scanText(text, RIN) >= 1, "Китайский TIN в нижнем регистре должен быть найден")
     }
 

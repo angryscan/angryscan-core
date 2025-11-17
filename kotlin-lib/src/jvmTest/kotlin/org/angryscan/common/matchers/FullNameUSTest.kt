@@ -14,278 +14,168 @@ import kotlin.test.assertTrue
  */
 internal class FullNameUSTest {
 
-    // === Тесты с ключевыми словами ===
+    private fun surround(text: String) = " $text "
+
+    // === Позитивные сценарии ===
+
+    @Test
+    fun testSimpleName() {
+        val count = scanText(surround("John Smith"), FullNameUS)
+        assertTrue(count >= 1, "Expected at least one match, got $count")
+    }
+
+    @Test
+    fun testNameInSentence() {
+        val text = "Please contact John Smith for assistance."
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameWithCommaSeparatedContext() {
+        val text = " John Smith ,"
+        val count = scanText(text, FullNameUS)
+        assertTrue(count >= 1, "Expected match, got $count")
+    }
+
+    @Test
+    fun testNameWithColon() {
+        val text = "Name: John Smith "
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameWithNewline() {
+        val text = "Name:\n John Smith "
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameWithTab() {
+        val text = "Name:\t John Smith "
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameWithMultipleSpaces() {
+        val text = surround("John    Smith")
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameWithMiddleInitial() {
+        assertTrue(scanText(surround("John A. Smith"), FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameWithMiddleInitialNoPeriod() {
+        assertTrue(scanText(surround("John A Smith"), FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameInParentheses() {
+        val text = " ( John Smith ) "
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testNameInQuotes() {
+        val text = " \" John Smith \" "
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    @Test
+    fun testMultipleNames() {
+        val text = " John Smith met Emily Davis and Michael Johnson. "
+        assertEquals(3, scanText(text, FullNameUS))
+    }
+
+    @Test
+    fun testNameNearTechnicalWord() {
+        val text = "The server incident was resolved by John Smith yesterday."
+        assertTrue(scanText(text, FullNameUS) >= 1)
+    }
+
+    // === Негативные сценарии ===
     
     @Test
-    fun testFullNameUSWithKeywordName() {
-        val text = "Name: John Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Name' should be found")
+    fun testUnknownName() {
+        assertEquals(0, scanText(surround("X Æa-12 Zøltar"), FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordFullName() {
-        val text = "Full Name: Michael Johnson"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Full Name' should be found")
+    fun testTechnicalPhrase() {
+        assertEquals(0, scanText("Pretty Good Privacy", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordEmployee() {
-        val text = "Employee: Sarah Williams"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Employee' should be found")
+    fun testCityName() {
+        assertEquals(0, scanText("New York City", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordPerson() {
-        val text = "Person: David Brown"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Person' should be found")
+    fun testCompanyPhrase() {
+        assertEquals(0, scanText("Apple Store", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordPatient() {
-        val text = "Patient: Jennifer Davis"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Patient' should be found")
+    fun testEmptyString() {
+        assertEquals(0, scanText("", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordClient() {
-        val text = "Client: Robert Miller"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Client' should be found")
+    fun testOnlyFirstName() {
+        assertEquals(0, scanText("John", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordCustomer() {
-        val text = "Customer: Emily Davis"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Customer' should be found")
+    fun testOnlyLastName() {
+        assertEquals(0, scanText("Smith", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordApplicant() {
-        val text = "Applicant: Daniel Wilson"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Applicant' should be found")
+    fun testAllCaps() {
+        assertEquals(0, scanText("JOHN SMITH", FullNameUS))
     }
 
     @Test
-    fun testFullNameUSWithKeywordCandidate() {
-        val text = "Candidate: Jessica Moore"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword 'Candidate' should be found")
-    }
-
-    // === Тесты с расширенными ключевыми словами ===
-    
-    @Test
-    fun testFullNameUSProfessionalContext() {
-        assertEquals(1, scanText("Worker: John Smith", FullNameUS), "Should find with 'Worker'")
-        assertEquals(1, scanText("Manager: Sarah Johnson", FullNameUS), "Should find with 'Manager'")
-        assertEquals(1, scanText("Supervisor Michael Brown", FullNameUS), "Should find with 'Supervisor'")
-    }
-
-    @Test
-    fun testFullNameUSMedicalContext() {
-        assertEquals(1, scanText("Doctor: John Smith", FullNameUS), "Should find with 'Doctor'")
-        assertEquals(1, scanText("Nurse Sarah Johnson", FullNameUS), "Should find with 'Nurse'")
-        assertEquals(1, scanText("Physician: Michael Brown", FullNameUS), "Should find with 'Physician'")
-    }
-
-    @Test
-    fun testFullNameUSEducationalContext() {
-        assertEquals(1, scanText("Student: John Smith", FullNameUS), "Should find with 'Student'")
-        assertEquals(1, scanText("Teacher Sarah Johnson", FullNameUS), "Should find with 'Teacher'")
-        assertEquals(1, scanText("Professor: Michael Brown", FullNameUS), "Should find with 'Professor'")
-    }
-
-    @Test
-    fun testFullNameUSLegalContext() {
-        assertEquals(1, scanText("Plaintiff: John Smith", FullNameUS), "Should find with 'Plaintiff'")
-        assertEquals(1, scanText("Attorney Sarah Johnson", FullNameUS), "Should find with 'Attorney'")
-        assertEquals(1, scanText("Witness: Michael Brown", FullNameUS), "Should find with 'Witness'")
-    }
-
-    @Test
-    fun testFullNameUSFamilyContext() {
-        assertEquals(1, scanText("Parent: John Smith", FullNameUS), "Should find with 'Parent'")
-        assertEquals(1, scanText("Spouse Sarah Johnson", FullNameUS), "Should find with 'Spouse'")
-        assertEquals(1, scanText("Guardian: Michael Brown", FullNameUS), "Should find with 'Guardian'")
-    }
-
-    // === Тесты с инициалами ===
-    
-    @Test
-    fun testFullNameUSWithMiddleInitial() {
-        val text = "Name: John M. Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with middle initial should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithMiddleInitialNoSpace() {
-        val text = "Employee: John M Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with middle initial (no space after) should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithMiddleInitialNoPeriod() {
-        val text = "Name: John M Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with middle initial without period should be found")
-    }
-
-    // === Тесты с различными именами ===
-    
-    @Test
-    fun testFullNameUSShortNames() {
-        val text = "Employee: Joe Lee"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Short names with keyword should be found")
-    }
-
-    @Test
-    fun testFullNameUSLongNames() {
-        val text = "Employee: Christopher Washington"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Long names with keyword should be found")
-    }
-
-    // === Тесты с различными позициями и окружением ===
-    
-    @Test
-    fun testFullNameUSInParentheses() {
-        val text = "Patient: John Smith (age 45)"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with keyword should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithComma() {
-        val text = "Employee: John Smith, Software Engineer"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with comma should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithPeriod() {
-        val text = "Contact: John Smith."
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with period should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithColon() {
-        val text = "Name: John Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with colon should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithDash() {
-        val text = "Employee-John Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with dash should be found")
-    }
-
-    // === Тесты с разными форматами текста ===
-    
-    @Test
-    fun testFullNameUSWithNewline() {
-        val text = "Name:\nJohn Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with newline should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithTab() {
-        val text = "Name:\tJohn Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with tab should be found")
-    }
-
-    @Test
-    fun testFullNameUSWithMultipleSpaces() {
-        val text = "Name:    John Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name with multiple spaces should be found")
-    }
-
-    // === Тесты для проверки фильтрации ложных срабатываний ===
-    
-    @Test
-    fun testFullNameUSNotGeography() {
-        val text = "New York is a city"
-        assertEquals(0, scanText(text, FullNameUS), "Geography without keyword should not be found")
-    }
-
-    @Test
-    fun testFullNameUSNotStreet() {
-        val text = "Main Street is busy"
-        assertEquals(0, scanText(text, FullNameUS), "Street names without keyword should not be found")
-    }
-
-    @Test
-    fun testFullNameUSNotSchool() {
-        val text = "High School graduation"
-        assertEquals(0, scanText(text, FullNameUS), "School names without keyword should not be found")
+    fun testAllLowercase() {
+        assertEquals(0, scanText("john smith", FullNameUS))
     }
     
     @Test
-    fun testFullNameUSNotCompanies() {
-        assertEquals(0, scanText("Apple Store", FullNameUS), "Company names should not be found")
-        assertEquals(0, scanText("Microsoft Office", FullNameUS), "Product names should not be found")
+    fun testPhraseWithBrother() {
+        assertEquals(0, scanText("Big Brother is watching", FullNameUS))
     }
+
+    // === Дополнительные проверки ===
     
     @Test
-    fun testFullNameUSNotStandaloneNames() {
-        // Без ключевых слов имена НЕ должны находиться (высокая точность)
-        assertEquals(0, scanText("John Smith", FullNameUS), "Standalone names should not be found")
-        assertEquals(0, scanText("Sarah Johnson", FullNameUS), "Standalone names should not be found")
-    }
-
-    // === Граничные тесты ===
-    
-    @Test
-    fun testFullNameUSMinimumLength() {
-        val text = "Patient: Joe Fox"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Minimum length names with keyword should be found")
+    fun testSequenceWithMixedContent() {
+        val text = " John Smith, Pretty Good Privacy, Ocean Park, Emily Davis "
+        assertEquals(2, scanText(text, FullNameUS))
     }
 
     @Test
-    fun testFullNameUSProperCapitalization() {
-        val text = "Contact: John Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Proper capitalization with keyword should be found")
-    }
-
-    // === Тесты в контексте предложений ===
-    
-    @Test
-    fun testFullNameUSInSentence() {
-        val text = "Please contact Person: John Smith at the office."
-        assertTrue(scanText(text, FullNameUS) >= 1, "Full name in sentence with keyword should be found")
-    }
-
-    // === Негативные тесты ===
-    
-    @Test
-    fun testFullNameUSEmptyString() {
-        val text = ""
-        assertEquals(0, scanText(text, FullNameUS), "Empty string should not contain names")
+    fun testNameAtStartWithSpace() {
+        val text = " John Smith went to the store."
+        assertTrue(scanText(text, FullNameUS) >= 1)
     }
 
     @Test
-    fun testFullNameUSOnlyFirstName() {
-        val text = "John"
-        assertEquals(0, scanText(text, FullNameUS), "Only first name should not be found")
+    fun testNameAtEndWithSpace() {
+        val text = "Meeting with manager and John Smith "
+        assertTrue(scanText(text, FullNameUS) >= 1)
     }
 
     @Test
-    fun testFullNameUSOnlyLastName() {
-        val text = "Smith"
-        assertEquals(0, scanText(text, FullNameUS), "Only last name should not be found")
-    }
-
-    // === Специальные случаи ===
-    
-    @Test
-    fun testFullNameUSWithTitle() {
-        val text = "Doctor: John Smith"
-        assertTrue(scanText(text, FullNameUS) >= 1, "Name with keyword should be found")
+    fun testNameWithDashContext() {
+        val text = "Lead engineer - John Smith - reviewed the plan."
+        assertTrue(scanText(text, FullNameUS) >= 1)
     }
 
     @Test
-    fun testFullNameUSMultipleWithKeywords() {
-        // Тестируем каждое имя отдельно, чтобы избежать проблем с дедупликацией между движками
-        val text1 = "Patient: John Smith"
-        val text2 = "Doctor: Sarah Johnson"
-        val text3 = "Nurse: Michael Brown"
-        
-        assertTrue(scanText(text1, FullNameUS) >= 1, "First name with keyword should be found")
-        assertTrue(scanText(text2, FullNameUS) >= 1, "Second name with keyword should be found")
-        assertTrue(scanText(text3, FullNameUS) >= 1, "Third name with keyword should be found")
+    fun testCheckDirect() {
+        assertTrue(FullNameUS.check("John Smith"))
     }
 
     private fun scanText(text: String, matcher: IMatcher): Int {

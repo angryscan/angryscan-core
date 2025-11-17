@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SSN : IHyperMatcher, IKotlinMatcher {
     override val name = "SSN"
     override val javaPatterns = listOf(
-        """\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b(?![-0-9])"""
+        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?![-0-9\p{L}\d])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE

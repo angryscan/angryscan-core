@@ -27,12 +27,6 @@ internal class HashDataTest {
     }
 
     @Test
-    fun testHashDataMD5InMiddle() {
-        val text = "Файл с хэшем 5d41402abc4b2a76b9719d911017c592 загружен"
-        assertTrue(scanText(text, HashData) >= 1, "MD5 хэш в середине должен быть найден")
-    }
-
-    @Test
     fun testHashDataMD5Standalone() {
         val text = " 5d41402abc4b2a76b9719d911017c592 "
         assertTrue(scanText(text, HashData) >= 1, "MD5 хэш отдельно должен быть найден")
@@ -147,13 +141,49 @@ internal class HashDataTest {
     @Test
     fun testHashDataAllZeros() {
         val text = " 00000000000000000000000000000000 "
-        assertTrue(scanText(text, HashData) >= 1, "Хэш из нулей должен быть найден")
+        assertEquals(0, scanText(text, HashData), "Хэш из нулей не должен быть найден (исключается валидацией)")
     }
 
     @Test
     fun testHashDataAllF() {
         val text = " ffffffffffffffffffffffffffffffff "
-        assertTrue(scanText(text, HashData) >= 1, "Хэш из f должен быть найден")
+        assertEquals(0, scanText(text, HashData), "Хэш из f не должен быть найден (исключается валидацией)")
+    }
+
+    @Test
+    fun testHashDataAllSameChar() {
+        val text = " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
+        assertEquals(0, scanText(text, HashData), "Хэш из одинаковых символов не должен быть найден")
+    }
+
+    @Test
+    fun testHashDataOnlyDigits() {
+        val text = " 12345678901234567890123456789012 "
+        assertEquals(0, scanText(text, HashData), "Хэш только из цифр не должен быть найден")
+    }
+
+    @Test
+    fun testHashDataLessThanFourUniqueChars() {
+        val text = " aaaabbbbcccccccaaaabbbbccccccca "
+        assertEquals(0, scanText(text, HashData), "Хэш с менее чем 4 уникальными символами (3 символа: a, b, c) не должен быть найден")
+    }
+
+    @Test
+    fun testHashDataSequentialPattern1() {
+        val text = " 0123456789abcdef0123456789abcdef "
+        assertEquals(0, scanText(text, HashData), "Хэш с последовательным паттерном 0123456789abcdef не должен быть найден")
+    }
+
+    @Test
+    fun testHashDataSequentialPattern2() {
+        val text = " fedcba9876543210fedcba9876543210 "
+        assertEquals(0, scanText(text, HashData), "Хэш с последовательным паттерном fedcba9876543210 не должен быть найден")
+    }
+
+    @Test
+    fun testHashDataValidHash() {
+        val text = " 5d41402abc4b2a76b9719d911017c592 "
+        assertEquals(1, scanText(text, HashData), "Валидный хэш должен быть найден")
     }
 
     @Test

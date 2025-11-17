@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     override val name = "OSAGO Policy"
     override val javaPatterns = listOf(
-        """(?<!\w)(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*[A-ZА-Я]{3}\s?№?\s?\d{10}(?:\.\s|\s|\n|[)\]}\s|["'»]\s)"""
+        """(?<!\w)(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*[A-ZА-Я]{3}\s?№?\s?\d{10}(?:\.\s|\s|\n|[)\]}\s"'»]\s)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*[A-ZА-Я]{3}\s?№?\s?\d{10}(?:\.\s|\s|\n|[)\]}\s|["'»]\s)"""
+        """(?:^|[^\w])(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*[A-ZА-Я]{3}\s?№?\s?\d{10}(?:\.\s|\s|\n|[)\]}\s"'»]\s)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

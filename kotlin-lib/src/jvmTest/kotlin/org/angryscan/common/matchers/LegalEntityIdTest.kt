@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера LegalEntityId (LEI/SWIFT)
+ * Тесты для проверки крайних позиций и пограничных значений матчера LegalEntityId (LEI)
  */
 internal class LegalEntityIdTest {
 
@@ -39,57 +39,15 @@ internal class LegalEntityIdTest {
     }
 
     @Test
-    fun testLegalEntityIdSWIFT8AtStart() {
-        val text = " SABRRUMM банк"
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT-8 в начале должен быть найден")
-    }
-
-    @Test
-    fun testLegalEntityIdSWIFT8AtEnd() {
-        val text = "SWIFT код: SABRRUMM "
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT-8 в конце должен быть найден")
-    }
-
-    @Test
-    fun testLegalEntityIdSWIFT8Standalone() {
-        val text = " SABRRUMM "
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT-8 отдельно должен быть найден")
-    }
-
-    @Test
-    fun testLegalEntityIdSWIFT11() {
-        val text = " SABRRUMMXXX код"
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT-11 должен быть найден")
-    }
-
-    @Test
     fun testLegalEntityIdWithLabelLEI() {
         val text = " LEI: 529900T8BM49AURSDO55 "
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI с меткой должен быть найден")
     }
 
     @Test
-    fun testLegalEntityIdWithLabelSWIFT() {
-        val text = "SWIFT-код: SABRRUMM "
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT с меткой должен быть найден")
-    }
-
-    @Test
-    fun testLegalEntityIdWithLabelBIC() {
-        val text = "BIC: SABRRUMM "
-        assertTrue(scanText(text, LegalEntityId) >= 1, "BIC с меткой должен быть найден")
-    }
-
-    @Test
     fun testLegalEntityIdLEIUpperCase() {
         val text = " 529900T8BM49AURSDO55 "
         assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в верхнем регистре должен быть найден")
-    }
-
-    @Test
-    fun testLegalEntityIdSWIFTUpperCase() {
-        val text = " SABRRUMM "
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT в верхнем регистре должен быть найден")
     }
 
     @Test
@@ -100,8 +58,20 @@ internal class LegalEntityIdTest {
 
     @Test
     fun testLegalEntityIdInQuotes() {
-        val text = "\"SABRRUMM\""
-        assertTrue(scanText(text, LegalEntityId) >= 1, "SWIFT в кавычках должен быть найден")
+        val text = "\"529900T8BM49AURSDO55\""
+        assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в кавычках должен быть найден")
+    }
+
+    @Test
+    fun testLegalEntityIdInSquareBrackets() {
+        val text = "[529900T8BM49AURSDO55]"
+        assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в квадратных скобках должен быть найден")
+    }
+
+    @Test
+    fun testLegalEntityIdInCurlyBrackets() {
+        val text = "{529900T8BM49AURSDO55}"
+        assertTrue(scanText(text, LegalEntityId) >= 1, "LEI в фигурных скобках должен быть найден")
     }
 
     @Test
@@ -111,23 +81,24 @@ internal class LegalEntityIdTest {
     }
 
     @Test
-    fun testMultipleLegalEntityIds() {
-        val text = """
-            Код первый: 529900T8BM49AURSDO55
-            Второй: SABRRUMM
-            Третий: DEUTDEFF
-        """.trimIndent()
-        assertTrue(scanText(text, LegalEntityId) >= 3, "Несколько идентификаторов должны быть найдены")
+    fun testLegalEntityIdWithComma() {
+        val text = " Код LEI: 529900T8BM49AURSDO55,"
+        assertTrue(scanText(text, LegalEntityId) >= 1, "LEI с запятой должен быть найден")
     }
 
     @Test
-    fun testLegalEntityIdSWIFTDifferentCountries() {
+    fun testLegalEntityIdWithSemicolon() {
+        val text = " Код LEI: 529900T8BM49AURSDO55;"
+        assertTrue(scanText(text, LegalEntityId) >= 1, "LEI с точкой с запятой должен быть найден")
+    }
+
+    @Test
+    fun testMultipleLegalEntityIds() {
         val text = """
-            Russia: SABRRUMM
-            Germany: DEUTDEFF
-            USA: CHASUS33
+            Код первый: 529900T8BM49AURSDO55
+            Второй: 5493000JABBMWE2H4P16
         """.trimIndent()
-        assertTrue(scanText(text, LegalEntityId) >= 3, "SWIFT разных стран должны быть найдены")
+        assertTrue(scanText(text, LegalEntityId) >= 2, "Несколько LEI должны быть найдены")
     }
 
     @Test
@@ -143,21 +114,33 @@ internal class LegalEntityIdTest {
     }
 
     @Test
-    fun testLegalEntityIdSWIFTTooShort() {
-        val text = " SABRRU "
-        assertEquals(0, scanText(text, LegalEntityId), "Слишком короткий SWIFT не должен быть найден")
+    fun testLegalEntityIdLEIWithoutDoubleZero() {
+        val text = " Код LEI: 5299A1T8BM49AURSDO55 "
+        assertEquals(0, scanText(text, LegalEntityId), "LEI без 00 в позициях 4-5 не должен быть найден паттерном")
     }
 
     @Test
-    fun testLegalEntityIdSWIFTTooLong() {
-        val text = " SABRRUMMXXXX "
-        assertEquals(0, scanText(text, LegalEntityId), "Слишком длинный SWIFT не должен быть найден")
+    fun testLegalEntityIdLEITooShort() {
+        val text = " Код LEI: 529900T8BM49AURSDO5 "
+        assertEquals(0, scanText(text, LegalEntityId), "Слишком короткий LEI не должен быть найден")
+    }
+
+    @Test
+    fun testLegalEntityIdLEITooLong() {
+        val text = " Код LEI: 529900T8BM49AURSDO555 "
+        assertEquals(0, scanText(text, LegalEntityId), "Слишком длинный LEI не должен быть найден")
     }
 
     @Test
     fun testLegalEntityIdEmptyString() {
         val text = ""
         assertEquals(0, scanText(text, LegalEntityId), "Пустая строка не должна содержать идентификатора ЮЛ")
+    }
+
+    @Test
+    fun testLegalEntityIdLEIWithSpaces() {
+        val text = " Код LEI: 5299 00T8 BM49 AURS DO55 "
+        assertEquals(0, scanText(text, LegalEntityId), "LEI с пробелами не должен быть найден паттерном")
     }
 
     private fun scanText(text: String, matcher: IMatcher): Int {

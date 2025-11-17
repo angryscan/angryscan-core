@@ -9,18 +9,22 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
     override val javaPatterns = listOf(
-        """(?:^|[^\p{L}\d]\s|[\s({\["'«»])(?<![\p{L}\d])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?![\p{L}\d])(?:\.\s|\s|\r?\n|[)\]}\s|["'«»]\s|$)"""
+        // Только без префикса - простая проверка на 11 цифр с разделителями, валидация будет в check() функции
+        """[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)(?![0-9])"""
     )
     override val regexOptions = setOf(
-        RegexOption.MULTILINE
+        RegexOption.MULTILINE,
+        RegexOption.IGNORE_CASE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«»])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
+        // Только без префикса - простая проверка на 11 цифр с разделителями, валидация будет в check() функции
+        """[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
-        ExpressionOption.UTF8
+        ExpressionOption.UTF8,
+        ExpressionOption.CASELESS
     )
 
     override fun check(value: String): Boolean {
@@ -32,6 +36,7 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
         // SNILS должен содержать ровно 11 цифр
         if (snils.length != 11)
             return false
+
 
         for (index in 0 until snils.length - 2) {
             summ += snils[index].digitToInt() * (9 - index)

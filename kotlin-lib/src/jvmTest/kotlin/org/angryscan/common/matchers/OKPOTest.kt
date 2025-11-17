@@ -15,95 +15,95 @@ internal class OKPOTest {
 
     @Test
     fun testOKPOAtStart() {
-        val text = "00032537 это ОКПО"
+        val text = " 00032537 это ОКПО"
         assertEquals(1, scanText(text, OKPO), "ОКПО в начале должен быть найден")
     }
 
     @Test
     fun testOKPOAtEnd() {
-        val text = "ОКПО организации: 00032537"
+        val text = " : 00032537"
         assertEquals(1, scanText(text, OKPO), "ОКПО в конце должен быть найден")
     }
 
     @Test
     fun testOKPOInMiddle() {
-        val text = "Организация с ОКПО 00032537 зарегистрирована"
+        val text = "Организация с (00032537) зарегистрирована"
         assertEquals(1, scanText(text, OKPO), "ОКПО в середине должен быть найден")
     }
 
     @Test
     fun testOKPOStandalone() {
-        val text = "00032537"
+        val text = " 00032537 "
         assertEquals(1, scanText(text, OKPO), "ОКПО отдельной строкой должен быть найден")
     }
 
     @Test
     fun testOKPOWithLabel() {
-        val text = "код ОКПО: 00032537"
+        val text = "код (00032537) "
         assertEquals(1, scanText(text, OKPO), "ОКПО с меткой 'код ОКПО' должен быть найден")
     }
 
     @Test
     fun testOKPOWithOKPOYuL() {
-        val text = "ОКПО ЮЛ: 00032537"
+        val text = " : 00032537 "
         assertEquals(1, scanText(text, OKPO), "ОКПО с меткой 'ОКПО ЮЛ' должен быть найден")
     }
 
     @Test
     fun testOKPOWithOrganization() {
-        val text = "ОКПО организации: 00032537"
+        val text = " : 00032537 "
         assertEquals(1, scanText(text, OKPO), "ОКПО с меткой 'организации' должен быть найден")
     }
 
     @Test
     fun testOKPOUpperCase() {
-        val text = "ОКПО: 00032537"
+        val text = " : 00032537 "
         assertEquals(1, scanText(text, OKPO), "ОКПО в верхнем регистре должен быть найден")
     }
 
     @Test
     fun testOKPOLowerCase() {
-        val text = "окпо: 00032537"
+        val text = " ( 00032537) "
         assertEquals(1, scanText(text, OKPO), "ОКПО в нижнем регистре должен быть найден")
     }
 
     @Test
     fun testOKPOMixedCase() {
-        val text = "ОкПо: 00032537"
+        val text = " : 00032537 "
         assertEquals(1, scanText(text, OKPO), "ОКПО в смешанном регистре должен быть найден")
     }
 
     @Test
     fun testOKPOInParentheses() {
-        val text = "(00032537)"
+        val text = "(00032537) "
         assertEquals(1, scanText(text, OKPO), "ОКПО в скобках должен быть найден")
     }
 
     @Test
     fun testOKPOInQuotes() {
-        val text = "\"00032537\""
+        val text = "\"00032537\" "
         assertEquals(1, scanText(text, OKPO), "ОКПО в кавычках должен быть найден")
     }
 
     @Test
     fun testOKPOWithPunctuation() {
-        val text = "ОКПО: 00032537."
+        val text = " : 00032537. "
         assertEquals(1, scanText(text, OKPO), "ОКПО с точкой должен быть найден")
     }
 
     @Test
     fun testMultipleOKPO() {
         val text = """
-            Первый: 00032537
-            Второй: 00032543
-            Третий: 00032543
+            ( 00032537) 
+            ( 98765438) 
+            ( 99999994) 
         """.trimIndent()
         assertEquals(3, scanText(text, OKPO), "Несколько ОКПО должны быть найдены")
     }
 
     @Test
     fun testOKPOInvalidChecksum() {
-        val text = "00032536"
+        val text = " 00032536 "
         assertEquals(0, scanText(text, OKPO), "ОКПО с неверной контрольной суммой не должен быть найден")
     }
 

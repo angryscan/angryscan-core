@@ -45,103 +45,109 @@ internal class EpCertificateNumberTest {
     }
 
     @Test
-    fun testEpCertificateNumberWithoutSpaces() {
+    fun testEpCertificateNumberInvalidWithoutSpaces() {
         val text = " 00112233445566778899AABBCCDDEEFF "
-        assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер без пробелов должен быть найден")
+        assertEquals(0, scanText(text, EpCertificateNumber), "Номер без пробелов не должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberUpperCase() {
-        val text = " 00112233445566778899AABBCCDDEEFF "
+        val text = " 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер в верхнем регистре должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberLowerCase() {
-        val text = " 00112233445566778899aabbccddeeff "
+        val text = " 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер в нижнем регистре должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberMixedCase() {
-        val text = " 00112233445566778899AaBbCcDdEeFf "
+        val text = " 00 11 22 33 44 55 66 77 88 99 Aa Bb Cc Dd Ee Ff "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер в смешанном регистре должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithSerialLabel() {
-        val text = "серийный номер сертификата ЭП: 00112233445566778899AABBCCDDEEFF "
+        val text = "серийный номер сертификата ЭП: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер с меткой 'серийный номер' должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithFullLabel() {
-        val text = "номер сертификата электронной подписи: 00112233445566778899AABBCCDDEEFF "
+        val text = "номер сертификата электронной подписи: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер с полной меткой должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithSerialNumberEP() {
-        val text = "serial number ЭП: 00112233445566778899AABBCCDDEEFF "
+        val text = "serial number ЭП: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер с меткой 'serial number ЭП' должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithKeyLabel() {
-        val text = "номер сертификата ключа проверки ЭП: 00112233445566778899AABBCCDDEEFF "
+        val text = "номер сертификата ключа проверки ЭП: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер сертификата ключа должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithUniqueLabel() {
-        val text = "уникальный номер сертификата: 00112233445566778899AABBCCDDEEFF "
+        val text = "уникальный номер сертификата: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF "
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Уникальный номер сертификата должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberInParentheses() {
-        val text = "(00112233445566778899AABBCCDDEEFF)"
+        val text = "(00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF)"
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер в скобках должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberInQuotes() {
-        val text = "\"00112233445566778899AABBCCDDEEFF\""
+        val text = "\"00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF\""
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер в кавычках должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithPunctuation() {
-        val text = "Номер: 00112233445566778899AABBCCDDEEFF."
+        val text = "Номер: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF."
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер с точкой должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberWithColon() {
-        val text = "Сертификат: 00112233445566778899AABBCCDDEEFF"
+        val text = "Сертификат: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF"
         assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер с двоеточием должен быть найден")
+    }
+
+    @Test
+    fun testEpCertificateNumberGroupByFour() {
+        val text = " Сертификат: 0011 2233 4455 6677 8899 AABB CCDD EEFF "
+        assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер с группировкой по 4 символа должен быть найден")
     }
 
     @Test
     fun testMultipleEpCertificateNumbers() {
         val text = """
-            Первый: 00112233445566778899AABBCCDDEEFF
-            Второй: 11223344556677889900AABBCCDDEEFF
-            Третий: 22334455667788990011AABBCCDDEEFF
+            Первый: 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
+            Второй: 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00
+            Третий: 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11
         """.trimIndent()
         assertTrue(scanText(text, EpCertificateNumber) >= 3, "Несколько номеров сертификатов должны быть найдены")
     }
 
     @Test
     fun testEpCertificateNumberAllZeros() {
-        val text = " 00000000000000000000000000000000 "
-        assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер из нулей должен быть найден")
+        val text = " 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+        assertEquals(0, scanText(text, EpCertificateNumber), "Номер из нулей не должен быть найден")
     }
 
     @Test
     fun testEpCertificateNumberAllF() {
-        val text = " FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF "
-        assertTrue(scanText(text, EpCertificateNumber) >= 1, "Номер из F должен быть найден")
+        val text = " FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF "
+        assertEquals(0, scanText(text, EpCertificateNumber), "Номер из одинаковых символов не должен быть найден")
     }
 
     @Test

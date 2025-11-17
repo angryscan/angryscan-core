@@ -9,6 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object HashData : IHyperMatcher, IKotlinMatcher {
     override val name = "Hash Data"
     override val javaPatterns = listOf(
+        """(?ix)(?<=:\s)([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?![\p{L}\d])""",
         """(?ix)(?:^|[^\w\s]\s|[\s({\["'«»])(?<![\p{L}\d])([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?![\p{L}\d])"""
     )
     override val regexOptions = setOf(

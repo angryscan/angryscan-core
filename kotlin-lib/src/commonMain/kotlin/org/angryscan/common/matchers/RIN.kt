@@ -9,7 +9,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object RIN : IHyperMatcher, IKotlinMatcher {
     override val name = "RIN"
     override val javaPatterns = listOf(
-        """(?ix)(?<![\p{L}\d])(?:китайский\s+идентификационный\s+номер|Chinese\s+ID|TIN\s+China)?\s*[:\-]?\s*([0-9]{17}[0-9X])(?![\p{L}\d])"""
+        """(?ix)(?<![\p{L}\d])(?:китайский\s+идентификационный\s+номер|Chinese\s+ID|TIN\s+China)\s*[:\-]?\s*([0-9]{17}[0-9X])(?![\p{L}\d])""",
+        """(?ix)(?<![\p{L}\d])([0-9]{17}[0-9X])(?![\p{L}\d])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,

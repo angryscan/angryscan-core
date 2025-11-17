@@ -9,21 +9,10 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object VIN : IHyperMatcher, IKotlinMatcher {
     override val name = "VIN"
     override val javaPatterns = listOf(
-        """
-        (?x)
-        (?:^|\s)
-        (?:
-          VIN|ВИН|
-          идентификационный\s+номер\s+транспортного\s+средства|
-          VIN-код|ВИН-код|
-          идентификационный\s+номер\s+ТС
-        )?
-        [\s\(\)\[\]\"':]*[:\-]?[\s\(\)\[\]\"':]*
-        ([A-HJ-NPR-Z0-9]{17})
-        (?:[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)
-        """.trimIndent()
+        """(?i)(?:^|[\s\(\)\[\]\"':])(?<![\p{L}\d])([A-HJ-NPR-Z0-9]{17})(?![\p{L}\d])(?:[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
     )
     override val regexOptions = setOf(
+        RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
     )
 
