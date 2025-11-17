@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
     override val javaPatterns = listOf(
-        """[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)(?![0-9])"""
+        """(?:^|[\s.,\-:;"()'\/\\*])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)(?![0-9])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE,
@@ -17,7 +17,7 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)"""
+        """(?:^|[\s.,\-:;"()'\/\\*])[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
