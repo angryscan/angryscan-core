@@ -9,7 +9,6 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
     override val javaPatterns = listOf(
-        // Только без префикса - простая проверка на 11 цифр с разделителями, валидация будет в check() функции
         """[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)(?![0-9])"""
     )
     override val regexOptions = setOf(
@@ -18,7 +17,6 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        // Только без префикса - простая проверка на 11 цифр с разделителями, валидация будет в check() функции
         """[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{2}(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)"""
     )
     override val expressionOptions = setOf(
