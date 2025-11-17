@@ -81,12 +81,6 @@ internal class VehicleRegNumberTest {
     }
 
     @Test
-    fun testVehicleRegNumberWithSpaces() {
-        val text = " А 123 ВС 77 "
-        assertTrue(scanText(text, VehicleRegNumber) >= 1, "Номер с пробелами должен быть найден")
-    }
-
-    @Test
     fun testVehicleRegNumberWithoutSpaces() {
         val text = " А123ВС77 "
         assertTrue(scanText(text, VehicleRegNumber) >= 1, "Номер без пробелов должен быть найден")

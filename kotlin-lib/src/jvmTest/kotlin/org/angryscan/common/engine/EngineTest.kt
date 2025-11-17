@@ -35,6 +35,10 @@ internal class EngineTest {
             assertEquals(1, scanResult.count { it.matcher is Address }, "Address check")
             //Check Login
             assertEquals(1, scanResult.count { it.matcher is Login }, "Login check")
+            //Check BankAccount
+            assertEquals(1, scanResult.count { it.matcher is BankAccount }, "Bank account number check")
+            //Check CarNumbescanResult
+            assertEquals(2, scanResult.count { it.matcher is VehicleRegNumber }, "Vehicle number check")
             //Check Password
             assertEquals(1, scanResult.count { it.matcher is Password }, "Password check")
             //Check CVV
