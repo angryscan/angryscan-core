@@ -92,7 +92,7 @@ internal class EngineTest {
                 continue
             }
             val count = getCountOfAttribute(file, attribute)
-            assertTrue(count == 1, "Matcher '${attribute.name}' found $count matches, expected at least 1")
+            assertTrue(count == 1, "Matcher '${attribute.name}' found $count matches, expected 1")
         }
     }
 
@@ -100,7 +100,7 @@ internal class EngineTest {
     fun testCardEdge() {
         val file = javaClass.getResource("/testFiles/cardNumber/edge.txt")?.file
         assertNotNull(file)
-        assertEquals(6, getCountOfAttribute(file, CardNumber()))
+        assertEquals(7, getCountOfAttribute(file, CardNumber()))
     }
 
     @Test

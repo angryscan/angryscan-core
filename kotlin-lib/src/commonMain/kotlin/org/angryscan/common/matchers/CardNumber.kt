@@ -12,7 +12,7 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     override val name = "Card number"
 
     override val javaPatterns = listOf(
-        """(?:^|[\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
+        """(?<=^|[\s.,\-:;"()'])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})(?![^\s.,;)"<])"""
     )
 
     override val regexOptions = setOf(
@@ -43,7 +43,7 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
     }
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s.,\-:"()])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
+        """(?:^|[\s.,\-:;"()'])([0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}|[0-9]{16})\b"""
     )
 
     override val expressionOptions = setOf(
