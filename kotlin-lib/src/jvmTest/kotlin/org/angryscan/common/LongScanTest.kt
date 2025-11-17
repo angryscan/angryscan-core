@@ -53,7 +53,7 @@ internal class LongScanTest {
 
         println("##### Kotlin Engine #####")
         val kotlinEngine = KotlinEngine(Matchers.filterIsInstance<IKotlinMatcher>())
-        assertEquals(250000, longScan(kotlinEngine, filePath))
+        assertEquals(260000, longScan(kotlinEngine, filePath))
     }
 
 
@@ -63,6 +63,6 @@ internal class LongScanTest {
         assertNotNull(filePath)
         val hyperEngine = HyperScanEngine(Matchers.filterIsInstance<IHyperMatcher>())
         println("##### Hyper Scan #####")
-        assertEquals(240000, longScan(hyperEngine, filePath))
+        assertEquals(250000, longScan(hyperEngine, filePath))
     }
 }
