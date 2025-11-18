@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object IPv6 : IHyperMatcher, IKotlinMatcher {
     override val name = "IPv6"
     override val javaPatterns = listOf(
-        """(?<![0-9a-fA-F:])((?:[0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})(?![0-9a-fA-F:])"""
+        """(?<=^|[\s>\"=\-\[\]{}()\`',;])(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})(?=[ \t\r\a.,;()\"`'<|()\[\]{}]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE,
@@ -17,7 +17,7 @@ object IPv6 : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(^|[^0-9a-fA-F:])((?:[0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})($|[^0-9a-fA-F:])"""
+        """(?:^|[\s>"=\-[\]{}()\`',;])(([0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})([ \t\r\a.,;()"`'<|()[\]{}]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -25,28 +25,7 @@ object IPv6 : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean {
-        // Паттерн HyperScan может захватывать символ перед адресом, нужно его убрать
-        // Извлекаем только IPv6 адрес (вторая группа в паттерне)
-        val cleaned = value.trim().let {
-            // Если строка начинается с не-шестнадцатеричного символа, убираем его
-            if (it.isNotEmpty() && !it.first().toString().matches(Regex("[0-9a-fA-F:]"))) {
-                it.drop(1)
-            } else {
-                it
-            }
-        }.trimEnd().let {
-            // Убираем символ после адреса, если он не является частью IPv6
-            if (it.isNotEmpty() && !it.last().toString().matches(Regex("[0-9a-fA-F:]"))) {
-                it.dropLast(1)
-            } else {
-                it
-            }
-        }
-        // Проверяем, что это валидный IPv6 адрес
-        val pattern = Regex("""^((?:[0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4})$""", RegexOption.IGNORE_CASE)
-        return pattern.matches(cleaned)
-    }
+    override fun check(value: String): Boolean = true
 
     override fun toString() = name
 }

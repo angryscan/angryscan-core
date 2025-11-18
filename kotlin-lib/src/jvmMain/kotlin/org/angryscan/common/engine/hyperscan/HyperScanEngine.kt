@@ -61,10 +61,6 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
             .filter {
                 expressions[it.matchedExpression]!!.check(it.matchedString)
             }
-            // Deduplicate overlapping matches that start at the same position for the same matcher.
-            // Prefer the longest end position to align with Kotlin regex greedy behavior.
-            .groupBy { it.startPosition }
-            .map { (_, group) -> group.maxBy { it.endPosition } }
             .toMutableList()
 
         scanner.close()
@@ -84,7 +80,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
                 endPosition = it.endPosition,
                 matcher = expressions[it.matchedExpression]!!
             )
-        }
+        }.distinct()
     }
 
     override fun close() {
