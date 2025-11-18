@@ -70,8 +70,10 @@ internal class LongScanTest {
             IPv4,
             IPv6
         )
-        val kotlinEngine = KotlinEngine(matchers)
-        assertEquals(220000, longScan(kotlinEngine, filePath))
+        KotlinEngine(matchers).use { kotlinEngine ->
+            assertEquals(220000, longScan(kotlinEngine, filePath))
+        }
+
     }
 
 
@@ -79,6 +81,8 @@ internal class LongScanTest {
     fun longScanHS() {
         val filePath = javaClass.getResource("/testFiles/first.csv")?.file
         assertNotNull(filePath)
+
+        println("##### Hyper Scan #####")
         val matchers = listOf<IHyperMatcher>(
             Email,
             CardNumber(),
@@ -97,8 +101,8 @@ internal class LongScanTest {
             IPv4,
             IPv6
         )
-        val hyperEngine = HyperScanEngine(matchers)
-        println("##### Hyper Scan #####")
-        assertEquals(220000, longScan(hyperEngine, filePath))
+        HyperScanEngine(matchers).use { hyperEngine ->
+            assertEquals(220000, longScan(hyperEngine, filePath))
+        }
     }
 }

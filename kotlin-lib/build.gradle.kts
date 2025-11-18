@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.angryscan"
-version = "1.4.2"
+version = "1.4.3"
 description = "Data Scanner Library"
 
 

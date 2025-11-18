@@ -166,11 +166,12 @@ internal class UserSignatureTest {
     }
 
     private fun scanText(text: String, matcher: IMatcher): Int {
-        val kotlinEngine = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>())
-        val hyperEngine = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>())
-
-        val kotlinRes = kotlinEngine.scan(text)
-        val hyperRes = hyperEngine.scan(text)
+        val kotlinRes = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>()).use {
+            it.scan(text)
+        }
+        val hyperRes = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>()).use {
+            it.scan(text)
+        }
         
         assertEquals(
             kotlinRes.count(),
@@ -178,7 +179,7 @@ internal class UserSignatureTest {
             "Количество совпадений для ${matcher.name} должно быть одинаковым для обоих движков. " +
             "Kotlin: ${kotlinRes.count()}, Hyper: ${hyperRes.count()}\nText: $text"
         )
-        
+
         return kotlinRes.count()
     }
 }

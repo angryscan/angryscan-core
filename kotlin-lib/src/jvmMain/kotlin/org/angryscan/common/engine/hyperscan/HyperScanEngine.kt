@@ -12,7 +12,7 @@ import org.angryscan.common.extensions.toExpressionFlag
 import java.util.*
 
 @Serializable
-class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) : IScanEngine, AutoCloseable {
+class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) : IScanEngine {
     @Transient
     private val expressions =
         matchers
@@ -45,12 +45,12 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
 
     @Transient
     private val database = Database.compile(expressions.keys.toList())
-
+    @Transient
+    private val scanner = Scanner().also {
+        it.allocScratch(database)
+    }
 
     override fun scan(text: String): List<Match> {
-        val scanner = Scanner()
-        scanner.allocScratch(database)
-
         val res = scanner
             .scan(
                 database,
@@ -62,8 +62,6 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
                 expressions[it.matchedExpression]!!.check(it.matchedString)
             }
             .toMutableList()
-
-        scanner.close()
 
         return res.map {
             Match(
@@ -84,6 +82,7 @@ class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) 
     }
 
     override fun close() {
+        scanner.close()
         database.close()
     }
 }

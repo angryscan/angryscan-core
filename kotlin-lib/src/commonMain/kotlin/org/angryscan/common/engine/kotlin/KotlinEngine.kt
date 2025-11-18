@@ -42,4 +42,6 @@ class KotlinEngine(@Serializable override val matchers: List<IKotlinMatcher>) : 
             }
         return matches.distinct()
     }
+
+    override fun close() {}
 }
