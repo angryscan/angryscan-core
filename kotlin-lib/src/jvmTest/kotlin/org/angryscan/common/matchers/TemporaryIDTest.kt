@@ -128,11 +128,12 @@ internal class TemporaryIDTest {
     }
 
     private fun scanText(text: String, matcher: IMatcher): Int {
-        val kotlinEngine = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>())
-        val hyperEngine = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>())
-
-        val kotlinRes = kotlinEngine.scan(text)
-        val hyperRes = hyperEngine.scan(text)
+        val kotlinRes = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>()).use {
+            it.scan(text)
+        }
+        val hyperRes = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>()).use {
+            it.scan(text)
+        }
         
         // Для TemporaryID может быть разное количество совпадений из-за двух паттернов
         // Проверяем, что оба движка находят хотя бы одно совпадение (если ожидается > 0)

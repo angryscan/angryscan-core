@@ -1,40 +1,35 @@
 package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IMatcher
-import org.angryscan.common.engine.hyperscan.HyperScanEngine
-import org.angryscan.common.engine.hyperscan.IHyperMatcher
-import org.angryscan.common.engine.kotlin.IKotlinMatcher
-import org.angryscan.common.engine.kotlin.KotlinEngine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
  * Тесты для проверки крайних позиций и пограничных значений матчера MilitaryRank
  */
-internal class MilitaryRankTest {
+internal class MilitaryRankTest: MatcherTestBase(MilitaryRank) {
 
     @Test
     fun testMilitaryRankAtStart() {
         val text = "майор Иванов служит в армии"
-        assertEquals(1, scanText(text, MilitaryRank), "Воинское звание в начале должно быть найдено")
+        assertEquals(1, scanText(text), "Воинское звание в начале должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankAtEnd() {
         val text = "Звание: капитан"
-        assertEquals(1, scanText(text, MilitaryRank), "Воинское звание в конце должно быть найдено")
+        assertEquals(1, scanText(text), "Воинское звание в конце должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankInMiddle() {
         val text = "Офицер полковник Петров выступил с докладом"
-        assertEquals(1, scanText(text, MilitaryRank), "Воинское звание в середине должно быть найдено")
+        assertEquals(1, scanText(text), "Воинское звание в середине должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankStandalone() {
         val text = "сержант"
-        assertEquals(1, scanText(text, MilitaryRank), "Воинское звание отдельной строкой должно быть найдено")
+        assertEquals(1, scanText(text), "Воинское звание отдельной строкой должно быть найдено")
     }
 
     @Test
@@ -45,7 +40,7 @@ internal class MilitaryRankTest {
             ефрейтор
             старший матрос
         """.trimIndent()
-        assertEquals(4, scanText(text, MilitaryRank), "Низшие воинские звания должны быть найдены")
+        assertEquals(4, scanText(text), "Низшие воинские звания должны быть найдены")
     }
 
     @Test
@@ -55,13 +50,13 @@ internal class MilitaryRankTest {
             адмирал флота
             маршал Российской Федерации
         """.trimIndent()
-        assertEquals(3, scanText(text, MilitaryRank), "Высшие воинские звания должны быть найдены")
+        assertEquals(3, scanText(text), "Высшие воинские звания должны быть найдены")
     }
 
     @Test
     fun testMilitaryRankWithService() {
         val text = "майор медицинской службы"
-        assertEquals(1, scanText(text, MilitaryRank), "Воинское звание с родом службы должно быть найдено")
+        assertEquals(1, scanText(text), "Воинское звание с родом службы должно быть найдено")
     }
 
     @Test
@@ -75,7 +70,7 @@ internal class MilitaryRankTest {
             подполковник
             полковник
         """.trimIndent()
-        assertEquals(7, scanText(text, MilitaryRank), "Все офицерские звания должны быть найдены")
+        assertEquals(7, scanText(text), "Все офицерские звания должны быть найдены")
     }
 
     @Test
@@ -89,7 +84,7 @@ internal class MilitaryRankTest {
             вице-адмирал
             адмирал
         """.trimIndent()
-        assertEquals(7, scanText(text, MilitaryRank), "Все морские звания должны быть найдены")
+        assertEquals(7, scanText(text), "Все морские звания должны быть найдены")
     }
 
     @Test
@@ -100,7 +95,7 @@ internal class MilitaryRankTest {
             старший сержант
             старшина
         """.trimIndent()
-        assertEquals(4, scanText(text, MilitaryRank), "Все сержантские звания должны быть найдены")
+        assertEquals(4, scanText(text), "Все сержантские звания должны быть найдены")
     }
 
     @Test
@@ -111,7 +106,7 @@ internal class MilitaryRankTest {
             главный старшина
             главный корабельный старшина
         """.trimIndent()
-        assertEquals(4, scanText(text, MilitaryRank), "Все морские сержантские звания должны быть найдены")
+        assertEquals(4, scanText(text), "Все морские сержантские звания должны быть найдены")
     }
 
     @Test
@@ -122,7 +117,7 @@ internal class MilitaryRankTest {
             мичман
             старший мичман
         """.trimIndent()
-        assertEquals(4, scanText(text, MilitaryRank), "Все прапорщики и мичманы должны быть найдены")
+        assertEquals(4, scanText(text), "Все прапорщики и мичманы должны быть найдены")
     }
 
     @Test
@@ -133,7 +128,7 @@ internal class MilitaryRankTest {
             генерал-полковник
             генерал армии
         """.trimIndent()
-        assertEquals(4, scanText(text, MilitaryRank), "Все генеральские звания должны быть найдены")
+        assertEquals(4, scanText(text), "Все генеральские звания должны быть найдены")
     }
 
     @Test
@@ -144,60 +139,43 @@ internal class MilitaryRankTest {
             адмирал
             адмирал флота
         """.trimIndent()
-        assertEquals(4, scanText(text, MilitaryRank), "Все адмиральские звания должны быть найдены")
+        assertEquals(4, scanText(text), "Все адмиральские звания должны быть найдены")
     }
 
     @Test
     fun testMilitaryRankWithLabel() {
         val text = "Воинское звание: капитан"
-        assertEquals(1, scanText(text, MilitaryRank), "Звание с меткой должно быть найдено")
+        assertEquals(1, scanText(text), "Звание с меткой должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankInParentheses() {
         val text = "Иванов (полковник) в отставке"
-        assertEquals(1, scanText(text, MilitaryRank), "Звание в скобках должно быть найдено")
+        assertEquals(1, scanText(text), "Звание в скобках должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankWithPunctuation() {
         val text = "Звание: майор."
-        assertEquals(1, scanText(text, MilitaryRank), "Звание с точкой должно быть найдено")
+        assertEquals(1, scanText(text), "Звание с точкой должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankUpperCase() {
         val text = "КАПИТАН"
-        assertEquals(1, scanText(text, MilitaryRank), "Звание в верхнем регистре должно быть найдено")
+        assertEquals(1, scanText(text), "Звание в верхнем регистре должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankMixedCase() {
         val text = "МаЙоР"
-        assertEquals(1, scanText(text, MilitaryRank), "Звание в смешанном регистре должно быть найдено")
+        assertEquals(1, scanText(text), "Звание в смешанном регистре должно быть найдено")
     }
 
     @Test
     fun testMilitaryRankEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text, MilitaryRank), "Пустая строка не должна содержать воинского звания")
-    }
-
-    private fun scanText(text: String, matcher: IMatcher): Int {
-        val kotlinEngine = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>())
-        val hyperEngine = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>())
-
-        val kotlinRes = kotlinEngine.scan(text)
-        val hyperRes = hyperEngine.scan(text)
-        
-        assertEquals(
-            kotlinRes.count(),
-            hyperRes.count(),
-            "Количество совпадений для ${matcher.name} должно быть одинаковым для обоих движков. " +
-            "Kotlin: ${kotlinRes.count()}, Hyper: ${hyperRes.count()}\nText: $text"
-        )
-        
-        return kotlinRes.count()
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать воинского звания")
     }
 }
 
