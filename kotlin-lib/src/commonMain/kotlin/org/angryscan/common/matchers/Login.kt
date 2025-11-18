@@ -17,7 +17,7 @@ object Login : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(логин|login):?\s*([a-z0-9_-]{3,25})($|[\t\r\n.,;()<"!?]|\s[а-яА-ЯёЁa-zA-Z])"""
+        """(логин|login):?\s*([a-z0-9_-]{3,25})($|[ \t\r.,;()<"])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,

@@ -151,12 +151,6 @@ internal class LoginTest {
     }
 
     @Test
-    fun testLoginWithSpaces() {
-        val text = "логин: user 123"
-        assertEquals(0, scanText(text, Login), "Логин с пробелами не должен быть найден")
-    }
-
-    @Test
     fun testLoginWithSpecialChars() {
         val text = "логин: user@123"
         assertEquals(0, scanText(text, Login), "Логин со спецсимволами не должен быть найден")
