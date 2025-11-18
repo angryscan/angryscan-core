@@ -134,7 +134,7 @@ mavenPublishing {
     pom {
         name.set("Angry Data Scanner library for Java and Kotlin")
         description.set("Angry Data Scanner library for Java and Kotlin")
-        url.set("https://github.com/angryscan/angrydata-core")
+        url.set("https://github.com/angryscan/angryscan-core")
 
         licenses {
             license {
@@ -149,10 +149,14 @@ mavenPublishing {
                 name.set("StellaLupus")
                 email.set("soulofpain.k@gmail.com")
             }
+            developer {
+                id.set("artemtaras")
+                name.set("ArtemTaras")
+            }
         }
 
         scm {
-            url.set("https://github.com/angryscan/angrydata-core")
+            url.set("https://github.com/angryscan/angryscan-core")
         }
     }
 

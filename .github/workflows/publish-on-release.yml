@@ -1,0 +1,70 @@
+name: Publish on Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate gradle wrappers
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Verify tag matches Gradle project version
+        shell: bash
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          if [[ -z "$TAG_NAME" ]]; then
+            echo "::error::Release tag name is empty"
+            exit 1
+          fi
+          if [[ "$TAG_NAME" != v* ]]; then
+            echo "::error::Release tag must start with 'v' (e.g. v1.4.3). Got: $TAG_NAME"
+            exit 1
+          fi
+          TAG_NO_V="${TAG_NAME#v}"
+          VERSION=$(./gradlew -q :kotlin-lib:printVersion)
+          echo "Tag without v: $TAG_NO_V"
+          echo "Gradle version: $VERSION"
+          if [[ "$VERSION" != "$TAG_NO_V" ]]; then
+            echo "::error::Tag '$TAG_NAME' does not match project version '$VERSION'"
+            exit 1
+          fi
+
+      - name: Tests with Gradle Wrapper and XVFB
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: ./gradlew allTests --no-daemon
+
+      - name: Publish to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+        run: ./gradlew :kotlin-lib:publishAllPublicationsToMavenCentralRepository
+
