@@ -11,6 +11,7 @@ object Matchers: List<IMatcher> by listOf<IMatcher>(
     Birthday,
     CadastralNumber,
     CardNumber(),
+    CryptoWallet,
     CVV,
     DeathDate,
     DriverLicense,
