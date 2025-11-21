@@ -98,7 +98,7 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
 
     @Test
     fun testBitcoinLegacyNotInNumberSequence() {
-        val text = "123${bitcoinLegacy}456"
+        val text = "999999${bitcoinLegacy}9999999"
         assertEquals(0, scanText(text), "Bitcoin Legacy адрес внутри числовой последовательности не должен быть найден")
     }
 
