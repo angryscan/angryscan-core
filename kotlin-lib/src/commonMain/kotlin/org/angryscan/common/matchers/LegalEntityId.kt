@@ -9,7 +9,7 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     override val name = "Legal Entity ID"
     override val javaPatterns = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?:^|[^a-zA-Z0-9])[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:[^a-zA-Z0-9]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +17,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?:^|[^a-zA-Z0-9])[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:[^a-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -33,7 +33,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
 
         if (s.any { it.isLetter() && it.isLowerCase() }) return false
 
-        val cleanValue = s.replace(" ", "")
+        val cleanValue = s.replace(Regex("\\s"), "")
         
         if (cleanValue.length == 20) {
             val body = cleanValue.substring(0, 18)

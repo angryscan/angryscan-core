@@ -9,7 +9,12 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object UidContractBankBki : IHyperMatcher, IKotlinMatcher {
     override val name = "UID Contract Bank BKI"
     override val javaPatterns = listOf(
-        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«»])\{?[0-9A-Fa-f]{8}[- ]?[0-9A-Fa-f]{4}[- ]?4[0-9A-Fa-f]{3}[- ]?[89ABab][0-9A-Fa-f]{3}[- ]?[0-9A-Fa-f]{12}\}?(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        \{?[0-9A-Fa-f]{8}[\s\t-]*[0-9A-Fa-f]{4}[\s\t-]*4[0-9A-Fa-f]{3}[\s\t-]*[89ABab][0-9A-Fa-f]{3}[\s\t-]*[0-9A-Fa-f]{12}\}?
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +22,7 @@ object UidContractBankBki : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«»])\{?[0-9A-Fa-f]{8}[- ]?[0-9A-Fa-f]{4}[- ]?4[0-9A-Fa-f]{3}[- ]?[89ABab][0-9A-Fa-f]{3}[- ]?[0-9A-Fa-f]{12}\}?(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9])\{?[0-9A-Fa-f]{8}[\s\t-]*[0-9A-Fa-f]{4}[\s\t-]*4[0-9A-Fa-f]{3}[\s\t-]*[89ABab][0-9A-Fa-f]{3}[\s\t-]*[0-9A-Fa-f]{12}\}?(?:[^а-яА-Яa-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

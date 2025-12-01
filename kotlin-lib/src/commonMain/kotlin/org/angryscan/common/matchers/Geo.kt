@@ -27,7 +27,9 @@ object Geo : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """\A\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})""",
+        """[\s\(\[\{«"']\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})""",
+        """,\s+(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -79,7 +81,6 @@ object Geo : IHyperMatcher, IKotlinMatcher {
         val originalLower = originalValue.lowercase()
         
         if (originalValue.contains("~N(") || originalValue.contains("N(")) return false
-        if (originalValue.contains("]") || originalValue.contains("[")) return false
         if (originalValue.contains("λ") || originalValue.contains("∪") || originalValue.contains("∩")) return false
         
         if (originalLower.contains("iter") || originalLower.contains("k-mea") || 

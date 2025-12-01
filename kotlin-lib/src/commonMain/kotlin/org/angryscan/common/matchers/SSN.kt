@@ -9,17 +9,25 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object SSN : IHyperMatcher, IKotlinMatcher {
     override val name = "SSN"
     override val javaPatterns = listOf(
-        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?![-0-9\p{L}\d])"""
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        ([0-9]{3}-[0-9]{2}-[0-9]{4})
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
-        RegexOption.MULTILINE
+        RegexOption.MULTILINE,
+        RegexOption.IGNORE_CASE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9])[0-9]{3}-[0-9]{2}-[0-9]{4}(?:[^а-яА-Яa-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
-        ExpressionOption.MULTILINE
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
     )
 
     override fun check(value: String): Boolean {

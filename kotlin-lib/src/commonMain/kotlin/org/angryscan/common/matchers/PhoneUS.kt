@@ -9,14 +9,14 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object PhoneUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Phone US"
     override val javaPatterns = listOf(
-        """(?<=^|[\s\(\)\[\]\"':])(?:(?:\+?1[ \t\-])\(?[2-9][0-9]{2}\)?[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}|\(?[2-9][0-9]{2}\)[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}|[2-9][0-9]{2}[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4})(?=[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
+        """(?<![\p{L}\d])(?:(?:\+?1[ \t\-]?)?(?:\([2-9][0-9]{2}\)[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}|[2-9][0-9]{2}[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}))(?![0-9])"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\(\)\[\]\"':])(?:(?:\+?1[ \t\-])\(?[2-9][0-9]{2}\)?[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}|\(?[2-9][0-9]{2}\)[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}|[2-9][0-9]{2}[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4})(?:[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
+        """(?:^|[^a-zA-Z0-9])(?:(?:\+?1[ \t\-]?)?(?:\([2-9][0-9]{2}\)[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}|[2-9][0-9]{2}[ \t\-][2-9][0-9]{2}[ \t\-][0-9]{4}))(?:[^0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -27,4 +27,3 @@ object PhoneUS : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
-

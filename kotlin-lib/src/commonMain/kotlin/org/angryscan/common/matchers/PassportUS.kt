@@ -9,8 +9,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object PassportUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport US"
     override val javaPatterns = listOf(
-        """(?i)(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?=\.\s|\s|[)\]\}]\s|['"]\s|$)""",
-        """(?i)(?:^|[#:=\-]\s|[\s()\[\]\{\}'"]+)([A-Z][0-9]{8})(?=\.\s|\s|[)\]\}]\s|['"]\s|$)"""
+        """(?i)(?<![\p{L}\d])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?!\d)""",
+        """(?<![\p{L}\d])([A-Z][0-9]{8})(?!\d)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,8 +18,8 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?i)(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[\s\r\n\(\)\[\]\{\}\"'.,;:!?\-]|$)""",
-        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'])([A-Z][0-9]{8})(?:[\s\r\n\(\)\[\]\{\}\"'.,;:!?\-]|$)"""
+        """(?i)(?:^|[^a-zA-Z0-9])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[^0-9]|$)""",
+        """(?i)(?:^|[^a-zA-Z0-9])([A-Z][0-9]{8})(?:[^0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -37,7 +37,6 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
         if (!isLetterPlusDigits) return false
 
         if (cleaned.all { it == cleaned[0] }) return false
-        if (cleaned == "A12345678" || cleaned == "C12345678") return false
         if (cleaned == "A00000000" || cleaned == "C00000000" || cleaned == "A99999999" || cleaned == "C99999999") return false
 
         val letter = cleaned[0]

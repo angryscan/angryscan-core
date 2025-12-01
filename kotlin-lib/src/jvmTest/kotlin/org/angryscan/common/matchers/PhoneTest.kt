@@ -5,162 +5,414 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера Phone
+ * Комплексные тесты для матчера Phone
  */
-internal class PhoneTest: MatcherTestBase(Phone) {
+internal class PhoneTest : MatcherTestBase(Phone) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testPhoneAtStart() {
-        val text = "+7 912 345 67 89 это мой номер"
-        assertTrue(scanText(text) >= 1, "Телефон в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "+79161234567 is a phone"
+        assertTrue(scanText(text) >= 1, "Телефон в начале текста должен быть найден")
     }
 
     @Test
-    fun testPhoneAtEnd() {
-        val text = "Контактный номер: +7 912 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Phone number is +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон в конце текста должен быть найден")
     }
 
     @Test
-    fun testPhoneInMiddle() {
-        val text = "Позвоните по номеру +7 912 345 67 89 для связи"
-        assertTrue(scanText(text) >= 1, "Телефон в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The phone +79161234567 is valid"
+        assertTrue(scanText(text) >= 1, "Телефон в середине текста должен быть найден")
     }
 
     @Test
-    fun testPhoneStandalone() {
-        val text = "+7 912 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон отдельной строкой должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "+79161234567\nSecond line"
+        assertTrue(scanText(text) >= 1, "Телефон в начале строки должен быть найден")
     }
 
     @Test
-    fun testPhoneWithPlus7() {
-        val text = "+7 912 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон с +7 должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\n+79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон в конце строки должен быть найден")
     }
 
     @Test
-    fun testPhoneWith7() {
-        val text = "7 912 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон с 7 должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with +79161234567 phone"
+        assertTrue(scanText(text) >= 1, "Телефон в середине строки должен быть найден")
     }
 
     @Test
-    fun testPhoneWith8() {
-        val text = "8 912 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон с 8 должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\n+79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон после \\n должен быть найден")
     }
 
     @Test
-    fun testPhoneWithDashes() {
-        val text = "+7-912-345-67-89"
+    fun testWithNewlineAfter() {
+        val text = "+79161234567\n"
+        assertTrue(scanText(text) >= 1, "Телефон перед \\n должен быть найден")
+    }
+
+    @Test
+    fun testWithCRLF() {
+        val text = "\r\n+79161234567\r\n"
+        assertTrue(scanText(text) >= 1, "Телефон с \\r\\n должен быть найден")
+    }
+
+    @Test
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n+79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон после пустой строки должен быть найден")
+    }
+
+    @Test
+    fun testWithEmptyLineAfter() {
+        val text = "+79161234567\n\n"
+        assertTrue(scanText(text) >= 1, "Телефон перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc+79161234567def"
+        assertEquals(0, scanText(text), "Телефон внутри буквенной последовательности не должен находиться")
+    }
+
+    @Test
+    fun testNotInsideNumericSequence() {
+        val text = "123+79161234567456"
+        assertEquals(0, scanText(text), "Телефон внутри цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testNotInsideAlphanumericSequence() {
+        val text = "abc123+79161234567def456"
+        assertEquals(0, scanText(text), "Телефон внутри буквенно-цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testWithSpaceBefore() {
+        val text = "Phone +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с пробелом перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSpaceAfter() {
+        val text = "+79161234567 is valid"
+        assertTrue(scanText(text) >= 1, "Телефон с пробелом после должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaBefore() {
+        val text = "Phone, +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaAfter() {
+        val text = "+79161234567, next"
+        assertTrue(scanText(text) >= 1, "Телефон с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithDotBefore() {
+        val text = "Phone. +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с точкой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithDotAfter() {
+        val text = "+79161234567."
+        assertTrue(scanText(text) >= 1, "Телефон с точкой после должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "Phone; +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с точкой с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "+79161234567; next"
+        assertTrue(scanText(text) >= 1, "Телефон с точкой с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "Phone: +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с двоеточием перед должен быть найден")
+    }
+
+    @Test
+    fun testWithExclamationAfter() {
+        val text = "+79161234567!"
+        assertTrue(scanText(text) >= 1, "Телефон с восклицательным знаком после должен быть найден")
+    }
+
+    @Test
+    fun testWithQuestionMarkAfter() {
+        val text = "+79161234567?"
+        assertTrue(scanText(text) >= 1, "Телефон с вопросительным знаком после должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( +79161234567 )"
+        assertTrue(scanText(text) >= 1, "Телефон в скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(+79161234567)"
+        assertTrue(scanText(text) >= 1, "Телефон в скобках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" +79161234567 \""
+        assertTrue(scanText(text) >= 1, "Телефон в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"+79161234567\""
+        assertTrue(scanText(text) >= 1, "Телефон в кавычках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithEqualsAndSpace() {
+        val text = "phone = +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с = и пробелом должен быть найден")
+    }
+
+    @Test
+    fun testWithHashAndSpace() {
+        val text = "phone # +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с # и пробелом должен быть найден")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ +79161234567 ]"
+        assertTrue(scanText(text) >= 1, "Телефон в квадратных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ +79161234567 }"
+        assertTrue(scanText(text) >= 1, "Телефон в фигурных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithPlusAsPartOfFormat() {
+        val text = "+79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с + как часть формата должен быть найден")
+    }
+
+    @Test
+    fun testWith8InsteadOfPlus() {
+        val text = "89161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с 8 вместо + должен быть найден")
+    }
+
+    @Test
+    fun testWithParenthesesInFormat() {
+        val text = "+7 (916) 123-45-67"
+        assertTrue(scanText(text) >= 1, "Телефон со скобками в формате должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "+79161234567 +79161234568"
+        assertTrue(scanText(text) >= 2, "Несколько телефонов через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "+79161234567, +79161234568"
+        assertTrue(scanText(text) >= 2, "Несколько телефонов через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "+79161234567; +79161234568"
+        assertTrue(scanText(text) >= 2, "Несколько телефонов через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "+79161234567\n+79161234568"
+        assertTrue(scanText(text) >= 2, "Несколько телефонов через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
+        val text = ""
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать телефонов")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no phone numbers at all"
+        assertEquals(0, scanText(text), "Текст без телефонов не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "89161234567"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithSpacesFormat() {
+        val text = "+7 916 123 45 67"
+        assertTrue(scanText(text) >= 1, "Телефон с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithDashesFormat() {
+        val text = "+7-916-123-45-67"
         assertTrue(scanText(text) >= 1, "Телефон с дефисами должен быть найден")
     }
 
     @Test
-    fun testPhoneWithParentheses() {
-        val text = "+7 (912) 345-67-89"
-        assertTrue(scanText(text) >= 1, "Телефон со скобками должен быть найден")
+    fun testTooShort() {
+        val text = "+7916123456"
+        assertEquals(0, scanText(text), "Слишком короткий номер не должен находиться")
     }
 
     @Test
-    fun testPhoneWithoutSpaces() {
-        val text = "+79123456789"
-        assertTrue(scanText(text) >= 1, "Телефон без пробелов должен быть найден")
+    fun testTooLong() {
+        val text = "+791612345678"
+        assertEquals(0, scanText(text), "Слишком длинный номер не должен находиться")
     }
 
     @Test
-    fun testPhoneCode9xx() {
-        val text = "+7 912 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон с кодом 9xx должен быть найден")
+    fun testWithMultipleSpaces() {
+        val text = "Phone    +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с несколькими пробелами должен быть найден")
     }
 
     @Test
-    fun testPhoneCode8xx() {
-        val text = "+7 812 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон с кодом 8xx должен быть найден")
+    fun testWithTabAfter() {
+        val text = "+79161234567\tnext"
+        assertTrue(scanText(text) >= 1, "Телефон с табуляцией после должен быть найден")
     }
 
     @Test
-    fun testPhoneCode4xx() {
-        val text = "+7 495 345 67 89"
-        assertTrue(scanText(text) >= 1, "Телефон с кодом 4xx должен быть найден")
+    fun testWithUnicodeCyrillic() {
+        val text = "Телефон +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с кириллицей рядом должен быть найден")
     }
 
     @Test
-    fun testPhoneMoscow495() {
-        val text = "+7 495 123 45 67"
-        assertTrue(scanText(text) >= 1, "Московский номер 495 должен быть найден")
+    fun testWithUnicodeLatin() {
+        val text = "Phone +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон с латиницей рядом должен быть найден")
     }
 
     @Test
-    fun testPhoneMoscow499() {
-        val text = "+7 499 123 45 67"
-        assertTrue(scanText(text) >= 1, "Московский номер 499 должен быть найден")
+    fun testStandalone() {
+        val text = "+79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон отдельной строкой должен быть найден")
     }
 
     @Test
-    fun testPhoneSPb812() {
-        val text = "+7 812 123 45 67"
-        assertTrue(scanText(text) >= 1, "Петербургский номер 812 должен быть найден")
+    fun testAtTextBoundaryStart() {
+        val text = "+79161234567 text"
+        assertTrue(scanText(text) >= 1, "Телефон в начале текста должен быть найден")
     }
 
     @Test
-    fun testPhoneInParenthesesFull() {
-        val text = "(+7 912 345 67 89)"
-        assertTrue(scanText(text) >= 1, "Телефон в полных скобках должен быть найден")
+    fun testAtTextBoundaryEnd() {
+        val text = "text +79161234567"
+        assertTrue(scanText(text) >= 1, "Телефон в конце текста должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidCountryCode() {
+        val text = "+99161234567"
+        assertEquals(0, scanText(text), "Телефон с неправильным кодом страны не должен находиться")
     }
 
     @Test
-    fun testPhoneInQuotes() {
-        val text = "\"+7 912 345 67 89\""
-        assertTrue(scanText(text) >= 1, "Телефон в кавычках должен быть найден")
+    fun testTooShortNumber() {
+        val text = "+7916123456"
+        assertEquals(0, scanText(text), "Слишком короткий номер телефона не должен находиться")
     }
 
     @Test
-    fun testPhoneWithPunctuation() {
-        val text = "Номер: +7 912 345 67 89."
-        assertTrue(scanText(text) >= 1, "Телефон с точкой должен быть найден")
+    fun testTooLongNumber() {
+        val text = "+791612345678"
+        assertEquals(0, scanText(text), "Слишком длинный номер телефона не должен находиться")
     }
 
     @Test
-    fun testPhoneWithEquals() {
-        val text = "phone=+79123456789"
-        assertTrue(scanText(text) >= 1, "Телефон после знака равенства должен быть найден")
+    fun testWithLetters() {
+        val text = "+7916123456A"
+        assertEquals(0, scanText(text), "Телефон с буквами не должен находиться")
     }
 
     @Test
-    fun testPhoneWithAsterisk() {
-        val text = "*+79123456789"
-        assertTrue(scanText(text) >= 1, "Телефон после звездочки должен быть найден")
+    fun testInsideLongNumericSequence() {
+        val text = "123456789012345678901234567890"
+        assertEquals(0, scanText(text), "Телефон внутри длинной цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testMultiplePhones() {
-        val text = """
-            Первый: +7 912 345 67 89
-            Второй: 8 923 456 78 90
-            Третий: +7 495 123 45 67
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько телефонов должны быть найдены")
+    fun testStickingToAlphabeticChar() {
+        val text = "phone+79161234567"
+        assertEquals(0, scanText(text), "Телефон, прилипший к буквам, не должен находиться")
     }
 
     @Test
-    fun testPhoneInvalidCode() {
-        val text = "+7 112 345 67 89"
-        assertEquals(0, scanText(text), "Телефон с некорректным кодом не должен быть найден")
+    fun testStickingToNumericChar() {
+        val text = "123+79161234567"
+        assertEquals(0, scanText(text), "Телефон, прилипший к цифрам, не должен находиться")
     }
 
     @Test
-    fun testPhoneTooShort() {
-        val text = "+7 912 345"
-        assertEquals(0, scanText(text), "Слишком короткий номер не должен быть найден")
+    fun testInvalidFormatWithWrongSeparators() {
+        val text = "+7916@1234@567"
+        assertEquals(0, scanText(text), "Телефон с неправильными разделителями не должен находиться")
     }
 
     @Test
-    fun testPhoneEmptyString() {
-        val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать телефона")
+    fun testPartialPhoneNumber() {
+        val text = "+7916"
+        assertEquals(0, scanText(text), "Частичный номер телефона не должен находиться")
+    }
+
+    @Test
+    fun testPhoneNumberInCode() {
+        val text = "function+79161234567()"
+        assertEquals(0, scanText(text), "Телефон внутри кода не должен находиться")
+    }
+
+    @Test
+    fun testPhoneNumberInEmail() {
+        val text = "user+79161234567@example.com"
+        assertEquals(0, scanText(text), "Телефон в email не должен находиться")
+    }
+
+    @Test
+    fun testPhoneNumberWithInvalidChars() {
+        val text = "+7916#1234#567"
+        assertEquals(0, scanText(text), "Телефон с недопустимыми символами не должен находиться")
     }
 }
 

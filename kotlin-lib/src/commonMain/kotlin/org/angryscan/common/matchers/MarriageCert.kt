@@ -11,13 +11,13 @@ object MarriageCert : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        \b
+        (?:^|[^А-ЯЁA-Za-z0-9IVX])
         (?:свидетельство\s+о\s+браке|свидетельство\s+о\s+заключении\s+брака)?
         \s*[:\-]?\s*
         ([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2})
         [\s,;:№Nn]*
         (\d{6})
-        \b
+        (?:[^А-ЯЁA-Za-z0-9]|$)
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -26,7 +26,7 @@ object MarriageCert : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}\b"""
+        """(?:^|[^А-ЯЁA-Za-z0-9IVX])[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}(?:[^А-ЯЁA-Za-z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

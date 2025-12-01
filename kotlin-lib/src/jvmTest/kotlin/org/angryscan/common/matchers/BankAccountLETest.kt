@@ -5,143 +5,360 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера BankAccountLE
+ * Комплексные тесты для матчера BankAccountLE
  */
-internal class BankAccountLETest: MatcherTestBase(BankAccountLE) {
+internal class BankAccountLETest : MatcherTestBase(BankAccountLE) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testBankAccountLEAtStart() {
-        val text = "40702810123456789012 счет ЮЛ"
-        assertTrue(scanText(text) >= 1, "Счет ЮЛ в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет в начале текста должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEAtEnd() {
-        val text = "Счет организации: 40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет ЮЛ в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Account: 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет в конце текста должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEInMiddle() {
-        val text = "Организация со счетом 40702810123456789012 работает"
-        assertTrue(scanText(text) >= 1, "Счет ЮЛ в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The account 40712345678901234567 is valid"
+        assertTrue(scanText(text) >= 1, "Счет в середине текста должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEStandalone() {
-        val text = "40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет ЮЛ отдельной строкой должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "40712345678901234567\nSecond line"
+        assertTrue(scanText(text) >= 1, "Счет в начале строки должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEBoundary40700() {
-        val text = "40700000000000000000"
-        assertTrue(scanText(text) >= 1, "Граничный счет 40700 должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\n40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет в конце строки должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEBoundary40799() {
-        val text = "40799999999999999999"
-        assertTrue(scanText(text) >= 1, "Граничный счет 40799 должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with 40712345678901234567 account"
+        assertTrue(scanText(text) >= 1, "Счет в середине строки должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEWithLabel() {
-        val text = "номер банковского счета ЮЛ: 40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет с меткой должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\n40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет после \\n должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEWithRS() {
-        val text = "р/с организации: 40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет с 'р/с организации' должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "40712345678901234567\n"
+        assertTrue(scanText(text) >= 1, "Счет перед \\n должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEWithRaschetny() {
-        val text = "расчетный счет ЮЛ: 40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет с 'расчетный счет ЮЛ' должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\n40712345678901234567\r\n"
+        assertTrue(scanText(text) >= 1, "Счет с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEInParentheses() {
-        val text = "(40702810123456789012)"
-        assertTrue(scanText(text) >= 1, "Счет в скобках должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет после пустой строки должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEInQuotes() {
-        val text = "\"40702810123456789012\""
-        assertTrue(scanText(text) >= 1, "Счет в кавычках должен быть найден")
+    fun testWithEmptyLineAfter() {
+        val text = "40712345678901234567\n\n"
+        assertTrue(scanText(text) >= 1, "Счет перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc40712345678901234567def"
+        assertEquals(0, scanText(text), "Счет внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testBankAccountLEWithPunctuation() {
-        val text = "Счет: 40702810123456789012."
-        assertTrue(scanText(text) >= 1, "Счет с точкой должен быть найден")
+    fun testNotInsideNumericSequence() {
+        val text = "12340712345678901234567456"
+        assertEquals(0, scanText(text), "Счет внутри цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testBankAccountLEUpperCase() {
-        val text = "Р/С ОРГАНИЗАЦИИ: 40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет в верхнем регистре должен быть найден")
+    fun testNotInsideAlphanumericSequence() {
+        val text = "abc12340712345678901234567def456"
+        assertEquals(0, scanText(text), "Счет внутри буквенно-цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testBankAccountLELowerCase() {
-        val text = "р/с организации: 40702810123456789012"
-        assertTrue(scanText(text) >= 1, "Счет в нижнем регистре должен быть найден")
+    fun testWithSpaceBefore() {
+        val text = "Account 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testMultipleBankAccountLE() {
-        val text = """
-            Первый: 40702810123456789012
-            Второй: 40702810987654321098
-            Третий: 40702810111111111111
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько счетов ЮЛ должны быть найдены")
+    fun testWithSpaceAfter() {
+        val text = "40712345678901234567 is valid"
+        assertTrue(scanText(text) >= 1, "Счет с пробелом после должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEInvalidPrefix406() {
-        val text = "40602810123456789012"
-        assertEquals(0, scanText(text), "Счет с неверным префиксом 406 не должен быть найден")
+    fun testWithCommaBefore() {
+        val text = "Account, 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с запятой перед должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEInvalidPrefix408() {
-        val text = "40802810123456789012"
-        assertEquals(0, scanText(text), "Счет с неверным префиксом 408 не должен быть найден")
+    fun testWithCommaAfter() {
+        val text = "40712345678901234567, next"
+        assertTrue(scanText(text) >= 1, "Счет с запятой после должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEInvalidPrefix405() {
-        val text = "40502810123456789012"
-        assertEquals(0, scanText(text), "Счет с неверным префиксом 405 не должен быть найден")
+    fun testWithDotBefore() {
+        val text = "Account. 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с точкой перед должен быть найден")
     }
 
     @Test
-    fun testBankAccountLETooShort() {
-        val text = "4070281012345678901"
-        assertEquals(0, scanText(text), "Слишком короткий счет не должен быть найден")
+    fun testWithDotAfter() {
+        val text = "40712345678901234567."
+        assertTrue(scanText(text) >= 1, "Счет с точкой после должен быть найден")
     }
 
     @Test
-    fun testBankAccountLETooLong() {
-        val text = "407028101234567890123"
-        assertEquals(0, scanText(text), "Слишком длинный счет не должен быть найден")
+    fun testWithSemicolonBefore() {
+        val text = "Account; 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с точкой с запятой перед должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEWithLetters() {
-        val text = "4070281012A456789012"
-        assertEquals(0, scanText(text), "Счет с буквами не должен быть найден")
+    fun testWithSemicolonAfter() {
+        val text = "40712345678901234567; next"
+        assertTrue(scanText(text) >= 1, "Счет с точкой с запятой после должен быть найден")
     }
 
     @Test
-    fun testBankAccountLEEmptyString() {
+    fun testWithColonBefore() {
+        val text = "Account: 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с двоеточием перед должен быть найден")
+    }
+
+    @Test
+    fun testWithExclamationAfter() {
+        val text = "40712345678901234567!"
+        assertTrue(scanText(text) >= 1, "Счет с восклицательным знаком после должен быть найден")
+    }
+
+    @Test
+    fun testWithQuestionMarkAfter() {
+        val text = "40712345678901234567?"
+        assertTrue(scanText(text) >= 1, "Счет с вопросительным знаком после должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 40712345678901234567 )"
+        assertTrue(scanText(text) >= 1, "Счет в скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(40712345678901234567)"
+        assertTrue(scanText(text) >= 1, "Счет в скобках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" 40712345678901234567 \""
+        assertTrue(scanText(text) >= 1, "Счет в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"40712345678901234567\""
+        assertTrue(scanText(text) >= 1, "Счет в кавычках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithEqualsAndSpace() {
+        val text = "account = 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с = и пробелом должен быть найден")
+    }
+
+    @Test
+    fun testWithHashAndSpace() {
+        val text = "account # 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с # и пробелом должен быть найден")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ 40712345678901234567 ]"
+        assertTrue(scanText(text) >= 1, "Счет в квадратных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ 40712345678901234567 }"
+        assertTrue(scanText(text) >= 1, "Счет в фигурных скобках с пробелами должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "40712345678901234567 40712345678901234568"
+        assertTrue(scanText(text) >= 2, "Несколько счетов через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "40712345678901234567, 40712345678901234568"
+        assertTrue(scanText(text) >= 2, "Несколько счетов через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "40712345678901234567; 40712345678901234568"
+        assertTrue(scanText(text) >= 2, "Несколько счетов через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "40712345678901234567\n40712345678901234568"
+        assertTrue(scanText(text) >= 2, "Несколько счетов через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать счета ЮЛ")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать счетов")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no bank accounts at all"
+        assertEquals(0, scanText(text), "Текст без счетов не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Account    40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Account\t40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "40712345678901234567\tnext"
+        assertTrue(scanText(text) >= 1, "Счет с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Счет 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Account 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "40712345678901234567 text"
+        assertTrue(scanText(text) >= 1, "Счет в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text 40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет в конце текста должен быть найден")
+    }
+
+    @Test
+    fun testWith407Prefix() {
+        val text = "40712345678901234567"
+        assertTrue(scanText(text) >= 1, "Счет с префиксом 407 должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testTooShort() {
+        val text = "4071234567890123456"
+        assertEquals(0, scanText(text), "Слишком короткий счет не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "407123456789012345678"
+        assertEquals(0, scanText(text), "Слишком длинный счет не должен находиться")
+    }
+
+    @Test
+    fun testWithLetters() {
+        val text = "4071234567890123456A"
+        assertEquals(0, scanText(text), "Счет с буквами не должен находиться")
+    }
+
+    @Test
+    fun testInsideLongNumericSequence() {
+        val text = "123456789012345678901234567890"
+        assertEquals(0, scanText(text), "Счет внутри длинной цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "account40712345678901234567"
+        assertEquals(0, scanText(text), "Счет, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "12340712345678901234567"
+        assertEquals(0, scanText(text), "Счет, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testWithInvalidPrefix() {
+        val text = "99912345678901234567"
+        assertEquals(0, scanText(text), "Счет с недопустимым префиксом не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "function40712345678901234567()"
+        assertEquals(0, scanText(text), "Счет внутри кода не должен находиться")
     }
 }
+

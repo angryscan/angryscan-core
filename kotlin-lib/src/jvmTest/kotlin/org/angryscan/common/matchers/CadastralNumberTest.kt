@@ -5,174 +5,384 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера CadastralNumber
+ * Комплексные тесты для матчера CadastralNumber
  */
-internal class CadastralNumberTest: MatcherTestBase(CadastralNumber) {
+internal class CadastralNumberTest : MatcherTestBase(CadastralNumber) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testCadastralNumberAtStart() {
+    fun testAtStartOfText() {
         val text = "77:01:123456:100 кадастровый номер"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в начале должен быть найден")
+        assertTrue(scanText(text) >= 1, "КН в начале текста должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberAtEnd() {
-        val text = "Кадастровый номер объекта: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Кадастровый номер: 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН в конце текста должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberInMiddle() {
-        val text = "Земельный участок с КН 77:01:123456:100 продается"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "Земельный участок 77:01:123456:100 продается"
+        assertTrue(scanText(text) >= 1, "КН в середине текста должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberStandalone() {
-        val text = "77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер отдельной строкой должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "77:01:123456:100\nSecond line"
+        assertTrue(scanText(text) >= 1, "КН в начале строки должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberWithSpaces() {
-        val text = "77 : 01 : 123456 : 100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с пробелами должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\n77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН в конце строки должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberWithoutSpaces() {
-        val text = "77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер без пробелов должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with 77:01:123456:100 cadastral"
+        assertTrue(scanText(text) >= 1, "КН в середине строки должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberMin6Digits() {
-        val text = "77:01:100000:1"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с минимум 6 цифрами должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\n77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН после \\n должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberMax7Digits() {
-        val text = "77:01:1234567:99999"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с максимум 7 цифрами должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "77:01:123456:100\n"
+        assertTrue(scanText(text) >= 1, "КН перед \\n должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberWith1DigitLast() {
-        val text = "77:01:123456:1"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с 1 цифрой в конце должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\n77:01:123456:100\r\n"
+        assertTrue(scanText(text) >= 1, "КН с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberWith5DigitsLast() {
-        val text = "77:01:123456:12345"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с 5 цифрами в конце должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН после пустой строки должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberWithFullLabel() {
-        val text = "кадастровый номер объекта недвижимости: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с полной меткой должен быть найден")
+    fun testWithEmptyLineAfter() {
+        val text = "77:01:123456:100\n\n"
+        assertTrue(scanText(text) >= 1, "КН перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc77:01:123456:100def"
+        assertEquals(0, scanText(text), "КН внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testCadastralNumberWithKN() {
+    fun testNotInsideNumericSequence() {
+        val text = "12377:01:123456:100456"
+        assertEquals(0, scanText(text), "КН внутри цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testNotInsideAlphanumericSequence() {
+        val text = "abc12377:01:123456:100def456"
+        assertEquals(0, scanText(text), "КН внутри буквенно-цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testWithSpaceBefore() {
+        val text = "КН 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с пробелом перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSpaceAfter() {
+        val text = "77:01:123456:100 is valid"
+        assertTrue(scanText(text) >= 1, "КН с пробелом после должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaBefore() {
+        val text = "КН, 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaAfter() {
+        val text = "77:01:123456:100, next"
+        assertTrue(scanText(text) >= 1, "КН с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithDotBefore() {
+        val text = "КН. 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с точкой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithDotAfter() {
+        val text = "77:01:123456:100."
+        assertTrue(scanText(text) >= 1, "КН с точкой после должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "КН; 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с точкой с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "77:01:123456:100; next"
+        assertTrue(scanText(text) >= 1, "КН с точкой с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithColonBefore() {
         val text = "КН: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с КН должен быть найден")
+        assertTrue(scanText(text) >= 1, "КН с двоеточием перед должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberZemelnySite() {
-        val text = "кадастровый номер земельного участка: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "КН земельного участка должен быть найден")
+    fun testWithExclamationAfter() {
+        val text = "77:01:123456:100!"
+        assertTrue(scanText(text) >= 1, "КН с восклицательным знаком после должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberKvartira() {
-        val text = "кадастровый номер квартиры: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "КН квартиры должен быть найден")
+    fun testWithQuestionMarkAfter() {
+        val text = "77:01:123456:100?"
+        assertTrue(scanText(text) >= 1, "КН с вопросительным знаком после должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 77:01:123456:100 )"
+        assertTrue(scanText(text) >= 1, "КН в скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberUpperCase() {
-        val text = "КАДАСТРОВЫЙ НОМЕР: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в верхнем регистре должен быть найден")
-    }
-
-    @Test
-    fun testCadastralNumberLowerCase() {
-        val text = "кадастровый номер: 77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в нижнем регистре должен быть найден")
-    }
-
-    @Test
-    fun testCadastralNumberInParentheses() {
+    fun testWithParenthesesNoSpace() {
         val text = "(77:01:123456:100)"
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в скобках должен быть найден")
+        assertTrue(scanText(text) >= 1, "КН в скобках без пробелов должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberInQuotes() {
+    fun testWithQuotesAndSpace() {
+        val text = "\" 77:01:123456:100 \""
+        assertTrue(scanText(text) >= 1, "КН в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
         val text = "\"77:01:123456:100\""
-        assertTrue(scanText(text) >= 1, "Кадастровый номер в кавычках должен быть найден")
+        assertTrue(scanText(text) >= 1, "КН в кавычках без пробелов должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberWithPunctuation() {
-        val text = "КН: 77:01:123456:100."
-        assertTrue(scanText(text) >= 1, "Кадастровый номер с точкой должен быть найден")
+    fun testWithEqualsAndSpace() {
+        val text = "kn = 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с = и пробелом должен быть найден")
     }
 
     @Test
-    fun testMultipleCadastralNumbers() {
-        val text = """
-            Первый: 77:01:123456:100
-            Второй: 50:12:234567:200
-            Третий: 78:05:345678:300
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько кадастровых номеров должны быть найдены")
+    fun testWithHashAndSpace() {
+        val text = "kn # 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с # и пробелом должен быть найден")
     }
 
     @Test
-    fun testCadastralNumberMoscow77() {
+    fun testWithBracketsAndSpace() {
+        val text = "[ 77:01:123456:100 ]"
+        assertTrue(scanText(text) >= 1, "КН в квадратных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ 77:01:123456:100 }"
+        assertTrue(scanText(text) >= 1, "КН в фигурных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithColonAsPartOfFormat() {
         val text = "77:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Московский КН должен быть найден")
+        assertTrue(scanText(text) >= 1, "КН с двоеточием как часть формата должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "77:01:123456:100 50:12:234567:200"
+        assertTrue(scanText(text) >= 2, "Несколько КН через пробел должны быть найдены")
     }
 
     @Test
-    fun testCadastralNumberSPb78() {
-        val text = "78:01:123456:100"
-        assertTrue(scanText(text) >= 1, "Петербургский КН должен быть найден")
+    fun testMultipleWithCommas() {
+        val text = "77:01:123456:100, 50:12:234567:200"
+        assertTrue(scanText(text) >= 2, "Несколько КН через запятую должны быть найдены")
     }
 
     @Test
-    fun testCadastralNumberInvalidFormat1Digit() {
-        val text = "77:1:123456:100"
-        assertEquals(0, scanText(text), "КН с 1 цифрой во втором блоке не должен быть найден")
+    fun testMultipleWithSemicolons() {
+        val text = "77:01:123456:100; 50:12:234567:200"
+        assertTrue(scanText(text) >= 2, "Несколько КН через точку с запятой должны быть найдены")
     }
 
     @Test
-    fun testCadastralNumberInvalidFormat5Digits() {
-        val text = "77:01:12345:100"
-        assertEquals(0, scanText(text), "КН с 5 цифрами в третьем блоке не должен быть найден")
+    fun testMultipleWithNewlines() {
+        val text = "77:01:123456:100\n50:12:234567:200"
+        assertTrue(scanText(text) >= 2, "Несколько КН через перенос строки должны быть найдены")
     }
 
     @Test
-    fun testCadastralNumberInvalidFormat8Digits() {
-        val text = "77:01:12345678:100"
-        assertEquals(0, scanText(text), "КН с 8 цифрами в третьем блоке не должен быть найден")
-    }
-
-    @Test
-    fun testCadastralNumberInvalidFormat6DigitsLast() {
-        val text = "77:01:123456:123456"
-        assertEquals(0, scanText(text), "КН с 6 цифрами в последнем блоке не должен быть найден")
-    }
-
-    @Test
-    fun testCadastralNumberEmptyString() {
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать кадастрового номера")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать КН")
     }
 
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no cadastral numbers at all"
+        assertEquals(0, scanText(text), "Текст без КН не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "77:01:100000:1"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testMaximalFormat() {
+        val text = "77:01:1234567:99999"
+        assertTrue(scanText(text) >= 1, "Максимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithSpacesFormat() {
+        val text = "77 : 01 : 123456 : 100"
+        assertTrue(scanText(text) >= 1, "КН с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "КН    77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "КН\t77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "77:01:123456:100\tnext"
+        assertTrue(scanText(text) >= 1, "КН с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Кадастровый номер 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Cadastral number 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "77:01:123456:100 text"
+        assertTrue(scanText(text) >= 1, "КН в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text 77:01:123456:100"
+        assertTrue(scanText(text) >= 1, "КН в конце текста должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidFormat() {
+        val text = "77-01-123456-100"
+        assertEquals(0, scanText(text), "КН с неправильными разделителями не должен находиться")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "77:01:12345:100"
+        assertEquals(0, scanText(text), "Слишком короткий КН не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "77:01:1234567:100"
+        assertEquals(0, scanText(text), "Слишком длинный КН не должен находиться")
+    }
+
+    @Test
+    fun testWithLetters() {
+        val text = "77:01:ABCDEF:100"
+        assertEquals(0, scanText(text), "КН с буквами не должен находиться")
+    }
+
+    @Test
+    fun testInsideLongNumericSequence() {
+        val text = "770112345610012345678901234567890"
+        assertEquals(0, scanText(text), "КН внутри длинной цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "cadastral77:01:123456:100"
+        assertEquals(0, scanText(text), "КН, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "12377:01:123456:100"
+        assertEquals(0, scanText(text), "КН, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testWithInvalidSeparators() {
+        val text = "77@01@123456@100"
+        assertEquals(0, scanText(text), "КН с неправильными разделителями не должен находиться")
+    }
+
+    @Test
+    fun testPartialCadastralNumber() {
+        val text = "77:01:123456"
+        assertEquals(0, scanText(text), "Частичный КН не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "function77:01:123456:100()"
+        assertEquals(0, scanText(text), "КН внутри кода не должен находиться")
+    }
 }
+

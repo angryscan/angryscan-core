@@ -11,10 +11,10 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?:^|(?<=[ \n(\[{\"'«“]))
+        (?<![\p{L}\d])
         \s*[:\-]?\s*
         (\d{8}|\d{10})
-        (?=\.\s|[\)\]}\"'»”]\s|\s|$)
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -23,14 +23,8 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}\.\s""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}[\)\]}\"'»”]\s""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}\s""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{8}$""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}\.\s""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}[\)\]}\"'»”]\s""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}\s""",
-        """(^|[ \n(\[{\"'«“])\s*[:\-]?\s*\d{10}$"""
+        """(?:^|[^\w])(?:[ \n(\[{\"'«""])?\s*[:\-]?\s*\d{8}(?:[^\w]|$)""",
+        """(?:^|[^\w])(?:[ \n(\[{\"'«""])?\s*[:\-]?\s*\d{10}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

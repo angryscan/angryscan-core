@@ -9,8 +9,19 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object TemporaryID : IHyperMatcher, IKotlinMatcher {
     override val name = "Temporary ID"
     override val javaPatterns = listOf(
-        """(?ix)(?:^|[\s"'«»(])(?<![\p{L}\d])(?:временное\s+удостоверение\s+личности|ВУЛ)\s*[:\-]?\s*(\d{12})(?=[\)\.\s"'«»]|$)""",
-        """(?ix)(?:^|[\s"'«»(])(?<![\p{L}\d])(\d{12})(?=[\)\.\s"'«»]|$)"""
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        (?:временное\s+удостоверение\s+личности|ВУЛ)\s*[:\-]?\s*
+        (\d{12})
+        (?![\p{L}\d])
+        """.trimIndent(),
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        (\d{12})
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,7 +29,8 @@ object TemporaryID : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n\(\)\[\]\{\}\"'«»])\d{12}(?:\.\s|[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9])(?:временное\s+удостоверение\s+личности|ВУЛ)\s*[:\-]?\s*\d{12}(?:[^а-яА-Яa-zA-Z0-9]|$)""",
+        """(?:^|[^а-яА-Яa-zA-Z0-9])\d{12}(?:[^а-яА-Яa-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

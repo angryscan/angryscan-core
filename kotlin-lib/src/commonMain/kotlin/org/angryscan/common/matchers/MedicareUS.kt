@@ -9,8 +9,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object MedicareUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Medicare US"
     override val javaPatterns = listOf(
-        """(?:medicare|mbi|health\s*insurance|medical\s*insurance)\s*[:\-#]?\s*([0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4})""",
-        """\b([0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4})\b"""
+        """(?i)(?:medicare|mbi|health\s*insurance|medical\s*insurance)(?:\s*[:\-#]\s*|\s+)([0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4})(?:[^a-zA-Z0-9]|$)""",
+        """(?:^|[^a-zA-Z0-9])([0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4})(?:[^a-zA-Z0-9]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,8 +18,8 @@ object MedicareUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:medicare|mbi|health\s*insurance|medical\s*insurance)\s*[:\-#]?\s*[0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4}""",
-        """\b[0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4}\b"""
+        """(?:medicare|mbi|health\s*insurance|medical\s*insurance)(?:\s*[:\-#]\s*|\s+)[0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4}(?:[^a-zA-Z0-9]|$)""",
+        """(?:^|[^a-zA-Z0-9])[0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4}(?:[^a-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

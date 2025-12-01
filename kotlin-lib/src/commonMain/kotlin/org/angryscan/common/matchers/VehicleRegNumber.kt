@@ -24,8 +24,8 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
         )?
         \s*[:\-]?\s*
         (?:
-          ([АВЕКМНОРСТУХABEKMHOPCTYX]\s?\d{3}\s?[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\s?)
-        | (\d{4}\s?[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\s?)
+          ([АВБГДЕКМНОРСТУХABEKMHOPCTYX]\s?\d{3}\s?[АВБГДЕКМНОРСТУХABEKMHOPCTYX]{2}\s+)
+        | (\d{4}\s?[АВБГДЕКМНОРСТУХABEKMHOPCTYX]{2}\s+)
         )
         (?:$regionCodes)
         (?![\p{L}\d])
@@ -37,10 +37,10 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}(?:$regionCodes)(?:[^\w]|$)""",
-        """(?:^|[^\w])[ABEKMHOPCTYX]\d{3}[ABEKMHOPCTYX]{2}(?:$regionCodes)(?:[^\w]|$)""",
-        """(?:^|[^\w])\d{4}[АВЕКМНОРСТУХ]{2}(?:$regionCodes)(?:[^\w]|$)""",
-        """(?:^|[^\w])\d{4}[ABEKMHOPCTYX]{2}(?:$regionCodes)(?:[^\w]|$)"""
+        """(?:^|[^\w])[АВБГДЕКМНОРСТУХ]\d{3}[АВБГДЕКМНОРСТУХ]{2}\s+(?:$regionCodes)(?:[^\w]|$)""",
+        """(?:^|[^\w])[ABEKMHOPCTYX]\d{3}[ABEKMHOPCTYX]{2}\s+(?:$regionCodes)(?:[^\w]|$)""",
+        """(?:^|[^\w])\d{4}[АВБГДЕКМНОРСТУХ]{2}\s+(?:$regionCodes)(?:[^\w]|$)""",
+        """(?:^|[^\w])\d{4}[ABEKMHOPCTYX]{2}\s+(?:$regionCodes)(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

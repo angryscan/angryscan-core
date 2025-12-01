@@ -11,7 +11,7 @@ object LegalEntityName : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d\p{S}\p{P}])
+        (?:(?<=^)|(?<=[\s\(\[\{«"'])|(?<![\p{L}\d]))
         (?:
           наименование\s+ЮЛ|
           полное\s+наименование\s+юридического\s+лица|
@@ -26,10 +26,10 @@ object LegalEntityName : IHyperMatcher, IKotlinMatcher {
             Акционерное\s+общество|
             Публичное\s+акционерное\s+общество
           )
-          \s*
+          \s+
           ["']?[\p{L}\d\s\-&.,()]{5,200}["']?
         )
-        (?![\p{L}\d\p{S}\p{P}])
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(

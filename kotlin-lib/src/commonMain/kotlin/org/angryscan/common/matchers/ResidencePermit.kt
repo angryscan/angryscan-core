@@ -11,11 +11,11 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?:^|(?<=[ \n(\[{\"'«“.,;:!?]))
+        (?<![\p{L}\d])
         (?:вид\s+на\s+жительство|ВНЖ)?
         \s*[:\-]?\s*
         ((?:82|83)\s*(?:№|N)?\s*\d{7})
-        (?=\.\s|[\)\]}\"'»”]\s|\s|$)
+        (?![\p{L}\d])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -24,10 +24,7 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(^|[ \n(\[{\"'«“.,;:!?])(?:вид\s+на\s+жительство|ВНЖ)?\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}\.\s""",
-        """(^|[ \n(\[{\"'«“.,;:!?])(?:вид\s+на\s+жительство|ВНЖ)?\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}[\)\]}\"'»”]\s""",
-        """(^|[ \n(\[{\"'«“.,;:!?])(?:вид\s+на\s+жительство|ВНЖ)?\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}\s""",
-        """(^|[ \n(\[{\"'«“.,;:!?])(?:вид\s+на\s+жительство|ВНЖ)?\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}$"""
+        """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])(?:вид\s+на\s+жительство|ВНЖ)?\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}(?:[^a-zA-Z0-9А-ЯЁа-яё]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

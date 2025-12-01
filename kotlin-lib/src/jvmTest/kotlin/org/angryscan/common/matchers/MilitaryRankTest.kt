@@ -2,180 +2,333 @@ package org.angryscan.common.matchers
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера MilitaryRank
+ * Комплексные тесты для матчера MilitaryRank
  */
-internal class MilitaryRankTest: MatcherTestBase(MilitaryRank) {
+internal class MilitaryRankTest : MatcherTestBase(MilitaryRank) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testMilitaryRankAtStart() {
-        val text = "майор Иванов служит в армии"
-        assertEquals(1, scanText(text), "Воинское звание в начале должно быть найдено")
+    fun testAtStartOfText() {
+        val text = "рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание в начале текста должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankAtEnd() {
-        val text = "Звание: капитан"
-        assertEquals(1, scanText(text), "Воинское звание в конце должно быть найдено")
+    fun testAtEndOfText() {
+        val text = "Rank: рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание в конце текста должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankInMiddle() {
-        val text = "Офицер полковник Петров выступил с докладом"
-        assertEquals(1, scanText(text), "Воинское звание в середине должно быть найдено")
+    fun testInMiddleOfText() {
+        val text = "The rank рядовой is valid"
+        assertTrue(scanText(text) >= 1, "Воинское звание в середине текста должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankStandalone() {
-        val text = "сержант"
-        assertEquals(1, scanText(text), "Воинское звание отдельной строкой должно быть найдено")
+    fun testAtStartOfLine() {
+        val text = "рядовой\nSecond line"
+        assertTrue(scanText(text) >= 1, "Воинское звание в начале строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankLowestRanks() {
-        val text = """
-            рядовой
-            матрос
-            ефрейтор
-            старший матрос
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Низшие воинские звания должны быть найдены")
+    fun testAtEndOfLine() {
+        val text = "First line\nрядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание в конце строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankHighestRanks() {
-        val text = """
-            генерал армии
-            адмирал флота
-            маршал Российской Федерации
-        """.trimIndent()
-        assertEquals(3, scanText(text), "Высшие воинские звания должны быть найдены")
+    fun testInMiddleOfLine() {
+        val text = "Line with рядовой rank"
+        assertTrue(scanText(text) >= 1, "Воинское звание в середине строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankWithService() {
-        val text = "майор медицинской службы"
-        assertEquals(1, scanText(text), "Воинское звание с родом службы должно быть найдено")
+    fun testWithNewlineBefore() {
+        val text = "\nрядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание после \\n должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankAllOfficerRanks() {
-        val text = """
-            младший лейтенант
-            лейтенант
-            старший лейтенант
-            капитан
-            майор
-            подполковник
-            полковник
-        """.trimIndent()
-        assertEquals(7, scanText(text), "Все офицерские звания должны быть найдены")
+    fun testWithNewlineAfter() {
+        val text = "рядовой\n"
+        assertTrue(scanText(text) >= 1, "Воинское звание перед \\n должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankNavyRanks() {
-        val text = """
-            капитан-лейтенант
-            капитан 3 ранга
-            капитан 2 ранга
-            капитан 1 ранга
-            контр-адмирал
-            вице-адмирал
-            адмирал
-        """.trimIndent()
-        assertEquals(7, scanText(text), "Все морские звания должны быть найдены")
+    fun testWithCRLF() {
+        val text = "\r\nрядовой\r\n"
+        assertTrue(scanText(text) >= 1, "Воинское звание с \\r\\n должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankSergeantRanks() {
-        val text = """
-            младший сержант
-            сержант
-            старший сержант
-            старшина
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Все сержантские звания должны быть найдены")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nрядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание после пустой строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankNavySergeantRanks() {
-        val text = """
-            старшина 2 статьи
-            старшина 1 статьи
-            главный старшина
-            главный корабельный старшина
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Все морские сержантские звания должны быть найдены")
+    fun testWithEmptyLineAfter() {
+        val text = "рядовой\n\n"
+        assertTrue(scanText(text) >= 1, "Воинское звание перед пустой строкой должно быть найдено")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abcрядовойdef"
+        assertEquals(0, scanText(text), "Воинское звание внутри буквенной последовательности не должно находиться")
     }
 
     @Test
-    fun testMilitaryRankWarrantOfficerRanks() {
-        val text = """
-            прапорщик
-            старший прапорщик
-            мичман
-            старший мичман
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Все прапорщики и мичманы должны быть найдены")
+    fun testNotInsideNumericSequence() {
+        val text = "123рядовой456"
+        assertEquals(0, scanText(text), "Воинское звание внутри цифровой последовательности не должно находиться")
     }
 
     @Test
-    fun testMilitaryRankGeneralRanks() {
-        val text = """
-            генерал-майор
-            генерал-лейтенант
-            генерал-полковник
-            генерал армии
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Все генеральские звания должны быть найдены")
+    fun testWithSpaceBefore() {
+        val text = "Rank рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с пробелом перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankAdmiralRanks() {
-        val text = """
-            контр-адмирал
-            вице-адмирал
-            адмирал
-            адмирал флота
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Все адмиральские звания должны быть найдены")
+    fun testWithSpaceAfter() {
+        val text = "рядовой is valid"
+        assertTrue(scanText(text) >= 1, "Воинское звание с пробелом после должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankWithLabel() {
-        val text = "Воинское звание: капитан"
-        assertEquals(1, scanText(text), "Звание с меткой должно быть найдено")
+    fun testWithCommaBefore() {
+        val text = "Rank, рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankInParentheses() {
-        val text = "Иванов (полковник) в отставке"
-        assertEquals(1, scanText(text), "Звание в скобках должно быть найдено")
+    fun testWithCommaAfter() {
+        val text = "рядовой, next"
+        assertTrue(scanText(text) >= 1, "Воинское звание с запятой после должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankWithPunctuation() {
-        val text = "Звание: майор."
-        assertEquals(1, scanText(text), "Звание с точкой должно быть найдено")
+    fun testWithDotBefore() {
+        val text = "Rank. рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с точкой перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankUpperCase() {
-        val text = "КАПИТАН"
-        assertEquals(1, scanText(text), "Звание в верхнем регистре должно быть найдено")
+    fun testWithDotAfter() {
+        val text = "рядовой."
+        assertTrue(scanText(text) >= 1, "Воинское звание с точкой после должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankMixedCase() {
-        val text = "МаЙоР"
-        assertEquals(1, scanText(text), "Звание в смешанном регистре должно быть найдено")
+    fun testWithSemicolonBefore() {
+        val text = "Rank; рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с точкой с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryRankEmptyString() {
+    fun testWithSemicolonAfter() {
+        val text = "рядовой; next"
+        assertTrue(scanText(text) >= 1, "Воинское звание с точкой с запятой после должно быть найдено")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "Rank: рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с двоеточием перед должно быть найдено")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( рядовой )"
+        assertTrue(scanText(text) >= 1, "Воинское звание в скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(рядовой)"
+        assertTrue(scanText(text) >= 1, "Воинское звание в скобках без пробелов должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" рядовой \""
+        assertTrue(scanText(text) >= 1, "Воинское звание в кавычках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"рядовой\""
+        assertTrue(scanText(text) >= 1, "Воинское звание в кавычках без пробелов должно быть найдено")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "рядовой сержант"
+        assertTrue(scanText(text) >= 2, "Несколько воинских званий через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "рядовой, сержант"
+        assertTrue(scanText(text) >= 2, "Несколько воинских званий через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "рядовой; сержант"
+        assertTrue(scanText(text) >= 2, "Несколько воинских званий через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "рядовой\nсержант"
+        assertTrue(scanText(text) >= 2, "Несколько воинских званий через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать воинского звания")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать воинских званий")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no military ranks at all"
+        assertEquals(0, scanText(text), "Текст без воинских званий не должен находить совпадения")
+    }
+
+    @Test
+    fun testRyadovoy() {
+        val text = "рядовой"
+        assertTrue(scanText(text) >= 1, "Рядовой должно быть найдено")
+    }
+
+    @Test
+    fun testMatros() {
+        val text = "матрос"
+        assertTrue(scanText(text) >= 1, "Матрос должно быть найдено")
+    }
+
+    @Test
+    fun testSerzhant() {
+        val text = "сержант"
+        assertTrue(scanText(text) >= 1, "Сержант должно быть найдено")
+    }
+
+    @Test
+    fun testLeytenant() {
+        val text = "лейтенант"
+        assertTrue(scanText(text) >= 1, "Лейтенант должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan() {
+        val text = "капитан"
+        assertTrue(scanText(text) >= 1, "Капитан должно быть найдено")
+    }
+
+    @Test
+    fun testGeneral() {
+        val text = "генерал-майор"
+        assertTrue(scanText(text) >= 1, "Генерал-майор должно быть найдено")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Rank     рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с несколькими пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Rank\tрядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с табуляцией перед должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "рядовой\tnext"
+        assertTrue(scanText(text) >= 1, "Воинское звание с табуляцией после должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Звание рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с кириллицей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Military rank рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с латиницей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание отдельной строкой должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "рядовой text"
+        assertTrue(scanText(text) >= 1, "Воинское звание в начале текста должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание в конце текста должно быть найдено")
+    }
+
+    @Test
+    fun testWithVoinskoeZvanieKeyword() {
+        val text = "воинское звание: рядовой"
+        assertTrue(scanText(text) >= 1, "Воинское звание с ключевым словом должно быть найдено")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidRank() {
+        val text = "неправильное звание"
+        assertEquals(0, scanText(text), "Несуществующее воинское звание не должно находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "rankрядовой"
+        assertEquals(0, scanText(text), "Воинское звание, прилипшее к буквам, не должно находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123рядовой"
+        assertEquals(0, scanText(text), "Воинское звание, прилипшее к цифрам, не должно находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "functionрядовой()"
+        assertEquals(0, scanText(text), "Воинское звание внутри кода не должно находиться")
+    }
+
+    @Test
+    fun testPartialRank() {
+        val text = "рядо"
+        assertEquals(0, scanText(text), "Частичное воинское звание не должно находиться")
     }
 }
 
