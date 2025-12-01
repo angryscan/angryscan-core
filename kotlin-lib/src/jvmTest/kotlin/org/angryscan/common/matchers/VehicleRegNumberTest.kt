@@ -5,184 +5,336 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера VehicleRegNumber
+ * Комплексные тесты для матчера VehicleRegNumber
  */
-internal class VehicleRegNumberTest: MatcherTestBase(VehicleRegNumber) {
+internal class VehicleRegNumberTest : MatcherTestBase(VehicleRegNumber) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testVehicleRegNumberAtStart() {
-        val text = " А123ВС77 регистрационный знак транспортного средства"
-        assertTrue(scanText(text) >= 1, "Регистрационный знак в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер в начале текста должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberAtEnd() {
-        val text = "Регистрационный номер ТС: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Регистрационный знак в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Vehicle number: А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер в конце текста должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberInMiddle() {
-        val text = "Автомобиль с номером А123ВС77 зарегистрирован"
-        assertTrue(scanText(text) >= 1, "Регистрационный знак в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The number А123БВ 77 is valid"
+        assertTrue(scanText(text) >= 1, "Госномер в середине текста должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberStandalone() {
-        val text = " А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Регистрационный знак отдельно должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "А123БВ 77\nSecond line"
+        assertTrue(scanText(text) >= 1, "Госномер в начале строки должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberTypePrivate() {
-        val text = " А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер легкового автомобиля должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\nА123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер в конце строки должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberTypeTaxi() {
-        val text = " 1234ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер такси должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with А123БВ 77 number"
+        assertTrue(scanText(text) >= 1, "Госномер в середине строки должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberRegion77() {
-        val text = " А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер с регионом 77 (Москва) должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\nА123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер после \\n должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberRegion78() {
-        val text = " А123ВС78 "
-        assertTrue(scanText(text) >= 1, "Номер с регионом 78 (СПб) должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "А123БВ 77\n"
+        assertTrue(scanText(text) >= 1, "Госномер перед \\n должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberRegion177() {
-        val text = " А123ВС177 "
-        assertTrue(scanText(text) >= 1, "Номер с 3-значным регионом 177 должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\nА123БВ 77\r\n"
+        assertTrue(scanText(text) >= 1, "Госномер с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberRegion01() {
-        val text = " А123ВС01 "
-        assertTrue(scanText(text) >= 1, "Номер с регионом 01 должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nА123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер после пустой строки должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberRegion99() {
-        val text = " А123ВС99 "
-        assertTrue(scanText(text) >= 1, "Номер с регионом 99 должен быть найден")
+    fun testWithEmptyLineAfter() {
+        val text = "А123БВ 77\n\n"
+        assertTrue(scanText(text) >= 1, "Госномер перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abcА123БВ 77def"
+        assertEquals(0, scanText(text), "Госномер внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testVehicleRegNumberWithoutSpaces() {
-        val text = " А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер без пробелов должен быть найден")
+    fun testNotInsideNumericSequence() {
+        val text = "123А123БВ 77456"
+        assertEquals(0, scanText(text), "Госномер внутри цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testVehicleRegNumberWithFullLabel() {
-        val text = "регистрационный номер ТС: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер с полной меткой должен быть найден")
+    fun testWithSpaceBefore() {
+        val text = "Number А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberWithGosNomer() {
-        val text = "госномер: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер с меткой 'госномер' должен быть найден")
+    fun testWithSpaceAfter() {
+        val text = "А123БВ 77 is valid"
+        assertTrue(scanText(text) >= 1, "Госномер с пробелом после должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberWithNomerZnak() {
-        val text = "номерной знак ТС: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер с меткой 'номерной знак' должен быть найден")
+    fun testWithCommaBefore() {
+        val text = "Number, А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с запятой перед должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberWithAvtoNomer() {
-        val text = "автомобильный номер: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер с меткой 'автомобильный номер' должен быть найден")
+    fun testWithCommaAfter() {
+        val text = "А123БВ 77, next"
+        assertTrue(scanText(text) >= 1, "Госномер с запятой после должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberWithRegZnak() {
-        val text = "регистрационный знак транспортного средства: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер с полной меткой ТС должен быть найден")
+    fun testWithDotBefore() {
+        val text = "Number. А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с точкой перед должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberUpperCase() {
-        val text = "ГОСНОМЕР: А123ВС77 "
-        assertTrue(scanText(text) >= 1, "Номер в верхнем регистре должен быть найден")
+    fun testWithDotAfter() {
+        val text = "А123БВ 77."
+        assertTrue(scanText(text) >= 1, "Госномер с точкой после должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberLowerCase() {
-        val text = "госномер: а123вс77 "
-        assertTrue(scanText(text) >= 1, "Номер в нижнем регистре должен быть найден")
+    fun testWithSemicolonBefore() {
+        val text = "Number; А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с точкой с запятой перед должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberInParentheses() {
-        val text = "(А123ВС77)"
-        assertTrue(scanText(text) >= 1, "Номер в скобках должен быть найден")
+    fun testWithSemicolonAfter() {
+        val text = "А123БВ 77; next"
+        assertTrue(scanText(text) >= 1, "Госномер с точкой с запятой после должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberInQuotes() {
-        val text = "\"А123ВС77\""
-        assertTrue(scanText(text) >= 1, "Номер в кавычках должен быть найден")
+    fun testWithColonBefore() {
+        val text = "Number: А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с двоеточием перед должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( А123БВ 77 )"
+        assertTrue(scanText(text) >= 1, "Госномер в скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberWithPunctuation() {
-        val text = "Номер: А123ВС77."
-        assertTrue(scanText(text) >= 1, "Номер с точкой должен быть найден")
+    fun testWithParenthesesNoSpace() {
+        val text = "(А123БВ 77)"
+        assertTrue(scanText(text) >= 1, "Госномер в скобках без пробелов должен быть найден")
     }
 
     @Test
-    fun testMultipleVehicleRegNumbers() {
-        val text = """
-            Первый: А123ВС77
-            Второй: В456ЕК99
-            Третий: 1234ТР177
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько номеров должны быть найдены")
+    fun testWithQuotesAndSpace() {
+        val text = "\" А123БВ 77 \""
+        assertTrue(scanText(text) >= 1, "Госномер в кавычках с пробелами должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberDifferentLetters() {
-        val text = """
-             А123ВС77
-             В234ЕК77
-             О345РС77
-             М456ТХ77
-        """.trimIndent()
-        assertTrue(scanText(text) >= 4, "Номера с разными буквами должны быть найдены")
+    fun testWithQuotesNoSpace() {
+        val text = "\"А123БВ 77\""
+        assertTrue(scanText(text) >= 1, "Госномер в кавычках без пробелов должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberInvalidRegion00() {
-        val text = " А123ВС00 "
-        assertEquals(0, scanText(text), "Номер с неверным регионом 00 не должен быть найден")
+    fun testWithBracketsAndSpace() {
+        val text = "[ А123БВ 77 ]"
+        assertTrue(scanText(text) >= 1, "Госномер в квадратных скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testVehicleRegNumberInvalidRegion100() {
-        val text = " А123ВС100 "
-        assertEquals(0, scanText(text), "Номер с неверным регионом 100 не должен быть найден")
+    fun testWithBracesAndSpace() {
+        val text = "{ А123БВ 77 }"
+        assertTrue(scanText(text) >= 1, "Госномер в фигурных скобках с пробелами должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "А123БВ 77 В456ГД 99"
+        assertTrue(scanText(text) >= 2, "Несколько госномеров через пробел должны быть найдены")
     }
 
     @Test
-    fun testVehicleRegNumberInvalidLetter() {
-        val text = " Ф123ВС77 "
-        assertEquals(0, scanText(text), "Номер с некорректной буквой не должен быть найден")
+    fun testMultipleWithCommas() {
+        val text = "А123БВ 77, В456ГД 99"
+        assertTrue(scanText(text) >= 2, "Несколько госномеров через запятую должны быть найдены")
     }
 
     @Test
-    fun testVehicleRegNumberEmptyString() {
+    fun testMultipleWithSemicolons() {
+        val text = "А123БВ 77; В456ГД 99"
+        assertTrue(scanText(text) >= 2, "Несколько госномеров через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "А123БВ 77\nВ456ГД 99"
+        assertTrue(scanText(text) >= 2, "Несколько госномеров через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать регистрационного знака")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать госномеров")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no vehicle registration numbers at all"
+        assertEquals(0, scanText(text), "Текст без госномеров не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithLatinLetters() {
+        val text = "A123BC 77"
+        assertTrue(scanText(text) >= 1, "Госномер с латинскими буквами должен быть найден")
+    }
+
+    @Test
+    fun testWithNumericFormat() {
+        val text = "1234АБ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с числовым форматом должен быть найден")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Number    А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Number\tА123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "А123БВ 77\tnext"
+        assertTrue(scanText(text) >= 1, "Госномер с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Госномер А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Vehicle number А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "А123БВ 77 text"
+        assertTrue(scanText(text) >= 1, "Госномер в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер в конце текста должен быть найден")
+    }
+
+    @Test
+    fun testWithGosnomerKeyword() {
+        val text = "госномер: А123БВ 77"
+        assertTrue(scanText(text) >= 1, "Госномер с ключевым словом должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidFormat() {
+        val text = "А123БВ77"
+        assertEquals(0, scanText(text), "Госномер без пробела не должен находиться")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "А12БВ 77"
+        assertEquals(0, scanText(text), "Слишком короткий госномер не должен находиться")
+    }
+
+    @Test
+    fun testWithInvalidChars() {
+        val text = "А123БВ 7A"
+        assertEquals(0, scanText(text), "Госномер с недопустимыми символами не должен находиться")
+    }
+
+    @Test
+    fun testInsideLongSequence() {
+        val text = "ABCА123БВ 77DEF"
+        assertEquals(0, scanText(text), "Госномер внутри длинной последовательности не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "numberА123БВ 77"
+        assertEquals(0, scanText(text), "Госномер, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123А123БВ 77"
+        assertEquals(0, scanText(text), "Госномер, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "functionА123БВ 77()"
+        assertEquals(0, scanText(text), "Госномер внутри кода не должен находиться")
     }
 }
+

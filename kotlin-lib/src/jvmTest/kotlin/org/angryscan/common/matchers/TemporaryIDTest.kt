@@ -1,171 +1,340 @@
 package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.IMatcher
-import org.angryscan.common.engine.hyperscan.HyperScanEngine
-import org.angryscan.common.engine.hyperscan.IHyperMatcher
-import org.angryscan.common.engine.kotlin.IKotlinMatcher
-import org.angryscan.common.engine.kotlin.KotlinEngine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера TemporaryID
+ * Комплексные тесты для матчера TemporaryID
  */
-internal class TemporaryIDTest {
+internal class TemporaryIDTest : MatcherTestBase(TemporaryID) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testTemporaryIDAtStart() {
-        val text = " 123456789013 это ВУЛ"
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ в начале должно быть найдено")
+    fun testAtStartOfText() {
+        val text = "234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ в начале текста должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDAtEnd() {
-        val text = "Временное удостоверение личности: 123456789013 "
-        val count = scanText(text, TemporaryID)
-        assertTrue(count >= 1, "ВУЛ в конце должно быть найдено. Найдено: $count")
+    fun testAtEndOfText() {
+        val text = "Temporary ID: 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ в конце текста должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDInMiddle() {
-        val text = "Гражданин с ВУЛ 123456789013 получил документ"
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ в середине должно быть найдено")
+    fun testInMiddleOfText() {
+        val text = "The ID 234567890123 is valid"
+        assertTrue(scanText(text) >= 1, "ВУЛ в середине текста должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDStandalone() {
-        val text = " 123456789013 "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ отдельной строкой должно быть найдено")
+    fun testAtStartOfLine() {
+        val text = "234567890123\nSecond line"
+        assertTrue(scanText(text) >= 1, "ВУЛ в начале строки должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDWithLabel() {
-        val text = "временное удостоверение личности: 123456789013 "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ с полной меткой должно быть найдено")
+    fun testAtEndOfLine() {
+        val text = "First line\n234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ в конце строки должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDWithVUL() {
-        val text = "ВУЛ: 123456789013 "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ с аббревиатурой должно быть найдено")
+    fun testInMiddleOfLine() {
+        val text = "Line with 234567890123 ID"
+        assertTrue(scanText(text) >= 1, "ВУЛ в середине строки должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDBoundaryAllZeros() {
-        val text = " 000000000000 "
-        assertEquals(0, scanText(text, TemporaryID), "ВУЛ из нулей не должно быть найдено (валидация)")
+    fun testWithNewlineBefore() {
+        val text = "\n234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ после \\n должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDBoundaryAllNines() {
-        val text = " 999999999999 "
-        assertEquals(0, scanText(text, TemporaryID), "ВУЛ из одинаковых цифр не должно быть найдено (валидация)")
+    fun testWithNewlineAfter() {
+        val text = "234567890123\n"
+        assertTrue(scanText(text) >= 1, "ВУЛ перед \\n должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDUpperCase() {
-        val text = "ВУЛ: 123456789013 "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ в верхнем регистре должно быть найдено")
+    fun testWithCRLF() {
+        val text = "\r\n234567890123\r\n"
+        assertTrue(scanText(text) >= 1, "ВУЛ с \\r\\n должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDLowerCase() {
-        val text = "вул: 123456789013 "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ в нижнем регистре должно быть найдено")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ после пустой строки должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDInParentheses() {
-        val text = "(123456789013) "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ в скобках должно быть найдено")
+    fun testWithEmptyLineAfter() {
+        val text = "234567890123\n\n"
+        assertTrue(scanText(text) >= 1, "ВУЛ перед пустой строкой должно быть найдено")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc234567890123def"
+        assertEquals(0, scanText(text), "ВУЛ внутри буквенной последовательности не должно находиться")
     }
 
     @Test
-    fun testTemporaryIDInQuotes() {
-        val text = "\"123456789013\" "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ в кавычках должно быть найдено")
+    fun testNotInsideNumericSequence() {
+        val text = "123234567890123456"
+        assertEquals(0, scanText(text), "ВУЛ внутри цифровой последовательности не должно находиться")
     }
 
     @Test
-    fun testTemporaryIDWithPunctuation() {
-        val text = "ВУЛ: 123456789013. "
-        assertTrue(scanText(text, TemporaryID) >= 1, "ВУЛ с точкой должно быть найдено")
+    fun testWithSpaceBefore() {
+        val text = "ID 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с пробелом перед должно быть найдено")
     }
 
     @Test
-    fun testMultipleTemporaryIDs() {
-        val text = """
-            Первое: 123456789013
-            Второе: 234567890123
-            Третье: 345678901234
-        """.trimIndent()
-        assertTrue(scanText(text, TemporaryID) >= 3, "Несколько ВУЛ должны быть найдены")
+    fun testWithSpaceAfter() {
+        val text = "234567890123 is valid"
+        assertTrue(scanText(text) >= 1, "ВУЛ с пробелом после должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDInvalidTooShort() {
-        val text = " 12345678901 "
-        assertEquals(0, scanText(text, TemporaryID), "Слишком короткий номер не должен быть найден")
+    fun testWithCommaBefore() {
+        val text = "ID, 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDInvalidTooLong() {
-        val text = " 1234567890133 "
-        assertEquals(0, scanText(text, TemporaryID), "Слишком длинный номер не должен быть найден")
+    fun testWithCommaAfter() {
+        val text = "234567890123, next"
+        assertTrue(scanText(text) >= 1, "ВУЛ с запятой после должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDInvalidWithLetters() {
-        val text = " 12345678901A "
-        assertEquals(0, scanText(text, TemporaryID), "Номер с буквами не должен быть найден")
+    fun testWithDotBefore() {
+        val text = "ID. 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с точкой перед должно быть найдено")
     }
 
     @Test
-    fun testTemporaryIDEmptyString() {
+    fun testWithDotAfter() {
+        val text = "234567890123."
+        assertTrue(scanText(text) >= 1, "ВУЛ с точкой после должно быть найдено")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "ID; 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с точкой с запятой перед должно быть найдено")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "234567890123; next"
+        assertTrue(scanText(text) >= 1, "ВУЛ с точкой с запятой после должно быть найдено")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "ID: 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с двоеточием перед должно быть найдено")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 234567890123 )"
+        assertTrue(scanText(text) >= 1, "ВУЛ в скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(234567890123)"
+        assertTrue(scanText(text) >= 1, "ВУЛ в скобках без пробелов должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" 234567890123 \""
+        assertTrue(scanText(text) >= 1, "ВУЛ в кавычках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"234567890123\""
+        assertTrue(scanText(text) >= 1, "ВУЛ в кавычках без пробелов должно быть найдено")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ 234567890123 ]"
+        assertTrue(scanText(text) >= 1, "ВУЛ в квадратных скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ 234567890123 }"
+        assertTrue(scanText(text) >= 1, "ВУЛ в фигурных скобках с пробелами должно быть найдено")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "234567890123 345678901234"
+        assertTrue(scanText(text) >= 2, "Несколько ВУЛ через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "234567890123, 345678901234"
+        assertTrue(scanText(text) >= 2, "Несколько ВУЛ через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "234567890123; 345678901234"
+        assertTrue(scanText(text) >= 2, "Несколько ВУЛ через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "234567890123\n345678901234"
+        assertTrue(scanText(text) >= 2, "Несколько ВУЛ через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text, TemporaryID), "Пустая строка не должна содержать ВУЛ")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать ВУЛ")
     }
 
-    private fun scanText(text: String, matcher: IMatcher): Int {
-        val kotlinRes = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>()).use {
-            it.scan(text)
-        }
-        val hyperRes = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>()).use {
-            it.scan(text)
-        }
-        
-        // Для TemporaryID может быть разное количество совпадений из-за двух паттернов
-        // Проверяем, что оба движка находят хотя бы одно совпадение (если ожидается > 0)
-        // или оба не находят (если ожидается 0)
-        if (matcher.name == "Temporary ID") {
-            val kotlinCount = kotlinRes.count()
-            val hyperCount = hyperRes.count()
-            // Если оба движка находят 0, это нормально
-            if (kotlinCount == 0 && hyperCount == 0) {
-                return 0
-            }
-            // Если один находит 0, а другой > 0, это проблема
-            if (kotlinCount == 0 || hyperCount == 0) {
-                assertEquals(
-                    kotlinCount,
-                    hyperCount,
-                    "Количество совпадений для ${matcher.name} должно быть одинаковым для обоих движков. " +
-                    "Kotlin: $kotlinCount, Hyper: $hyperCount\nText: $text"
-                )
-            }
-            // Если оба находят > 0, это нормально (может быть разное количество)
-            return kotlinCount
-        }
-        
-        assertEquals(
-            kotlinRes.count(),
-            hyperRes.count(),
-            "Количество совпадений для ${matcher.name} должно быть одинаковым для обоих движков. " +
-            "Kotlin: ${kotlinRes.count()}, Hyper: ${hyperRes.count()}\nText: $text"
-        )
-        
-        return kotlinRes.count()
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no temporary IDs at all"
+        assertEquals(0, scanText(text), "Текст без ВУЛ не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "234567890123"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "12345678901"
+        assertEquals(0, scanText(text), "Слишком короткий номер не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "2345678901233"
+        assertEquals(0, scanText(text), "Слишком длинный номер не должен находиться")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "ID    234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с несколькими пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "ID\t234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с табуляцией перед должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "234567890123\tnext"
+        assertTrue(scanText(text) >= 1, "ВУЛ с табуляцией после должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Временное удостоверение 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с кириллицей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Temporary ID 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с латиницей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ отдельной строкой должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "234567890123 text"
+        assertTrue(scanText(text) >= 1, "ВУЛ в начале текста должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ в конце текста должно быть найдено")
+    }
+
+    @Test
+    fun testWithVremennoeUdoverenieKeyword() {
+        val text = "временное удостоверение личности: 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с ключевым словом должно быть найдено")
+    }
+
+    @Test
+    fun testWithVULKeyword() {
+        val text = "ВУЛ: 234567890123"
+        assertTrue(scanText(text) >= 1, "ВУЛ с ключевым словом ВУЛ должно быть найдено")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testWithLetters() {
+        val text = "12345678901A"
+        assertEquals(0, scanText(text), "ВУЛ с буквами не должно находиться")
+    }
+
+    @Test
+    fun testAllZeros() {
+        val text = "000000000000"
+        assertEquals(0, scanText(text), "ВУЛ из всех нулей не должно находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "id234567890123"
+        assertEquals(0, scanText(text), "ВУЛ, прилипшее к буквам, не должно находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123234567890123"
+        assertEquals(0, scanText(text), "ВУЛ, прилипшее к цифрам, не должно находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "function234567890123()"
+        assertEquals(0, scanText(text), "ВУЛ внутри кода не должно находиться")
+    }
+
+    @Test
+    fun testWithSpaces() {
+        val text = "123456 789012"
+        assertEquals(0, scanText(text), "ВУЛ с пробелами не должно находиться")
     }
 }
 

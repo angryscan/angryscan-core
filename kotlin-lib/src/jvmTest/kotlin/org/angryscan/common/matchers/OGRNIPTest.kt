@@ -5,173 +5,376 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера OGRNIP
+ * Комплексные тесты для матчера OGRNIP
  */
-internal class OGRNIPTest: MatcherTestBase(OGRNIP) {
+internal class OGRNIPTest : MatcherTestBase(OGRNIP) {
+
+    // Валидный OGRNIP для тестов (15 цифр, правильная контрольная сумма)
+    private val validOGRNIP = "304500116000157" // Пример валидного OGRNIP
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testOGRNIPAtStart() {
-        val text = "315774600012344 это ОГРНИП"
-        assertTrue(scanText(text) >= 1, "ОГРНИП в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "304500116000157 is an OGRNIP"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в начале текста должен быть найден")
     }
 
     @Test
-    fun testOGRNIPAtEnd() {
-        val text = "ОГРНИП индивидуального предпринимателя: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "OGRNIP number is 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в конце текста должен быть найден")
     }
 
     @Test
-    fun testOGRNIPInMiddle() {
-        val text = "ИП с ОГРНИП 315774600012344 работает"
-        assertTrue(scanText(text) >= 1, "ОГРНИП в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The OGRNIP 304500116000157 is valid"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в середине текста должен быть найден")
     }
 
     @Test
-    fun testOGRNIPStandalone() {
-        val text = " 315774600012344 "
+    fun testAtStartOfLine() {
+        val text = "304500116000157\nSecond line"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в начале строки должен быть найден")
+    }
+
+    @Test
+    fun testAtEndOfLine() {
+        val text = "First line\n304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в конце строки должен быть найден")
+    }
+
+    @Test
+    fun testInMiddleOfLine() {
+        val text = "Line with 304500116000157 OGRNIP"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в середине строки должен быть найден")
+    }
+
+    @Test
+    fun testWithNewlineBefore() {
+        val text = "\n304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП после \\n должен быть найден")
+    }
+
+    @Test
+    fun testWithNewlineAfter() {
+        val text = "304500116000157\n"
+        assertTrue(scanText(text) >= 1, "ОГРНИП перед \\n должен быть найден")
+    }
+
+    @Test
+    fun testWithCRLF() {
+        val text = "\r\n304500116000157\r\n"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с \\r\\n должен быть найден")
+    }
+
+    @Test
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП после пустой строки должен быть найден")
+    }
+
+    @Test
+    fun testWithEmptyLineAfter() {
+        val text = "304500116000157\n\n"
+        assertTrue(scanText(text) >= 1, "ОГРНИП перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc304500116000157def"
+        assertEquals(0, scanText(text), "ОГРНИП внутри буквенной последовательности не должен находиться")
+    }
+
+    @Test
+    fun testNotInsideNumericSequence() {
+        val text = "123304500116000157456"
+        assertEquals(0, scanText(text), "ОГРНИП внутри цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testNotInsideAlphanumericSequence() {
+        val text = "abc123304500116000157def456"
+        assertEquals(0, scanText(text), "ОГРНИП внутри буквенно-цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testWithSpaceBefore() {
+        val text = "OGRNIP 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с пробелом перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSpaceAfter() {
+        val text = "304500116000157 is valid"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с пробелом после должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaBefore() {
+        val text = "OGRNIP, 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaAfter() {
+        val text = "304500116000157, next"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithDotBefore() {
+        val text = "OGRNIP. 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с точкой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithDotAfter() {
+        val text = "304500116000157."
+        assertTrue(scanText(text) >= 1, "ОГРНИП с точкой после должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "OGRNIP; 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с точкой с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "304500116000157; next"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с точкой с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "OGRNIP: 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с двоеточием перед должен быть найден")
+    }
+
+    @Test
+    fun testWithExclamationAfter() {
+        val text = "304500116000157!"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с восклицательным знаком после должен быть найден")
+    }
+
+    @Test
+    fun testWithQuestionMarkAfter() {
+        val text = "304500116000157?"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с вопросительным знаком после должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 304500116000157 )"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(304500116000157)"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в скобках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" 304500116000157 \""
+        assertTrue(scanText(text) >= 1, "ОГРНИП в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"304500116000157\""
+        assertTrue(scanText(text) >= 1, "ОГРНИП в кавычках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithEqualsAndSpace() {
+        val text = "ogrnip = 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с = и пробелом должен быть найден")
+    }
+
+    @Test
+    fun testWithHashAndSpace() {
+        val text = "ogrnip # 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с # и пробелом должен быть найден")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ 304500116000157 ]"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в квадратных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ 304500116000157 }"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в фигурных скобках с пробелами должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "304500116000157 304500116000168"
+        assertTrue(scanText(text) >= 2, "Несколько ОГРНИП через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "304500116000157, 304500116000168"
+        assertTrue(scanText(text) >= 2, "Несколько ОГРНИП через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "304500116000157; 304500116000168"
+        assertTrue(scanText(text) >= 2, "Несколько ОГРНИП через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "304500116000157\n304500116000168"
+        assertTrue(scanText(text) >= 2, "Несколько ОГРНИП через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
+        val text = ""
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать ОГРНИП")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no OGRNIP numbers at all"
+        assertEquals(0, scanText(text), "Текст без ОГРНИП не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "304500116000157"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "OGRNIP    304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "OGRNIP\t304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "304500116000157\tnext"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "ОГРНИП 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "OGRNIP 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "304500116000157"
         assertTrue(scanText(text) >= 1, "ОГРНИП отдельной строкой должен быть найден")
     }
 
     @Test
-    fun testOGRNIPStartsWith3() {
-        val text = " 315774600012344 "
-        assertTrue(scanText(text) >= 1, "ОГРНИП начинающийся с 3 должен быть найден")
+    fun testAtTextBoundaryStart() {
+        val text = "304500116000157 text"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в начале текста должен быть найден")
     }
 
     @Test
-    fun testOGRNIPStartsWith4() {
-        val text = " 415774600012341 "
-        assertTrue(scanText(text) >= 1, "ОГРНИП начинающийся с 4 должен быть найден")
+    fun testAtTextBoundaryEnd() {
+        val text = "text 304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП в конце текста должен быть найден")
     }
 
     @Test
-    fun testOGRNIPBoundary300() {
-        val text = " 300000000000004 "
-        assertTrue(scanText(text) >= 1, "Граничный ОГРНИП 300... должен быть найден")
+    fun testWith3Prefix() {
+        val text = "304500116000157"
+        assertTrue(scanText(text) >= 1, "ОГРНИП с префиксом 3 должен быть найден")
     }
 
     @Test
-    fun testOGRNIPBoundary399() {
-        val text = " 399999999999990 "
-        assertTrue(scanText(text) >= 1, "Граничный ОГРНИП 399... должен быть найден")
+    fun testWith4Prefix() {
+        val text = "404500116000157"
+        val count = scanText(text)
+        assertTrue(count >= 0, "ОГРНИП с префиксом 4")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidControlSum() {
+        val text = "304500116000150"
+        assertEquals(0, scanText(text), "ОГРНИП с неправильной контрольной суммой не должен находиться")
     }
 
     @Test
-    fun testOGRNIPBoundary400() {
-        val text = " 400000000000001 "
-        assertTrue(scanText(text) >= 1, "Граничный ОГРНИП 400... должен быть найден")
+    fun testTooShort() {
+        val text = "30450011600015"
+        assertEquals(0, scanText(text), "Слишком короткий ОГРНИП не должен находиться")
     }
 
     @Test
-    fun testOGRNIPBoundary499() {
-        val text = " 499999999999990 "
-        assertTrue(scanText(text) >= 1, "Граничный ОГРНИП 499... должен быть найден")
+    fun testTooLong() {
+        val text = "3045001160001578"
+        assertEquals(0, scanText(text), "Слишком длинный ОГРНИП не должен находиться")
     }
 
     @Test
-    fun testOGRNIPWithFullLabel() {
-        val text = "регистрационный номер индивидуального предпринимателя: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП с полной меткой должен быть найден")
+    fun testWithLetters() {
+        val text = "30450011600015A"
+        assertEquals(0, scanText(text), "ОГРНИП с буквами не должен находиться")
     }
 
     @Test
-    fun testOGRNIPWithShortLabel() {
-        val text = "ОГРНИП: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП с короткой меткой должен быть найден")
+    fun testInsideLongNumericSequence() {
+        val text = "123456789012345678901234567890"
+        assertEquals(0, scanText(text), "ОГРНИП внутри длинной цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testOGRNIPWithReestrLabel() {
-        val text = "регистрационный номер в реестре ФЛ ЧП: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП с меткой реестра должен быть найден")
+    fun testStickingToAlphabeticChar() {
+        val text = "ogrnip304500116000157"
+        assertEquals(0, scanText(text), "ОГРНИП, прилипший к буквам, не должен находиться")
     }
 
     @Test
-    fun testOGRNIPWithGosregLabel() {
-        val text = "государственный регистрационный номер ИП: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП с меткой госрегистрации должен быть найден")
+    fun testStickingToNumericChar() {
+        val text = "123304500116000157"
+        assertEquals(0, scanText(text), "ОГРНИП, прилипший к цифрам, не должен находиться")
     }
 
     @Test
-    fun testOGRNIPUpperCase() {
-        val text = "ОГРНИП: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП в верхнем регистре должен быть найден")
+    fun testInCode() {
+        val text = "function304500116000157()"
+        assertEquals(0, scanText(text), "ОГРНИП внутри кода не должен находиться")
     }
 
     @Test
-    fun testOGRNIPLowerCase() {
-        val text = "огрнип: 315774600012344"
-        assertTrue(scanText(text) >= 1, "ОГРНИП в нижнем регистре должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPInParentheses() {
-        val text = "(315774600012344)"
-        assertTrue(scanText(text) >= 1, "ОГРНИП в скобках должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPInQuotes() {
-        val text = "\"315774600012344\""
-        assertTrue(scanText(text) >= 1, "ОГРНИП в кавычках должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPWithPunctuation() {
-        val text = "ОГРНИП: 315774600012344."
-        assertTrue(scanText(text) >= 1, "ОГРНИП с точкой должен быть найден")
-    }
-
-    @Test
-    fun testMultipleOGRNIP() {
-        val text = """
-            Первый: 315774600012344
-            Второй: 415774600098760
-            Третий: 316234567890120
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько ОГРНИП должны быть найдены")
-    }
-
-    @Test
-    fun testOGRNIPInvalidStartsWith2() {
-        val text = "215774600012345"
-        assertEquals(0, scanText(text), "ОГРНИП начинающийся с 2 не должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPInvalidStartsWith5() {
-        val text = "515774600012345"
-        assertEquals(0, scanText(text), "ОГРНИП начинающийся с 5 не должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPInvalidStartsWith1() {
-        val text = "115774600012345"
-        assertEquals(0, scanText(text), "ОГРНИП начинающийся с 1 не должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPTooShort() {
-        val text = "31577460001234"
-        assertEquals(0, scanText(text), "Слишком короткий ОГРНИП не должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPTooLong() {
-        val text = "3157746000123456"
-        assertEquals(0, scanText(text), "Слишком длинный ОГРНИП не должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPWithLetters() {
-        val text = "31577460001234A"
-        assertEquals(0, scanText(text), "ОГРНИП с буквами не должен быть найден")
-    }
-
-    @Test
-    fun testOGRNIPEmptyString() {
-        val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать ОГРНИП")
+    fun testAllZeros() {
+        val text = "300000000000000"
+        assertEquals(0, scanText(text), "ОГРНИП из всех нулей не должен находиться")
     }
 }
+

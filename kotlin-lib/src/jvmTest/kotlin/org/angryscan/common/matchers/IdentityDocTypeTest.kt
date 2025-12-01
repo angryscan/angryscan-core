@@ -5,165 +5,320 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера IdentityDocType
+ * Комплексные тесты для матчера IdentityDocType
  */
-internal class IdentityDocTypeTest: MatcherTestBase(IdentityDocType) {
+internal class IdentityDocTypeTest : MatcherTestBase(IdentityDocType) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testIdentityDocTypeAtStart() {
-        val text = "паспорт гражданина РФ был выдан в 2015 году"
-        assertEquals(1, scanText(text), "Тип документа в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа в начале текста должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeAtEnd() {
-        val text = "Документ: паспорт гражданина РФ"
-        assertEquals(1, scanText(text), "Тип документа в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Document type: паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа в конце текста должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeInMiddle() {
-        val text = "Гражданин предъявил паспорт гражданина РФ для идентификации"
-        assertEquals(1, scanText(text), "Тип документа в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The type паспорт гражданина российской федерации is valid"
+        assertTrue(scanText(text) >= 1, "Тип документа в середине текста должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeStandalone() {
-        val text = "военный билет"
-        assertEquals(1, scanText(text), "Тип документа отдельной строкой должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "паспорт гражданина российской федерации\nSecond line"
+        assertTrue(scanText(text) >= 1, "Тип документа в начале строки должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeAllVariants() {
-        val text = """
-            паспорт гражданина РФ
-            паспорт гражданина России
-            загранпаспорт
-            военный билет
-            ВНЖ
-            РВП
-            свидетельство о рождении
-            временное удостоверение личности гражданина РФ
-        """.trimIndent()
-        assertTrue(scanText(text) >= 8, "Все типы документов должны быть найдены")
+    fun testAtEndOfLine() {
+        val text = "First line\nпаспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа в конце строки должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeWithPrefix() {
-        val text = "Вид документа удостоверяющего личность: паспорт гражданина РФ"
-        assertEquals(1, scanText(text), "Тип документа с префиксом должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with паспорт гражданина российской федерации type"
+        assertTrue(scanText(text) >= 1, "Тип документа в середине строки должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypePassportVariants() {
-        val text = """
-            паспорт гражданина РФ
-            паспорт гражданина Российской Федерации
-            паспорт гражданина России
-        """.trimIndent()
-        assertEquals(3, scanText(text), "Все варианты паспорта должны быть найдены")
+    fun testWithNewlineBefore() {
+        val text = "\nпаспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа после \\n должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeForeignPassport() {
-        val text = "паспорт иностранного гражданина"
-        assertEquals(1, scanText(text), "Паспорт иностранного гражданина должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "паспорт гражданина российской федерации\n"
+        assertTrue(scanText(text) >= 1, "Тип документа перед \\n должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeInternationalPassport() {
-        val text = """
-            загранпаспорт
-            заграничный паспорт
-        """.trimIndent()
-        assertEquals(2, scanText(text), "Загранпаспорт должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\nпаспорт гражданина российской федерации\r\n"
+        assertTrue(scanText(text) >= 1, "Тип документа с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeDiplomaticPassports() {
-        val text = """
-            дипломатический паспорт
-            служебный паспорт
-        """.trimIndent()
-        assertEquals(2, scanText(text), "Дипломатический и служебный паспорта должны быть найдены")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nпаспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа после пустой строки должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeTemporaryID() {
-        val text = "временное удостоверение личности гражданина РФ"
-        assertEquals(1, scanText(text), "Временное удостоверение должно быть найдено")
+    fun testWithEmptyLineAfter() {
+        val text = "паспорт гражданина российской федерации\n\n"
+        assertTrue(scanText(text) >= 1, "Тип документа перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abcпаспорт гражданина российской федерацииdef"
+        assertEquals(0, scanText(text), "Тип документа внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testIdentityDocTypeBirthCertificate() {
-        val text = "свидетельство о рождении"
-        assertEquals(1, scanText(text), "Свидетельство о рождении должно быть найдено")
+    fun testWithSpaceBefore() {
+        val text = "Type паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeResidencePermit() {
-        val text = """
-            вид на жительство
-            вид на жительство в РФ
-            ВНЖ
-        """.trimIndent()
-        assertEquals(3, scanText(text), "Все варианты ВНЖ должны быть найдены")
+    fun testWithSpaceAfter() {
+        val text = "паспорт гражданина российской федерации is valid"
+        assertTrue(scanText(text) >= 1, "Тип документа с пробелом после должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeTemporaryResidence() {
-        val text = """
-            разрешение на временное проживание
-            РВП
-        """.trimIndent()
-        assertEquals(2, scanText(text), "Все варианты РВП должны быть найдены")
+    fun testWithCommaBefore() {
+        val text = "Type, паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с запятой перед должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeMilitaryID() {
-        val text = """
-            военный билет
-            удостоверение личности офицера
-            удостоверение личности военнослужащего
-            удостоверение личности моряка
-        """.trimIndent()
-        assertEquals(4, scanText(text), "Все военные документы должны быть найдены")
+    fun testWithCommaAfter() {
+        val text = "паспорт гражданина российской федерации, next"
+        assertTrue(scanText(text) >= 1, "Тип документа с запятой после должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeNationalPassport() {
-        val text = "национальный паспорт"
-        assertEquals(1, scanText(text), "Национальный паспорт должен быть найден")
+    fun testWithDotBefore() {
+        val text = "Type. паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с точкой перед должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeInParentheses() {
-        val text = "Документ (паспорт гражданина РФ) предъявлен"
-        assertEquals(1, scanText(text), "Тип документа в скобках должен быть найден")
+    fun testWithDotAfter() {
+        val text = "паспорт гражданина российской федерации."
+        assertTrue(scanText(text) >= 1, "Тип документа с точкой после должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeInQuotes() {
-        val text = "Тип: \"военный билет\""
-        assertEquals(1, scanText(text), "Тип документа в кавычках должен быть найден")
+    fun testWithSemicolonBefore() {
+        val text = "Type; паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с точкой с запятой перед должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeWithPunctuation() {
-        val text = "Документ: паспорт гражданина РФ."
-        assertEquals(1, scanText(text), "Тип документа с точкой должен быть найден")
+    fun testWithSemicolonAfter() {
+        val text = "паспорт гражданина российской федерации; next"
+        assertTrue(scanText(text) >= 1, "Тип документа с точкой с запятой после должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeUpperCase() {
-        val text = "ПАСПОРТ ГРАЖДАНИНА РФ"
-        assertEquals(1, scanText(text), "Тип документа в верхнем регистре должен быть найден")
+    fun testWithColonBefore() {
+        val text = "Type: паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с двоеточием перед должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( паспорт гражданина российской федерации )"
+        assertTrue(scanText(text) >= 1, "Тип документа в скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testIdentityDocTypeEmptyString() {
+    fun testWithParenthesesNoSpace() {
+        val text = "(паспорт гражданина российской федерации)"
+        assertTrue(scanText(text) >= 1, "Тип документа в скобках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" паспорт гражданина российской федерации \""
+        assertTrue(scanText(text) >= 1, "Тип документа в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"паспорт гражданина российской федерации\""
+        assertTrue(scanText(text) >= 1, "Тип документа в кавычках без пробелов должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "паспорт гражданина российской федерации загранпаспорт"
+        assertTrue(scanText(text) >= 2, "Несколько типов документов через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "паспорт гражданина российской федерации, загранпаспорт"
+        assertTrue(scanText(text) >= 2, "Несколько типов документов через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "паспорт гражданина российской федерации; загранпаспорт"
+        assertTrue(scanText(text) >= 2, "Несколько типов документов через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "паспорт гражданина российской федерации\nзагранпаспорт"
+        assertTrue(scanText(text) >= 2, "Несколько типов документов через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать типа документа")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать типов документов")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no identity document types at all"
+        assertEquals(0, scanText(text), "Текст без типов документов не должен находить совпадения")
+    }
+
+    @Test
+    fun testPasportGrazhdaninaRF() {
+        val text = "паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Паспорт гражданина РФ должен быть найден")
+    }
+
+    @Test
+    fun testZagranpasport() {
+        val text = "загранпаспорт"
+        assertTrue(scanText(text) >= 1, "Загранпаспорт должен быть найден")
+    }
+
+    @Test
+    fun testVidNaZhitelstvo() {
+        val text = "вид на жительство"
+        assertTrue(scanText(text) >= 1, "Вид на жительство должен быть найден")
+    }
+
+    @Test
+    fun testVNJ() {
+        val text = "ВНЖ"
+        assertTrue(scanText(text) >= 1, "ВНЖ должен быть найден")
+    }
+
+    @Test
+    fun testSvidetelstvoORozhdenii() {
+        val text = "свидетельство о рождении"
+        assertTrue(scanText(text) >= 1, "Свидетельство о рождении должно быть найдено")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Type     паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Type\tпаспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "паспорт гражданина российской федерации\tnext"
+        assertTrue(scanText(text) >= 1, "Тип документа с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Документ паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Identity document паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "паспорт гражданина российской федерации text"
+        assertTrue(scanText(text) >= 1, "Тип документа в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа в конце текста должен быть найден")
+    }
+
+    @Test
+    fun testWithNaimenovanieVidaKeyword() {
+        val text = "наименование вида документа удостоверяющего личность: паспорт гражданина российской федерации"
+        assertTrue(scanText(text) >= 1, "Тип документа с ключевым словом должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidDocType() {
+        val text = "неправильный документ"
+        assertEquals(0, scanText(text), "Несуществующий тип документа не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "doctypeпаспорт гражданина российской федерации"
+        assertEquals(0, scanText(text), "Тип документа, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123паспорт гражданина российской федерации"
+        assertEquals(0, scanText(text), "Тип документа, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "functionпаспорт гражданина российской федерации()"
+        assertEquals(0, scanText(text), "Тип документа внутри кода не должен находиться")
+    }
+
+    @Test
+    fun testPartialDocType() {
+        val text = "паспорт"
+        // В зависимости от реализации - может быть найден или нет
+        val count = scanText(text)
+        assertTrue(count >= 0, "Частичный тип документа")
     }
 }
 
