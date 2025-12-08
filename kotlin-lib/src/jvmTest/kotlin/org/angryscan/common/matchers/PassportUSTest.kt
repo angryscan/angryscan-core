@@ -112,7 +112,7 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     @Test
     fun testWithCommaAfter() {
         val text = "A12345678, next"
-        assertTrue(scanText(text) >= 1, "Паспорт США с запятой после должен быть найден")
+        assertEquals(0, scanText(text), "Паспорт США с запятой после не должен находиться (спецсимвол после)")
     }
 
     @Test
@@ -124,7 +124,7 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     @Test
     fun testWithDotAfter() {
         val text = "A12345678."
-        assertTrue(scanText(text) >= 1, "Паспорт США с точкой после должен быть найден")
+        assertEquals(0, scanText(text), "Паспорт США с точкой после не должен находиться (спецсимвол после)")
     }
 
     @Test
@@ -136,7 +136,7 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     @Test
     fun testWithSemicolonAfter() {
         val text = "A12345678; next"
-        assertTrue(scanText(text) >= 1, "Паспорт США с точкой с запятой после должен быть найден")
+        assertEquals(0, scanText(text), "Паспорт США с точкой с запятой после не должен находиться (спецсимвол после)")
     }
 
     @Test
@@ -156,7 +156,7 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     @Test
     fun testWithParenthesesNoSpace() {
         val text = "(A12345678)"
-        assertTrue(scanText(text) >= 1, "Паспорт США в скобках без пробелов должен быть найден")
+        assertEquals(0, scanText(text), "Паспорт США в скобках без пробелов не должен находиться (спецсимвол до и после)")
     }
 
     @Test
@@ -168,7 +168,7 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     @Test
     fun testWithQuotesNoSpace() {
         val text = "\"A12345678\""
-        assertTrue(scanText(text) >= 1, "Паспорт США в кавычках без пробелов должен быть найден")
+        assertEquals(0, scanText(text), "Паспорт США в кавычках без пробелов не должен находиться (спецсимвол до и после)")
     }
 
     @Test
@@ -195,18 +195,6 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     fun testMultipleWithSpaces() {
         val text = "A12345678 C98765432"
         assertTrue(scanText(text) >= 2, "Несколько паспортов США через пробел должны быть найдены")
-    }
-
-    @Test
-    fun testMultipleWithCommas() {
-        val text = "A12345678, C98765432"
-        assertTrue(scanText(text) >= 2, "Несколько паспортов США через запятую должны быть найдены")
-    }
-
-    @Test
-    fun testMultipleWithSemicolons() {
-        val text = "A12345678; C98765432"
-        assertTrue(scanText(text) >= 2, "Несколько паспортов США через точку с запятой должны быть найдены")
     }
 
     @Test
@@ -341,6 +329,30 @@ internal class PassportUSTest : MatcherTestBase(PassportUS) {
     fun testInCode() {
         val text = "functionA12345678()"
         assertEquals(0, scanText(text), "Паспорт США внутри кода не должен находиться")
+    }
+
+    @Test
+    fun testWithSpecialCharBefore() {
+        val text = "!A12345678"
+        assertEquals(0, scanText(text), "Паспорт США со спецсимволом перед не должен находиться")
+    }
+
+    @Test
+    fun testWithSpecialCharAfter() {
+        val text = "A12345678!"
+        assertEquals(0, scanText(text), "Паспорт США со спецсимволом после не должен находиться")
+    }
+
+    @Test
+    fun testWithSpecialCharBeforeAndAfter() {
+        val text = "@A12345678#"
+        assertEquals(0, scanText(text), "Паспорт США со спецсимволами до и после не должен находиться")
+    }
+
+    @Test
+    fun testWithSpaceBeforeSpecialChar() {
+        val text = "A12345678 !"
+        assertTrue(scanText(text) >= 1, "Паспорт США с пробелом перед спецсимволом должен быть найден")
     }
 }
 

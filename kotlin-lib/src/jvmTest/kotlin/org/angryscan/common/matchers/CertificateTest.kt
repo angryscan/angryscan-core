@@ -5,9 +5,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Комплексные тесты для матчера MarriageCert
+ * Комплексные тесты для матчера Certificate (объединяет BirthCert и MarriageCert)
  */
-internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
+internal class CertificateTest : MatcherTestBase(Certificate) {
 
     // ========== 1. Позиция совпадения в тексте и строке ==========
 
@@ -19,7 +19,7 @@ internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
 
     @Test
     fun testAtEndOfText() {
-        val text = "Marriage certificate: IV-АБ 123456"
+        val text = "Certificate: IV-АБ 123456"
         assertTrue(scanText(text) >= 1, "Свидетельство в конце текста должно быть найдено")
     }
 
@@ -45,12 +45,6 @@ internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
     fun testInMiddleOfLine() {
         val text = "Line with IV-АБ 123456 certificate"
         assertTrue(scanText(text) >= 1, "Свидетельство в середине строки должно быть найдено")
-    }
-
-    @Test
-    fun testWithNewlineBefore() {
-        val text = "\nIV-АБ 123456"
-        assertTrue(scanText(text) >= 1, "Свидетельство после \\n должно быть найдено")
     }
 
     @Test
@@ -145,6 +139,18 @@ internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
         assertTrue(scanText(text) >= 1, "Свидетельство с двоеточием перед должно быть найдено")
     }
 
+    @Test
+    fun testWithExclamationAfter() {
+        val text = "IV-АБ 123456!"
+        assertTrue(scanText(text) >= 1, "Свидетельство с восклицательным знаком после должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuestionMarkAfter() {
+        val text = "IV-АБ 123456?"
+        assertTrue(scanText(text) >= 1, "Свидетельство с вопросительным знаком после должно быть найдено")
+    }
+
     // ========== 3. Контекст со спецсимволами и пунктуацией ==========
 
     @Test
@@ -186,6 +192,12 @@ internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
     // ========== 4. Дополнительные структурные и форматные границы ==========
 
     @Test
+    fun testMultipleWithSpaces() {
+        val text = "IV-АБ 123456 V-ВГ 654321"
+        assertTrue(scanText(text) >= 2, "Несколько свидетельств через пробел должны быть найдены")
+    }
+
+    @Test
     fun testMultipleWithCommas() {
         val text = "IV-АБ 123456, V-ВГ 654321"
         assertTrue(scanText(text) >= 2, "Несколько свидетельств через запятую должны быть найдены")
@@ -211,7 +223,7 @@ internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
 
     @Test
     fun testNoMatches() {
-        val text = "This text has no marriage certificates at all"
+        val text = "This text has no certificates at all"
         assertEquals(0, scanText(text), "Текст без свидетельств не должен находить совпадения")
     }
 
@@ -276,58 +288,70 @@ internal class MarriageCertTest : MatcherTestBase(MarriageCert) {
     }
 
     @Test
-    fun testWithSvidetelstvoKeyword() {
+    fun testWithRomanNumerals() {
+        val text = "III-АБ 123456"
+        assertTrue(scanText(text) >= 1, "Свидетельство с римскими цифрами должно быть найдено")
+    }
+
+    @Test
+    fun testWithBirthCertificateKeyword() {
+        val text = "свидетельство о рождении: IV-АБ 123456"
+        assertTrue(scanText(text) >= 1, "Свидетельство о рождении с ключевым словом должно быть найдено")
+    }
+
+    @Test
+    fun testWithMarriageCertificateKeyword() {
         val text = "свидетельство о браке: IV-АБ 123456"
-        assertTrue(scanText(text) >= 1, "Свидетельство с ключевым словом должно быть найдено")
+        assertTrue(scanText(text) >= 1, "Свидетельство о браке с ключевым словом должно быть найдено")
     }
 
     // ========== 5. Негативные сценарии ==========
 
     @Test
     fun testTooShort() {
-        val text = "IV-АБ 12345"
+        val text = "III-АБ 12345"
         assertEquals(0, scanText(text), "Слишком короткое свидетельство не должно находиться")
     }
 
     @Test
     fun testTooLong() {
-        val text = "IV-АБ 1234567"
+        val text = "III-АБ 1234567"
         assertEquals(0, scanText(text), "Слишком длинное свидетельство не должно находиться")
     }
 
     @Test
     fun testWithInvalidFormat() {
-        val text = "IV@АБ@123456"
+        val text = "III@АБ@123456"
         assertEquals(0, scanText(text), "Свидетельство с неправильными разделителями не должно находиться")
     }
 
     @Test
     fun testInsideLongSequence() {
-        val text = "ABCIV-АБ 123456DEF"
+        val text = "ABCIII-АБ 123456DEF"
         assertEquals(0, scanText(text), "Свидетельство внутри длинной последовательности не должно находиться")
     }
 
     @Test
     fun testStickingToAlphabeticChar() {
-        val text = "certIV-АБ 123456"
+        val text = "certIII-АБ 123456"
         assertEquals(0, scanText(text), "Свидетельство, прилипшее к буквам, не должно находиться")
     }
 
     @Test
     fun testStickingToNumericChar() {
-        val text = "123IV-АБ 123456"
+        val text = "123III-АБ 123456"
         assertEquals(0, scanText(text), "Свидетельство, прилипшее к цифрам, не должно находиться")
     }
 
     @Test
-    fun testPartialMarriageCert() {
-        val text = "IV-АБ"
+    fun testPartialCertificate() {
+        val text = "III-АБ"
         assertEquals(0, scanText(text), "Частичное свидетельство не должно находиться")
     }
 
     @Test
     fun testInCode() {
-        val text = "functionIV-АБ 123456()"
+        val text = "functionIII-АБ 123456()"
         assertEquals(0, scanText(text), "Свидетельство внутри кода не должно находиться")
     }
 }

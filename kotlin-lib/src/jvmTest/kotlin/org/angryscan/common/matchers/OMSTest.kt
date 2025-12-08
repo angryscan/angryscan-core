@@ -16,67 +16,67 @@ internal class OMSTest : MatcherTestBase(OMS) {
 
     @Test
     fun testAtStartOfText() {
-        val text = "ОМС 1234 5678 9012 3452"
+        val text = "страхование 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС в начале текста должен быть найден")
     }
 
     @Test
     fun testAtEndOfText() {
-        val text = "Полис ОМС: 1234 5678 9012 3452"
+        val text = "ОМС: омс 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС в конце текста должен быть найден")
     }
 
     @Test
     fun testInMiddleOfText() {
-        val text = "The ОМС 1234 5678 9012 3452 is valid"
+        val text = "The страховка 1234 5678 9012 3452 is valid"
         assertTrue(scanText(text) >= 1, "ОМС в середине текста должен быть найден")
     }
 
     @Test
     fun testAtStartOfLine() {
-        val text = "ОМС 1234 5678 9012 3452\nSecond line"
+        val text = "ОМС № 1234 5678 9012 3452\nSecond line"
         assertTrue(scanText(text) >= 1, "ОМС в начале строки должен быть найден")
     }
 
     @Test
     fun testAtEndOfLine() {
-        val text = "First line\nОМС 1234 5678 9012 3452"
+        val text = "First line\nстрахование 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС в конце строки должен быть найден")
     }
 
     @Test
     fun testInMiddleOfLine() {
-        val text = "Line with ОМС 1234 5678 9012 3452 policy"
+        val text = "Line with омс 1234 5678 9012 3452 policy"
         assertTrue(scanText(text) >= 1, "ОМС в середине строки должен быть найден")
     }
 
     @Test
     fun testWithNewlineBefore() {
-        val text = "\nОМС 1234 5678 9012 3452"
+        val text = "\nстраховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС после \\n должен быть найден")
     }
 
     @Test
     fun testWithNewlineAfter() {
-        val text = "ОМС 1234 5678 9012 3452\n"
+        val text = "страховка 1234 5678 9012 3452\n"
         assertTrue(scanText(text) >= 1, "ОМС перед \\n должен быть найден")
     }
 
     @Test
     fun testWithCRLF() {
-        val text = "\r\nОМС 1234 5678 9012 3452\r\n"
+        val text = "\r\nстрахование 1234 5678 9012 3452\r\n"
         assertTrue(scanText(text) >= 1, "ОМС с \\r\\n должен быть найден")
     }
 
     @Test
     fun testWithEmptyLineBefore() {
-        val text = "\n\nОМС 1234 5678 9012 3452"
+        val text = "\n\nомс 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС после пустой строки должен быть найден")
     }
 
     @Test
     fun testWithEmptyLineAfter() {
-        val text = "ОМС 1234 5678 9012 3452\n\n"
+        val text = "страхование 1234 5678 9012 3452\n\n"
         assertTrue(scanText(text) >= 1, "ОМС перед пустой строкой должен быть найден")
     }
 
@@ -96,55 +96,55 @@ internal class OMSTest : MatcherTestBase(OMS) {
 
     @Test
     fun testWithSpaceBefore() {
-        val text = "Policy ОМС 1234 5678 9012 3452"
+        val text = "Policy номер полиса 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с пробелом перед должен быть найден")
     }
 
     @Test
     fun testWithSpaceAfter() {
-        val text = "ОМС 1234 5678 9012 3452 is valid"
+        val text = "полис обязательного медицинского страхования 1234 5678 9012 3452 is valid"
         assertTrue(scanText(text) >= 1, "ОМС с пробелом после должен быть найден")
     }
 
     @Test
     fun testWithCommaBefore() {
-        val text = "Policy, ОМС 1234 5678 9012 3452"
+        val text = "Policy, серия и номер полиса 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с запятой перед должен быть найден")
     }
 
     @Test
     fun testWithCommaAfter() {
-        val text = "ОМС 1234 5678 9012 3452, next"
+        val text = "номер полиса ОМС 1234 5678 9012 3452, next"
         assertTrue(scanText(text) >= 1, "ОМС с запятой после должен быть найден")
     }
 
     @Test
     fun testWithDotBefore() {
-        val text = "Policy. ОМС 1234 5678 9012 3452"
+        val text = "Policy. ОМС № 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с точкой перед должен быть найден")
     }
 
     @Test
     fun testWithDotAfter() {
-        val text = "ОМС 1234 5678 9012 3452."
+        val text = "омс 1234 5678 9012 3452."
         assertTrue(scanText(text) >= 1, "ОМС с точкой после должен быть найден")
     }
 
     @Test
     fun testWithSemicolonBefore() {
-        val text = "Policy; ОМС 1234 5678 9012 3452"
+        val text = "Policy; страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с точкой с запятой перед должен быть найден")
     }
 
     @Test
     fun testWithSemicolonAfter() {
-        val text = "ОМС 1234 5678 9012 3452; next"
+        val text = "страхование 1234 5678 9012 3452; next"
         assertTrue(scanText(text) >= 1, "ОМС с точкой с запятой после должен быть найден")
     }
 
     @Test
     fun testWithColonBefore() {
-        val text = "Policy: ОМС 1234 5678 9012 3452"
+        val text = "Policy: номер полиса обязательного медицинского страхования 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с двоеточием перед должен быть найден")
     }
 
@@ -164,61 +164,61 @@ internal class OMSTest : MatcherTestBase(OMS) {
 
     @Test
     fun testWithParenthesesAndSpace() {
-        val text = "( ОМС 1234 5678 9012 3452 )"
+        val text = "( полис обязательного медицинского страхования 1234 5678 9012 3452 )"
         assertTrue(scanText(text) >= 1, "ОМС в скобках с пробелами должен быть найден")
     }
 
     @Test
     fun testWithParenthesesNoSpace() {
-        val text = "(ОМС 1234 5678 9012 3452)"
+        val text = "(номер полиса 1234 5678 9012 3452)"
         assertTrue(scanText(text) >= 1, "ОМС в скобках без пробелов должен быть найден")
     }
 
     @Test
     fun testWithQuotesAndSpace() {
-        val text = "\" ОМС 1234 5678 9012 3452 \""
+        val text = "\" серия и номер полиса 1234 5678 9012 3452 \""
         assertTrue(scanText(text) >= 1, "ОМС в кавычках с пробелами должен быть найден")
     }
 
     @Test
     fun testWithQuotesNoSpace() {
-        val text = "\"ОМС 1234 5678 9012 3452\""
+        val text = "\"ОМС № 1234 5678 9012 3452\""
         assertTrue(scanText(text) >= 1, "ОМС в кавычках без пробелов должен быть найден")
     }
 
     @Test
     fun testWithEqualsAndSpace() {
-        val text = "oms = ОМС 1234 5678 9012 3452"
+        val text = "oms = страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с = и пробелом должен быть найден")
     }
 
     @Test
     fun testWithHashAndSpace() {
-        val text = "oms # ОМС 1234 5678 9012 3452"
+        val text = "oms # страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с # и пробелом должен быть найден")
     }
 
     @Test
     fun testWithBracketsAndSpace() {
-        val text = "[ ОМС 1234 5678 9012 3452 ]"
+        val text = "[ номер полиса ОМС 1234 5678 9012 3452 ]"
         assertTrue(scanText(text) >= 1, "ОМС в квадратных скобках с пробелами должен быть найден")
     }
 
     @Test
     fun testWithBracesAndSpace() {
-        val text = "{ ОМС 1234 5678 9012 3452 }"
+        val text = "{ страхование 1234 5678 9012 3452 }"
         assertTrue(scanText(text) >= 1, "ОМС в фигурных скобках с пробелами должен быть найден")
     }
 
     @Test
     fun testWithColonAsPartOfFormat() {
-        val text = "ОМС: 1234 5678 9012 3452"
+        val text = "полис ОМС: 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с двоеточием как часть формата должен быть найден")
     }
 
     @Test
     fun testWithDashAsPartOfFormat() {
-        val text = "ОМС-1234-5678-9012-3452"
+        val text = "омс-1234-5678-9012-3452"
         assertTrue(scanText(text) >= 1, "ОМС с дефисом как часть формата должен быть найден")
     }
 
@@ -226,25 +226,25 @@ internal class OMSTest : MatcherTestBase(OMS) {
 
     @Test
     fun testMultipleWithSpaces() {
-        val text = "ОМС 1234 5678 9012 3452 ОМС 9876 5432 1098 7658"
+        val text = "страховка 1234 5678 9012 3452 номер полиса 9876 5432 1098 7658"
         assertTrue(scanText(text) >= 2, "Несколько ОМС через пробел должны быть найдены")
     }
 
     @Test
     fun testMultipleWithCommas() {
-        val text = "ОМС 1234 5678 9012 3452, ОМС 9876 5432 1098 7658"
+        val text = "серия и номер полиса 1234 5678 9012 3452, ОМС № 9876 5432 1098 7658"
         assertTrue(scanText(text) >= 2, "Несколько ОМС через запятую должны быть найдены")
     }
 
     @Test
     fun testMultipleWithSemicolons() {
-        val text = "ОМС 1234 5678 9012 3452; ОМС 9876 5432 1098 7658"
+        val text = "номер полиса ОМС 1234 5678 9012 3452; страховка 9876 5432 1098 7658"
         assertTrue(scanText(text) >= 2, "Несколько ОМС через точку с запятой должны быть найдены")
     }
 
     @Test
     fun testMultipleWithNewlines() {
-        val text = "ОМС 1234 5678 9012 3452\nОМС 9876 5432 1098 7658"
+        val text = "полис обязательного медицинского страхования 1234 5678 9012 3452\nстрахование 9876 5432 1098 7658"
         assertTrue(scanText(text) >= 2, "Несколько ОМС через перенос строки должны быть найдены")
     }
 
@@ -262,80 +262,116 @@ internal class OMSTest : MatcherTestBase(OMS) {
 
     @Test
     fun testMinimalFormat() {
-        val text = "ОМС 1234 5678 9012 3452"
+        val text = "полис обязательного медицинского страхования 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
     }
 
     @Test
     fun testWithSpacesFormat() {
-        val text = "ОМС 1234 5678 9012 3452"
+        val text = "номер полиса 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с пробелами должен быть найден")
     }
 
     @Test
     fun testWithDashesFormat() {
-        val text = "ОМС 1234-5678-9012-3452"
+        val text = "серия и номер полиса ОМС 1234-5678-9012-3452"
         assertTrue(scanText(text) >= 1, "ОМС с дефисами должен быть найден")
     }
 
     @Test
     fun testWithMultipleSpaces() {
-        val text = "Policy    ОМС 1234 5678 9012 3452"
+        val text = "Policy    номер полиса обязательного медицинского страхования 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с несколькими пробелами должен быть найден")
     }
 
     @Test
     fun testWithTabBefore() {
-        val text = "Policy\tОМС 1234 5678 9012 3452"
+        val text = "Policy\tОМС № 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с табуляцией перед должен быть найден")
     }
 
     @Test
     fun testWithTabAfter() {
-        val text = "ОМС 1234 5678 9012 3452\tnext"
+        val text = "ОМС № 1234 5678 9012 3452\tnext"
         assertTrue(scanText(text) >= 1, "ОМС с табуляцией после должен быть найден")
     }
 
     @Test
     fun testWithUnicodeCyrillic() {
-        val text = "Полис ОМС 1234 5678 9012 3452"
+        val text = "Полис номер полиса ОМС 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с кириллицей рядом должен быть найден")
     }
 
     @Test
     fun testWithUnicodeLatin() {
-        val text = "Policy ОМС 1234 5678 9012 3452"
+        val text = "Policy страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с латиницей рядом должен быть найден")
     }
 
     @Test
     fun testStandalone() {
-        val text = "ОМС 1234 5678 9012 3452"
+        val text = "страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС отдельной строкой должен быть найден")
     }
 
     @Test
     fun testAtTextBoundaryStart() {
-        val text = "ОМС 1234 5678 9012 3452 text"
+        val text = "страхование 1234 5678 9012 3452 text"
         assertTrue(scanText(text) >= 1, "ОМС в начале текста должен быть найден")
     }
 
     @Test
     fun testAtTextBoundaryEnd() {
-        val text = "text ОМС 1234 5678 9012 3452"
+        val text = "text омс 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС в конце текста должен быть найден")
     }
 
     @Test
     fun testWithPolisKeyword() {
+        val text = "полис ОМС 1234 5678 9012 3452"
+        assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'полис ОМС' должен быть найден")
+    }
+
+    @Test
+    fun testWithoutPolisAlone() {
         val text = "полис 1234 5678 9012 3452"
-        assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'полис' должен быть найден")
+        assertEquals(0, scanText(text), "ОМС с отдельно стоящим 'полис' не должен находиться")
     }
 
     @Test
     fun testWithStrahovkaKeyword() {
         val text = "страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'страховка' должен быть найден")
+    }
+
+    @Test
+    fun testWithoutKeywords() {
+        val text = "1234 5678 9012 3452"
+        assertEquals(0, scanText(text), "ОМС без ключевых слов не должен находиться")
+    }
+
+    @Test
+    fun testWithPolisObyazatelnogo() {
+        val text = "полис обязательного медицинского страхования 1234 5678 9012 3452"
+        assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'полис обязательного медицинского страхования' должен быть найден")
+    }
+
+    @Test
+    fun testWithNomerPolisaOMS() {
+        val text = "номер полиса ОМС 1234 5678 9012 3452"
+        assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'номер полиса ОМС' должен быть найден")
+    }
+
+    @Test
+    fun testWithSeriyaINomer() {
+        val text = "серия и номер полиса 1234 5678 9012 3452"
+        assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'серия и номер полиса' должен быть найден")
+    }
+
+    @Test
+    fun testWithOMS() {
+        val text = "ОМС № 1234 5678 9012 3452"
+        assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'ОМС №' должен быть найден")
     }
 
     // ========== 5. Негативные сценарии ==========

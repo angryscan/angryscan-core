@@ -93,13 +93,19 @@ object Geo : IHyperMatcher, IKotlinMatcher {
         
         if (lat == 0.0 && lon == 0.0) return false
         
+        // Не брать в расчет координаты <= 11 градусов
+        if (kotlin.math.abs(lat) <= 11.0 || kotlin.math.abs(lon) <= 11.0) return false
+        
+        // Координаты должны отличаться больше чем на 1 градус
+        val diff = kotlin.math.abs(lat - lon)
+        if (diff <= 1.0) return false
+        
         if (matchedLabel == null) {
             val isLatInteger = lat == lat.toInt().toDouble()
             val isLonInteger = lon == lon.toInt().toDouble()
             
             if (isLatInteger && isLonInteger && kotlin.math.abs(lat) < 100.0 && kotlin.math.abs(lon) < 100.0) {
-                val diff = kotlin.math.abs(lat - lon)
-                if (diff < 10.0) return false
+                // Эта проверка уже не нужна, так как мы проверили diff <= 1.0 выше
             }
         }
         

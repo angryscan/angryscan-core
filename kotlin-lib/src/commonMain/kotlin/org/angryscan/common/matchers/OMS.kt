@@ -13,8 +13,19 @@ object OMS : IHyperMatcher, IKotlinMatcher {
         (?ix)
         (?<![\p{L}\d])
         (?:
-          (?:омс|полис|страховка|страхование)\s*[:\-]?\s*
-        )?
+          полис\s+обязательного\s+медицинского\s+страхования|
+          номер\s+полиса\s+ОМС|
+          номер\s+полиса\s+обязательного\s+медицинского\s+страхования|
+          серия\s+и\s+номер\s+полиса\s+ОМС|
+          серия\s+и\s+номер\s+полиса|
+          номер\s+полиса|
+          полис\s+ОМС|
+          ОМС\s+№|
+          омс|
+          страховка|
+          страхование
+        )
+        \s*[:\-]?\s*
         ([0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4})
         (?![\p{L}\d])
         """.trimIndent()
@@ -25,7 +36,7 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[^\w])(?:(?:омс|полис|страховка|страхование)\s*[:\-]?\s*)?[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}(?:[^\w]|$)"""
+        """(?:^|[^\w])(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)\s*[:\-]?\s*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -35,11 +46,29 @@ object OMS : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean {
         val oms = value.replace("""\D""".toRegex(), "")
+        
+        if (oms.length != 16) return false
+        
+        val zeroCount = oms.count { it == '0' }
+        if (zeroCount > oms.length / 2) return false
+        
+        if (oms.all { it == oms[0] }) return false
+        
+        val chunks = oms.chunked(4)
+        val allAreYears = chunks.all { chunk ->
+            val year = chunk.toIntOrNull() ?: return@all false
+            year in 1900..2100
+        }
+        if (allAreYears) return false
+        
+        if (oms.all { it == '0' || it == '1' }) return false
+        
+        if (oms.chunked(4).any { chunk -> chunk.all { it == chunk[0] } }) return false
+        
         val key = oms.last().digitToInt()
         val odd = mutableListOf<Char>()
         val even = mutableListOf<Char>()
         oms.substring(0 until oms.length - 1).reversed().forEachIndexed { index, digit ->
-            // it's odd because starts with index = 0
             if (index % 2 == 0) {
                 odd.add(digit)
             } else {
@@ -47,13 +76,11 @@ object OMS : IHyperMatcher, IKotlinMatcher {
             }
         }
         val right = (odd.joinToString(separator = "").toInt() * 2).toString()
-        // getValue sum of all elements
         var summ = 0
         for (elem in even)
             summ += elem.digitToInt()
         for (elem in right)
             summ += elem.digitToInt()
-        // nearest value more or equal sum and sum % 10 = 0 minus sum
         val checker = 10 - summ % 10
         return checker == key || (checker == 10 && key == 0)
     }

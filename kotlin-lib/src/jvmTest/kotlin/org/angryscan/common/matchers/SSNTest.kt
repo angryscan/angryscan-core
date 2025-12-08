@@ -381,5 +381,59 @@ internal class SSNTest : MatcherTestBase(SSN) {
         val text = "000-00-0000"
         assertEquals(0, scanText(text), "SSN из всех нулей не должен находиться")
     }
+
+    @Test
+    fun testWithDashBefore() {
+        val text = "-234-56-7890"
+        assertEquals(0, scanText(text), "SSN с дефисом перед не должен находиться")
+    }
+
+    @Test
+    fun testWithDashAfter() {
+        val text = "234-56-7890-"
+        assertEquals(0, scanText(text), "SSN с дефисом после не должен находиться")
+    }
+
+    @Test
+    fun testWithDashBeforeAndAfter() {
+        val text = "-234-56-7890-"
+        assertEquals(0, scanText(text), "SSN с дефисом до и после не должен находиться")
+    }
+
+    @Test
+    fun testWithYearAsThirdPart() {
+        val text = "234-56-1999"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (1999), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear2000AsThirdPart() {
+        val text = "234-56-2000"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (2000), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear2024AsThirdPart() {
+        val text = "234-56-2024"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (2024), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear1900AsThirdPart() {
+        val text = "234-56-1900"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (1900), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear2100AsThirdPart() {
+        val text = "234-56-2100"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (2100), не должен находиться")
+    }
+
+    @Test
+    fun testWithValidThirdPart() {
+        val text = "234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с валидной третьей частью должен быть найден")
+    }
 }
 

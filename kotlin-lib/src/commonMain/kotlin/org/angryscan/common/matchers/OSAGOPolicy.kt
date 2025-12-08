@@ -12,6 +12,16 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
         """
         (?ix)
         (?<![\p{L}\d])
+        (?:
+          ОСАГО|
+          полис\s+ОСАГО|
+          полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|
+          номер\s+полиса\s+ОСАГО|
+          серия\s+и\s+номер\s+полиса\s+ОСАГО|
+          страховой\s+полис\s+ОСАГО|
+          страховка\s+ОСАГО
+        )
+        \s*[:\-]?\s*
         ([A-ZА-Я]{3}\s+№?\s*\d{10})
         (?![\p{L}\d])
         """.trimIndent()
@@ -22,7 +32,7 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])([A-ZА-Я]{3}\s+№?\s*\d{10})(?:[^\w]|$)"""
+        """(?:^|[^\w])(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)\s*[:\-]?\s*[A-ZА-Я]{3}\s+№?\s*\d{10}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -30,7 +40,29 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean = true
+    override fun check(value: String): Boolean {
+        // Извлекаем только номер полиса ОСАГО из совпадения (может включать ключевые слова)
+        val numberPattern = Regex("[A-ZА-Я]{3}\\s+№?\\s*\\d{10}")
+        val match = numberPattern.find(value)
+        if (match == null) return false
+        
+        val cleaned = match.value.replace(Regex("[^A-Za-z0-9]"), "").uppercase()
+        
+        if (cleaned.length != 13) return false
+        
+        val series = cleaned.substring(0, 3)
+        val number = cleaned.substring(3)
+        
+        if (!series.all { it in 'A'..'Z' }) return false
+        
+        if (!number.all { it.isDigit() }) return false
+        
+        if (number.all { it == '0' }) return false
+        
+        if (number.all { it == number[0] }) return false
+        
+        return true
+    }
 
     override fun toString() = name
 }

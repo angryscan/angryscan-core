@@ -339,5 +339,40 @@ internal class VINTest : MatcherTestBase(VIN) {
         val text = "1HGBH 41JX MN109186"
         assertEquals(0, scanText(text), "VIN с пробелами не должен находиться")
     }
+
+    @Test
+    fun testOnlyDigits() {
+        val text = "12345678901234567"
+        assertEquals(0, scanText(text), "VIN состоящий только из цифр не должен находиться")
+    }
+
+    @Test
+    fun testOnlyZerosAndOnes() {
+        val text = "00000000000000000"
+        assertEquals(0, scanText(text), "VIN состоящий только из нулей не должен находиться")
+    }
+
+    @Test
+    fun testOnlyZerosAndOnesWithLetters() {
+        // VIN с буквами, но все цифры - только 0 и 1
+        // Используем VIN, который не пройдет проверку контрольной суммы, но имеет только 0 и 1
+        val text = "ABCDEFGHJKLMNPR01"
+        assertEquals(0, scanText(text), "VIN где все цифры только 0 и 1 не должен находиться")
+    }
+
+    @Test
+    fun testOnlyOneDigit() {
+        // VIN с только одной цифрой (остальные буквы)
+        val text = "ABCDEFGHJKLMNPRS2"
+        // Этот VIN может пройти паттерн, но должен быть отфильтрован в check
+        // Проверяем, что он не находится
+        assertEquals(0, scanText(text), "VIN с только одной цифрой не должен находиться")
+    }
+
+    @Test
+    fun testValidVINWithLettersAndDigits() {
+        val text = "1HGBH41JXMN109186"
+        assertTrue(scanText(text) >= 1, "Валидный VIN с буквами и цифрами должен быть найден")
+    }
 }
 

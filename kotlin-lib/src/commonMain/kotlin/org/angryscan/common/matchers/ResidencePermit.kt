@@ -12,7 +12,15 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
         """
         (?ix)
         (?<![\p{L}\d])
-        (?:вид\s+на\s+жительство|ВНЖ)?
+        (?:
+          ВНЖ|
+          вид\s+на\s+жительство|
+          номер\s+вида\s+на\s+жительство|
+          серия\s+и\s+номер\s+вида\s+на\s+жительство|
+          серия\s+и\s+номер\s+ВНЖ|
+          номер\s+ВНЖ|
+          документ\s+вида\s+на\s+жительство
+        )
         \s*[:\-]?\s*
         ((?:82|83)\s*(?:№|N)?\s*\d{7})
         (?![\p{L}\d])
@@ -24,7 +32,7 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])(?:вид\s+на\s+жительство|ВНЖ)?\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}(?:[^a-zA-Z0-9А-ЯЁа-яё]|$)"""
+        """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])(?:ВНЖ|вид\s+на\s+жительство|номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+ВНЖ|номер\s+ВНЖ|документ\s+вида\s+на\s+жительство)\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}(?:[^a-zA-Z0-9А-ЯЁа-яё]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -33,11 +41,19 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val cleaned = value.replace(Regex("[^0-9]"), "")
+        // Извлекаем номер ВНЖ из значения (которое может содержать ключевые слова)
+        val numberPattern = Regex("""(?:82|83)\s*(?:№|N)?\s*(\d{7})""")
+        val match = numberPattern.find(value) ?: return false
+        val numberPart = match.groupValues[1]
+        
+        // Формируем полный номер: серия + номер
+        val seriesMatch = Regex("""(82|83)""").find(value)
+        val series = seriesMatch?.value ?: return false
+        
+        val cleaned = series + numberPart
         
         if (cleaned.length != 9) return false
         
-        val series = cleaned.substring(0, 2)
         if (series != "82" && series != "83") return false
         
         val number = cleaned.substring(2)

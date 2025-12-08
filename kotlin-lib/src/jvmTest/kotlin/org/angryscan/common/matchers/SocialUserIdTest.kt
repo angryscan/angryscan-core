@@ -330,5 +330,222 @@ internal class SocialUserIdTest : MatcherTestBase(SocialUserId) {
         val text = "@"
         assertEquals(0, scanText(text), "Только символ @ не должен находиться")
     }
+
+    // ========== 6. CSS at-rules (не должны находиться) ==========
+
+    @Test
+    fun testCSSMedia() {
+        val text = "@media"
+        assertEquals(0, scanText(text), "CSS @media не должен находиться")
+    }
+
+    @Test
+    fun testCSSPage() {
+        val text = "@page"
+        assertEquals(0, scanText(text), "CSS @page не должен находиться")
+    }
+
+    @Test
+    fun testCSSPagemargin() {
+        val text = "@pagemargin"
+        assertEquals(0, scanText(text), "CSS @pagemargin не должен находиться")
+    }
+
+    @Test
+    fun testCSSImport() {
+        val text = "@import"
+        assertEquals(0, scanText(text), "CSS @import не должен находиться")
+    }
+
+    @Test
+    fun testCSSCharset() {
+        val text = "@charset"
+        assertEquals(0, scanText(text), "CSS @charset не должен находиться")
+    }
+
+    @Test
+    fun testCSSNamespace() {
+        val text = "@namespace"
+        assertEquals(0, scanText(text), "CSS @namespace не должен находиться")
+    }
+
+    @Test
+    fun testCSSKeyframes() {
+        val text = "@keyframes"
+        assertEquals(0, scanText(text), "CSS @keyframes не должен находиться")
+    }
+
+    @Test
+    fun testCSSSupports() {
+        val text = "@supports"
+        assertEquals(0, scanText(text), "CSS @supports не должен находиться")
+    }
+
+    @Test
+    fun testCSSFontFace() {
+        val text = "@font-face"
+        assertEquals(0, scanText(text), "CSS @font-face не должен находиться")
+    }
+
+    @Test
+    fun testCSSDocument() {
+        val text = "@document"
+        assertEquals(0, scanText(text), "CSS @document не должен находиться")
+    }
+
+    @Test
+    fun testCSSViewport() {
+        val text = "@viewport"
+        assertEquals(0, scanText(text), "CSS @viewport не должен находиться")
+    }
+
+    @Test
+    fun testCSSLayer() {
+        val text = "@layer"
+        assertEquals(0, scanText(text), "CSS @layer не должен находиться")
+    }
+
+    @Test
+    fun testCSSContainer() {
+        val text = "@container"
+        assertEquals(0, scanText(text), "CSS @container не должен находиться")
+    }
+
+    @Test
+    fun testCSSScope() {
+        val text = "@scope"
+        assertEquals(0, scanText(text), "CSS @scope не должен находиться")
+    }
+
+    @Test
+    fun testCSSMediaInContext() {
+        val text = "CSS rule: @media (max-width: 768px)"
+        assertEquals(0, scanText(text), "CSS @media в контексте не должен находиться")
+    }
+
+    @Test
+    fun testCSSPageInContext() {
+        val text = "Print styles: @page { margin: 2cm; }"
+        assertEquals(0, scanText(text), "CSS @page в контексте не должен находиться")
+    }
+
+    @Test
+    fun testValidUsernameAfterCSS() {
+        val text = "@username"
+        assertTrue(scanText(text) >= 1, "Валидный username должен находиться")
+    }
+
+    @Test
+    fun testValidUsernameWithCSSKeyword() {
+        val text = "@username_media"
+        assertTrue(scanText(text) >= 1, "Username содержащий 'media' должен находиться")
+    }
+
+    // ========== 7. Username только из цифр (не должны находиться) ==========
+
+    @Test
+    fun testOnlyDigits() {
+        val text = "@545"
+        assertEquals(0, scanText(text), "Username состоящий только из цифр не должен находиться")
+    }
+
+    @Test
+    fun testOnlyDigitsWithLeadingZero() {
+        val text = "@028"
+        assertEquals(0, scanText(text), "Username состоящий только из цифр с ведущим нулем не должен находиться")
+    }
+
+    @Test
+    fun testOnlyDigitsLong() {
+        val text = "@1234567890"
+        assertEquals(0, scanText(text), "Длинный username состоящий только из цифр не должен находиться")
+    }
+
+    @Test
+    fun testOnlyDigitsMinimal() {
+        val text = "@123"
+        assertEquals(0, scanText(text), "Минимальный username состоящий только из цифр не должен находиться")
+    }
+
+    @Test
+    fun testValidUsernameWithDigits() {
+        val text = "@user123"
+        assertTrue(scanText(text) >= 1, "Username содержащий буквы и цифры должен находиться")
+    }
+
+    @Test
+    fun testValidUsernameWithDigitsAtStart() {
+        val text = "@123user"
+        assertTrue(scanText(text) >= 1, "Username начинающийся с цифр, но содержащий буквы должен находиться")
+    }
+
+    @Test
+    fun testValidUsernameWithDigitsInMiddle() {
+        val text = "@user123name"
+        assertTrue(scanText(text) >= 1, "Username с цифрами в середине должен находиться")
+    }
+
+    // ========== 8. Зарезервированные имена (не должны находиться) ==========
+
+    @Test
+    fun testReservedAdmin() {
+        val text = "@admin"
+        assertEquals(0, scanText(text), "Зарезервированное имя 'admin' не должно находиться")
+    }
+
+    @Test
+    fun testReservedTest() {
+        val text = "@test"
+        assertEquals(0, scanText(text), "Зарезервированное имя 'test' не должно находиться")
+    }
+
+    @Test
+    fun testReservedSupport() {
+        val text = "@support"
+        assertEquals(0, scanText(text), "Зарезервированное имя 'support' не должно находиться")
+    }
+
+    @Test
+    fun testReservedLogin() {
+        val text = "@login"
+        assertEquals(0, scanText(text), "Зарезервированное имя 'login' не должно находиться")
+    }
+
+    @Test
+    fun testReservedNull() {
+        val text = "@null"
+        assertEquals(0, scanText(text), "Зарезервированное имя 'null' не должно находиться")
+    }
+
+    @Test
+    fun testReservedWww() {
+        val text = "@www"
+        assertEquals(0, scanText(text), "Зарезервированное имя 'www' не должно находиться")
+    }
+
+    // ========== 9. Контекст email (не должны находиться) ==========
+    // Примечание: проверка контекста email/URL сложна для реализации через regex,
+    // поэтому эти случаи могут находиться. В реальных сценариях матчер Email
+    // должен обрабатывать email адреса отдельно.
+
+    // ========== 11. Проверка наличия букв ==========
+
+    @Test
+    fun testOnlyUnderscores() {
+        val text = "@___"
+        assertEquals(0, scanText(text), "Username состоящий только из подчеркиваний не должен находиться")
+    }
+
+    @Test
+    fun testOnlyDigitsAndUnderscores() {
+        val text = "@123_456"
+        assertEquals(0, scanText(text), "Username состоящий только из цифр и подчеркиваний не должен находиться")
+    }
+
+    @Test
+    fun testValidUsernameWithUnderscores() {
+        val text = "@user_name"
+        assertTrue(scanText(text) >= 1, "Username с буквами и подчеркиваниями должен находиться")
+    }
 }
 

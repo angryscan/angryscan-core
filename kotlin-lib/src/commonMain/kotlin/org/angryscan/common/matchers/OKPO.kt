@@ -12,6 +12,14 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
         """
         (?ix)
         (?<![\p{L}\d])
+        (?:
+          ОКПО|
+          код\s+ОКПО|
+          номер\s+ОКПО|
+          общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|
+          классификатор\s+предприятий\s+и\s+организаций|
+          серия\s+и\s+номер\s+ОКПО
+        )
         \s*[:\-]?\s*
         (\d{8}|\d{10})
         (?![\p{L}\d])
@@ -23,8 +31,8 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])(?:[ \n(\[{\"'«""])?\s*[:\-]?\s*\d{8}(?:[^\w]|$)""",
-        """(?:^|[^\w])(?:[ \n(\[{\"'«""])?\s*[:\-]?\s*\d{10}(?:[^\w]|$)"""
+        """(?:^|[^\w])(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)\s*[:\-]?\s*\d{8}(?:[^\w]|$)""",
+        """(?:^|[^\w])(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)\s*[:\-]?\s*\d{10}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -32,15 +40,75 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private fun isSequential(digits: String, ascending: Boolean): Boolean {
+        for (i in 1 until digits.length) {
+            val current = digits[i].digitToInt()
+            val previous = digits[i - 1].digitToInt()
+            if (ascending) {
+                if (current != previous + 1) return false
+            } else {
+                if (current != previous - 1) return false
+            }
+        }
+        return true
+    }
+
+    private fun isRepeatingPattern(digits: String, patternLength: Int): Boolean {
+        if (digits.length % patternLength != 0) return false
+        val pattern = digits.substring(0, patternLength)
+        for (i in patternLength until digits.length step patternLength) {
+            if (digits.substring(i, i + patternLength) != pattern) return false
+        }
+        return true
+    }
+
     override fun check(value: String): Boolean {
-        val okpoClean = value.replace(Regex("[^\\d]"), "")
+        // Извлекаем номер ОКПО из значения (которое может содержать ключевые слова)
+        val numberPattern = Regex("""(\d{8}|\d{10})""")
+        val match = numberPattern.find(value) ?: return false
+        val okpoClean = match.value
         val length = okpoClean.length
         if (length != 8 && length != 10) return false
-        if (okpoClean.all { it == '0' }) return false
-        if (okpoClean.all { it in "01" }) return false
+        
+        val zeroCount = okpoClean.count { it == '0' }
+        if (zeroCount > okpoClean.length / 2) return false
+        
+        if (okpoClean.all { it == okpoClean.first() }) return false
+        
+        if (okpoClean.all { it == '0' || it == '1' }) return false
+
+        if (isSequential(okpoClean, true) || isSequential(okpoClean, false)) return false
+
+        if (length == 8) {
+            if (isRepeatingPattern(okpoClean, 2) || isRepeatingPattern(okpoClean, 4)) return false
+            val chunks = listOf(okpoClean.substring(0, 2), okpoClean.substring(2, 4), okpoClean.substring(4, 6), okpoClean.substring(6, 8))
+            if (chunks.any { it.all { char -> char == it[0] } }) return false
+        } else {
+            if (isRepeatingPattern(okpoClean, 2) || isRepeatingPattern(okpoClean, 5)) return false
+            val chunks = listOf(okpoClean.substring(0, 2), okpoClean.substring(2, 4), okpoClean.substring(4, 6), okpoClean.substring(6, 8), okpoClean.substring(8, 10))
+            if (chunks.any { it.all { char -> char == it[0] } }) return false
+        }
+
+        if (okpoClean == okpoClean.reversed()) return false
+
+        val digitCounts = okpoClean.groupingBy { it }.eachCount()
+        if (length == 8 && digitCounts.values.any { it > 6 }) return false
+        if (length == 10 && digitCounts.values.any { it > 7 }) return false
+        
         if (length == 8 && okpoClean == "12345678") return false
         if (length == 10 && okpoClean == "1234567890") return false
         if (length == 10 && okpoClean == "0123456789") return false
+        
+        val lastFourDigits = if (length == 8) {
+            okpoClean.substring(4, 8)
+        } else {
+            okpoClean.substring(6, 10)
+        }
+        val year = lastFourDigits.toIntOrNull()
+        if (year != null && year in 1900..2099) {
+            return false
+        }
+        
         val digits = okpoClean.map { it.toString().toInt() }
         if (length == 8) {
             val weights1 = intArrayOf(1, 2, 3, 4, 5, 6, 7)

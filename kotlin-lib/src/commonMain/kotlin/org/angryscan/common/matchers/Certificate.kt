@@ -6,10 +6,24 @@ import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 @Serializable
-object BirthCert : IHyperMatcher, IKotlinMatcher {
-    override val name = "Birth Certificate"
+object Certificate : IHyperMatcher, IKotlinMatcher {
+    override val name = "Certificate"
     override val javaPatterns = listOf(
-        """(?<![\p{L}\d])[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}(?![\p{L}\d])"""
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        (?:свидетельство\s+о\s+(?:рождении|браке|заключении\s+брака))?\s*[:\-]?\s*
+        ([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2})
+        [\s,;:№Nn]*
+        (\d{6})
+        (?![\p{L}\d])
+        """.trimIndent(),
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        ([IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6})
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,6 +31,7 @@ object BirthCert : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
+        """(?:^|[^А-ЯЁA-Za-z0-9IVX])(?:свидетельство\s+о\s+(?:рождении|браке|заключении\s+брака))?\s*[:\-]?\s*[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}(?:[^А-ЯЁA-Za-z0-9]|$)""",
         """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}[\s,;:№Nn]*\d{6}(?:[^0-9]|$)"""
     )
     override val expressionOptions = setOf(
@@ -29,3 +44,4 @@ object BirthCert : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
+

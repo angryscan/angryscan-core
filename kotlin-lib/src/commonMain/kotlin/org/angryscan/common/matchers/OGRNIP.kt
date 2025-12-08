@@ -14,10 +14,13 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
         (?<![\p{L}\d])
         (?:
           ОГРНИП|
+          основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|
           регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|
           регистрационный\s+номер\s+индивидуального\s+предпринимателя|
-          государственный\s+регистрационный\s+номер\s+ИП
-        )?
+          государственный\s+регистрационный\s+номер\s+ИП|
+          номер\s+ОГРНИП|
+          серия\s+и\s+номер\s+ОГРНИП
+        )
         \s*[:\-]?\s*
         ([34]\d{14})
         (?![\p{L}\d])
@@ -29,7 +32,7 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])[34]\d{14}(?:[^\w]|$)"""
+        """(?:^|[^\w])(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)\s*[:\-]?\s*[34]\d{14}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -38,7 +41,11 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val ogrnipClean = value.replace(Regex("[^\\d]"), "")
+        val numberPattern = Regex("[34]\\d{14}")
+        val match = numberPattern.find(value)
+        if (match == null) return false
+        
+        val ogrnipClean = match.value.replace(Regex("[^\\d]"), "")
         if (ogrnipClean.length != 15) return false
         val digits = ogrnipClean.map { it.toString().toInt() }
         val bigNum = ogrnipClean.substring(0, 14).toLong()

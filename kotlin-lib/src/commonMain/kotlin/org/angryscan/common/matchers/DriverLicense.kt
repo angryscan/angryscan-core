@@ -9,7 +9,23 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object DriverLicense : IHyperMatcher, IKotlinMatcher {
     override val name = "Driver License"
     override val javaPatterns = listOf(
-        """(?<![\p{L}\d])\d{2}\s\d{2}\s\d{6}(?![\p{L}\d])"""
+        """
+        (?ix)
+        (?:(?<=^)|(?<=[\s\(\[\{«"'])|(?<![\p{L}\d]))
+        (?:
+          водительское\s+удостоверение|
+          номер\s+водительского\s+удостоверения|
+          номер\s+удостоверения|
+          номер\s+ВУ|
+          ВУ\s+№|
+          driver\s+license|
+          license\s+number|
+          driving\s+license
+        )
+        \s*[:\-]?\s*
+        (\d{2}\s\d{2}\s\d{6})
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +33,7 @@ object DriverLicense : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])\d{2}\s\d{2}\s\d{6}(?:[^0-9]|$)"""
+        """(?:^|[\s\(\[\{«"'])(?:водительское\s+удостоверение|номер\s+водительского\s+удостоверения|номер\s+удостоверения|номер\s+ВУ|ВУ\s+№|driver\s+license|license\s+number|driving\s+license)\s*[:\-]?\s*\d{2}\s\d{2}\s\d{6}(?:[^0-9a-zA-ZА-ЯЁа-яё]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

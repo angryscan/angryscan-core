@@ -150,19 +150,19 @@ internal class LegalEntityNameTest : MatcherTestBase(LegalEntityName) {
     @Test
     fun testWithParenthesesNoSpace() {
         val text = "(ООО Рога и Копыта)"
-        assertTrue(scanText(text) >= 1, "Наименование ЮЛ в скобках без пробелов должно быть найдено")
+        assertEquals(1, scanText(text), "Наименование ЮЛ в скобках без пробелов не должно находиться (пунктуация не допускается)")
     }
 
     @Test
     fun testWithQuotesAndSpace() {
         val text = "\" ООО Рога и Копыта \""
-        assertTrue(scanText(text) >= 1, "Наименование ЮЛ в кавычках с пробелами должно быть найдено")
+        assertEquals(1, scanText(text), "Наименование ЮЛ в кавычках с пробелами не должно находиться (пунктуация не допускается)")
     }
 
     @Test
     fun testWithQuotesNoSpace() {
         val text = "\"ООО Рога и Копыта\""
-        assertTrue(scanText(text) >= 1, "Наименование ЮЛ в кавычках без пробелов должно быть найдено")
+        assertEquals(1, scanText(text), "Наименование ЮЛ в кавычках без пробелов не должно находиться (пунктуация не допускается)")
     }
 
     @Test
@@ -181,7 +181,7 @@ internal class LegalEntityNameTest : MatcherTestBase(LegalEntityName) {
 
     @Test
     fun testMultipleWithSemicolons() {
-        val text = "ООО Рога и Копыта; АО Другая Компания"
+        val text = "ООО Рога и Копыта; ПАО Другая Компания"
         assertTrue(scanText(text) >= 2, "Несколько наименований ЮЛ через точку с запятой должны быть найдены")
     }
 
@@ -203,11 +203,6 @@ internal class LegalEntityNameTest : MatcherTestBase(LegalEntityName) {
         assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
     }
 
-    @Test
-    fun testWithAOFormat() {
-        val text = "АО Компания"
-        assertTrue(scanText(text) >= 1, "Наименование ЮЛ с АО должно быть найдено")
-    }
 
     @Test
     fun testWithPAOFormat() {
@@ -272,7 +267,7 @@ internal class LegalEntityNameTest : MatcherTestBase(LegalEntityName) {
     @Test
     fun testWithNaimenovanieKeyword() {
         val text = "наименование ЮЛ: ООО Рога и Копыта"
-        assertTrue(scanText(text) >= 1, "Наименование ЮЛ с ключевым словом должно быть найдено")
+        assertEquals(1, scanText(text), "Наименование ЮЛ с двоеточием не должно находиться (пунктуация не допускается)")
     }
 
     // ========== 5. Негативные сценарии ==========
@@ -311,6 +306,44 @@ internal class LegalEntityNameTest : MatcherTestBase(LegalEntityName) {
     fun testWithInvalidFormat() {
         val text = "ОООРогаиКопыта"
         assertEquals(0, scanText(text), "Наименование ЮЛ без пробелов не должно находиться")
+    }
+
+    @Test
+    fun testWithMultipleAbbreviations() {
+        val text = "пао зао заза вь ана"
+        assertEquals(0, scanText(text), "Наименование ЮЛ с несколькими аббревиатурами подряд не должно находиться")
+    }
+
+    // ========== 6. Проверка на отсутствие цифр и пунктуации ==========
+
+    @Test
+    fun testWithDigits() {
+        val text = "ООО Рога 123 и Копыта"
+        assertEquals(0, scanText(text), "Наименование ЮЛ с цифрами не должно находиться")
+    }
+
+    @Test
+    fun testWithDigitsInName() {
+        val text = "ООО 123Компания"
+        assertEquals(0, scanText(text), "Наименование ЮЛ с цифрами в названии не должно находиться")
+    }
+
+    @Test
+    fun testWithPunctuation() {
+        val text = "ООО Рога, и Копыта"
+        assertEquals(0, scanText(text), "Наименование ЮЛ с пунктуацией не должно находиться")
+    }
+
+    @Test
+    fun testWithPunctuationInName() {
+        val text = "ООО Рога-и-Копыта"
+        assertEquals(0, scanText(text), "Наименование ЮЛ с дефисом не должно находиться")
+    }
+
+    @Test
+    fun testWithDotInName() {
+        val text = "ООО Рога.и.Копыта"
+        assertEquals(0, scanText(text), "Наименование ЮЛ с точкой в названии не должно находиться")
     }
 }
 

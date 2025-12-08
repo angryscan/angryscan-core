@@ -31,6 +31,14 @@ object VIN : IHyperMatcher, IKotlinMatcher {
         
         if (cleaned.contains('I') || cleaned.contains('O') || cleaned.contains('Q')) return false
         
+        // Не может состоять только из цифр, нужна минимум одна буква
+        if (cleaned.all { it.isDigit() }) return false
+        
+        // Не может быть только одна цифра, либо комбинация из 0 и 1
+        val digits = cleaned.filter { it.isDigit() }
+        if (digits.length == 1) return false
+        if (digits.isNotEmpty() && digits.all { it == '0' || it == '1' }) return false
+        
         val weights = intArrayOf(8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2)
         
         val values = mapOf(

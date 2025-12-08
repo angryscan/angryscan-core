@@ -9,8 +9,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 object PassportUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport US"
     override val javaPatterns = listOf(
-        """(?i)(?<![\p{L}\d])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?!\d)""",
-        """(?<![\p{L}\d])([A-Z][0-9]{8})(?!\d)"""
+        """(?i)(?<![\p{L}\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?![\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])""",
+        """(?<![\p{L}\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])([A-Z][0-9]{8})(?![\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,8 +18,8 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?i)(?:^|[^a-zA-Z0-9])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[^0-9]|$)""",
-        """(?i)(?:^|[^a-zA-Z0-9])([A-Z][0-9]{8})(?:[^0-9]|$)"""
+        """(?i)(?:^|[^a-zA-Z0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[^0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\]|$)""",
+        """(?i)(?:^|[^a-zA-Z0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])([A-Z][0-9]{8})(?:[^0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -28,7 +28,12 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val cleaned = value.replace(Regex("[^A-Z0-9]"), "").uppercase()
+        // Извлекаем номер паспорта из совпадения (может включать ключевые слова)
+        val numberPattern = Regex("[A-Z][0-9]{8}")
+        val match = numberPattern.find(value)
+        if (match == null) return false
+        
+        val cleaned = match.value.replace(Regex("[^A-Z0-9]"), "").uppercase()
 
         if (cleaned.length != 9) return false
 

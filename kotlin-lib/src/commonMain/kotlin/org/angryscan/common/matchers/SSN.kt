@@ -11,9 +11,9 @@ object SSN : IHyperMatcher, IKotlinMatcher {
     override val javaPatterns = listOf(
         """
         (?ix)
-        (?<![\p{L}\d])
+        (?<![\p{L}\d\-])
         ([0-9]{3}-[0-9]{2}-[0-9]{4})
-        (?![\p{L}\d])
+        (?![\p{L}\d\-])
         """.trimIndent()
     )
     override val regexOptions = setOf(
@@ -22,7 +22,7 @@ object SSN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^а-яА-Яa-zA-Z0-9])[0-9]{3}-[0-9]{2}-[0-9]{4}(?:[^а-яА-Яa-zA-Z0-9]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?:[^а-яА-Яa-zA-Z0-9\-]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -49,6 +49,8 @@ object SSN : IHyperMatcher, IKotlinMatcher {
         if (area == 0 || area == 666 || area >= 900) return false
         if (group == 0) return false
         if (serial == 0) return false
+
+        if (serial in 1900..2100) return false
 
         return true
     }

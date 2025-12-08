@@ -216,6 +216,18 @@ internal class IdentityDocTypeTest : MatcherTestBase(IdentityDocType) {
     }
 
     @Test
+    fun testZagranichnyiPasport() {
+        val text = "заграничный паспорт"
+        assertTrue(scanText(text) >= 1, "Заграничный паспорт должен быть найден")
+    }
+
+    @Test
+    fun testZagranichnyiAlone() {
+        val text = "заграничный"
+        assertEquals(0, scanText(text), "Заграничный без паспорт не должен находиться")
+    }
+
+    @Test
     fun testVidNaZhitelstvo() {
         val text = "вид на жительство"
         assertTrue(scanText(text) >= 1, "Вид на жительство должен быть найден")

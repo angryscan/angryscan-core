@@ -348,5 +348,53 @@ internal class GeoTest : MatcherTestBase(Geo) {
         val text = "55.7558; 37.6173"
         assertEquals(0, scanText(text), "Геокоординаты с неправильным разделителем не должны находиться")
     }
+
+    @Test
+    fun testCoordinatesLessThanOrEqual11() {
+        val text = "10.123, 5.456"
+        assertEquals(0, scanText(text), "Геокоординаты <= 11 градусов не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesExactly11() {
+        val text = "11.000, 11.000"
+        assertEquals(0, scanText(text), "Геокоординаты равные 11 градусам не должны находиться")
+    }
+
+    @Test
+    fun testLatitudeLessThanOrEqual11() {
+        val text = "10.123, 37.617"
+        assertEquals(0, scanText(text), "Геокоординаты с широтой <= 11 градусов не должны находиться")
+    }
+
+    @Test
+    fun testLongitudeLessThanOrEqual11() {
+        val text = "55.755, 10.123"
+        assertEquals(0, scanText(text), "Геокоординаты с долготой <= 11 градусов не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesDifferenceLessThanOrEqual1() {
+        val text = "55.755, 56.755"
+        assertEquals(0, scanText(text), "Геокоординаты с разницей <= 1 градус не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesDifferenceExactly1() {
+        val text = "55.755, 56.755"
+        assertEquals(0, scanText(text), "Геокоординаты с разницей равной 1 градусу не должны находиться")
+    }
+
+    @Test
+    fun testValidCoordinatesWithDifferenceGreaterThan1() {
+        val text = "55.755, 37.617"
+        assertTrue(scanText(text) >= 1, "Валидные геокоординаты с разницей > 1 градус должны находиться")
+    }
+
+    @Test
+    fun testValidCoordinatesGreaterThan11() {
+        val text = "55.755, 37.617"
+        assertTrue(scanText(text) >= 1, "Валидные геокоординаты > 11 градусов должны находиться")
+    }
 }
 
