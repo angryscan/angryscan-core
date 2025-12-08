@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for IPv4 addresses.
+ * Matches standard IPv4 format: XXX.XXX.XXX.XXX
+ * Validates that each octet is in range 0-255.
+ */
 @Serializable
 object IPv4 : IHyperMatcher, IKotlinMatcher {
     override val name = "IPv4"

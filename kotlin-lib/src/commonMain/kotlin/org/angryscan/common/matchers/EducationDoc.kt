@@ -5,13 +5,62 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian education documents (diplomas, certificates, attestations).
+ * Matches document numbers in formats:
+ * - 123456 1234567 (6 digits space 7 digits)
+ * - 12 АБ 1234567 (2 digits space 2 Cyrillic letters space 6-7 digits)
+ * May be preceded by keywords like "диплом", "аттестат", "свидетельство об образовании".
+ * Validates against common fake patterns (all same digits, sequential numbers, repeating patterns).
+ */
 @Serializable
 object EducationDoc : IHyperMatcher, IKotlinMatcher {
     override val name = "Education Document"
     override val javaPatterns = listOf(
-        """\b\d{6}\s+\d{7}\b""",
-        """\b\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7}\b""",
-        """\b[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6}\b"""
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        (?:
+          диплом|
+          аттестат|
+          свидетельство\s+об\s+образовании|
+          сертификат|
+          удостоверение|
+          документ\s+об\s+образовании|
+          образовательный\s+документ|
+          номер\s+диплома|
+          серия\s+и\s+номер\s+диплома|
+          номер\s+аттестата|
+          серия\s+и\s+номер\s+аттестата|
+          номер\s+свидетельства|
+          серия\s+и\s+номер\s+свидетельства
+        )
+        \s*[:\-]?\s*
+        (\d{6}\s+\d{7})
+        (?![\p{L}\d])
+        """.trimIndent(),
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        (?:
+          диплом|
+          аттестат|
+          свидетельство\s+об\s+образовании|
+          сертификат|
+          удостоверение|
+          документ\s+об\s+образовании|
+          образовательный\s+документ|
+          номер\s+диплома|
+          серия\s+и\s+номер\s+диплома|
+          номер\s+аттестата|
+          серия\s+и\s+номер\s+аттестата|
+          номер\s+свидетельства|
+          серия\s+и\s+номер\s+свидетельства
+        )
+        \s*[:\-]?\s*
+        (\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7})
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -19,9 +68,8 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b\d{6}\s+\d{7}\b""",
-        """\b\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7}\b""",
-        """\b[IVX]{1,4}\s*[-–]?\s*[А-ЯЁ]{2}\s*\d{6}\b"""
+        """(?:^|[^\w])(?:диплом|аттестат|свидетельство\s+об\s+образовании|сертификат|удостоверение|документ\s+об\s+образовании|образовательный\s+документ|номер\s+диплома|серия\s+и\s+номер\s+диплома|номер\s+аттестата|серия\s+и\s+номер\s+аттестата|номер\s+свидетельства|серия\s+и\s+номер\s+свидетельства)\s*[:\-]?\s*\d{6}\s+\d{7}(?:[^\w]|$)""",
+        """(?:^|[^\w])(?:диплом|аттестат|свидетельство\s+об\s+образовании|сертификат|удостоверение|документ\s+об\s+образовании|образовательный\s+документ|номер\s+диплома|серия\s+и\s+номер\s+диплома|номер\s+аттестата|серия\s+и\s+номер\s+аттестата|номер\s+свидетельства|серия\s+и\s+номер\s+свидетельства)\s*[:\-]?\s*\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7}(?:[^\w]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -29,7 +77,57 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean = true
+    private fun isSequential(digits: String, ascending: Boolean): Boolean {
+        for (i in 1 until digits.length) {
+            val current = digits[i].digitToInt()
+            val previous = digits[i - 1].digitToInt()
+            if (ascending) {
+                if (current != previous + 1) return false
+            } else {
+                if (current != previous - 1) return false
+            }
+        }
+        return true
+    }
+
+    private fun isRepeatingPattern(digits: String, patternLength: Int): Boolean {
+        if (digits.length % patternLength != 0) return false
+        val pattern = digits.substring(0, patternLength)
+        for (i in patternLength until digits.length step patternLength) {
+            if (digits.substring(i, i + patternLength) != pattern) return false
+        }
+        return true
+    }
+
+    override fun check(value: String): Boolean {
+        val digits = value.replace(Regex("[^0-9]"), "")
+        
+        if (digits.isEmpty()) return false
+        
+        val zeroCount = digits.count { it == '0' }
+        if (zeroCount > digits.length / 2) return false
+        
+        if (digits.all { it == digits[0] }) return false
+        
+        if (digits.all { it == '0' || it == '1' }) return false
+
+        if (isSequential(digits, true) || isSequential(digits, false)) return false
+
+        if (isRepeatingPattern(digits, 2) || isRepeatingPattern(digits, 3) || isRepeatingPattern(digits, 5)) return false
+
+        val parts = value.split(Regex("\\s+")).filter { it.isNotBlank() }
+        for (part in parts) {
+            val partDigits = part.replace(Regex("[^0-9]"), "")
+            if (partDigits.length >= 6 && partDigits.all { it == partDigits[0] }) return false
+        }
+
+        if (digits == digits.reversed()) return false
+
+        val digitCounts = digits.groupingBy { it }.eachCount()
+        if (digitCounts.values.any { it > digits.length * 0.7 }) return false
+
+        return true
+    }
 
     override fun toString() = name
 }

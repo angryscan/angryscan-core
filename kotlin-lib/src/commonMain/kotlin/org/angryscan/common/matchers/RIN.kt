@@ -5,12 +5,18 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Chinese Resident Identity Number (RIN).
+ * Matches 18-character ID numbers: 17 digits followed by 1 digit or X (checksum).
+ * Validates date of birth (positions 6-13: YYYYMMDD), checksum using weighted algorithm.
+ * May be preceded by keywords like "китайский идентификационный номер", "Chinese ID", "TIN China".
+ */
 @Serializable
 object RIN : IHyperMatcher, IKotlinMatcher {
     override val name = "RIN"
     override val javaPatterns = listOf(
-        """(?ix)(?<![\p{L}\d])(?:китайский\s+идентификационный\s+номер|Chinese\s+ID|TIN\s+China)\s*[:\-]?\s*([0-9]{17}[0-9X])(?![\p{L}\d])""",
-        """(?ix)(?<![\p{L}\d])([0-9]{17}[0-9X])(?![\p{L}\d])"""
+        """(?ix)(?:^|[\s.,\-:;"()'\/\\*])(?:китайский\s+идентификационный\s+номер|Chinese\s+ID|TIN\s+China)\s*[:\-]?\s*[0-9]{17}[0-9X](?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)(?![0-9])""",
+        """(?:^|[\s.,\-:;"()'\/\\*])[0-9]{17}[0-9X](?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)(?![0-9])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,7 +24,8 @@ object RIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?i)(?:^|[\s\r\n])[0-9]{17}[0-9X](?:[\s\r\n]|$)"""
+        """(?i)(?:^|[\s.,\-:;"()'\/\\*])(?:китайский\s+идентификационный\s+номер|Chinese\s+ID|TIN\s+China)\s*[:\-]?\s*[0-9]{17}[0-9X](?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)""",
+        """(?:^|[\s.,\-:;"()'\/\\*])[0-9]{17}[0-9X](?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?*\/\-<>]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -27,7 +34,7 @@ object RIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val cleaned = value.replace(Regex("[-\\s]"), "").uppercase()
+        val cleaned = value.replace(Regex("[^0-9Xx]"), "").uppercase()
 
         if (cleaned.length == 18) {
             return validateChineseId(cleaned)

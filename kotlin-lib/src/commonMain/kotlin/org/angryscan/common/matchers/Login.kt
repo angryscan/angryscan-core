@@ -5,11 +5,17 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for login usernames.
+ * Matches usernames preceded by keywords "логин" or "login" followed by colon or space.
+ * Format: login: username or логин: username
+ * Username must be 3-25 characters (letters, digits, underscore, hyphen).
+ */
 @Serializable
 object Login : IHyperMatcher, IKotlinMatcher {
     override val name = "Login"
     override val javaPatterns = listOf(
-        """(логин|login):?\s*[a-z0-9_-]{3,25}(?=$|[\s.,;()<"!?])(?![\w@]|\s\d)"""
+        """(логин|login):?\s+[a-z0-9_-]{3,25}(?:\s|$|[<"])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +23,7 @@ object Login : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(логин|login):?\s*([a-z0-9_-]{3,25})($|[ \t\r.,;()<"])"""
+        """(логин|login):?\s+[a-z0-9_-]{3,25}(?:\s|$|[<"])"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.CASELESS,

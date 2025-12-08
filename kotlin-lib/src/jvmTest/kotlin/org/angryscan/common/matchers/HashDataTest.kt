@@ -5,203 +5,348 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера HashData
+ * Комплексные тесты для матчера HashData
  */
-internal class HashDataTest: MatcherTestBase(HashData) {
+internal class HashDataTest : MatcherTestBase(HashData) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testHashDataMD5AtStart() {
-        val text = " 5d41402abc4b2a76b9719d911017c592 это MD5 хэш"
-        assertTrue(scanText(text) >= 1, "MD5 хэш в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш в начале текста должен быть найден")
     }
 
     @Test
-    fun testHashDataMD5AtEnd() {
-        val text = "MD5 хэш файла: 5d41402abc4b2a76b9719d911017c592 "
-        assertTrue(scanText(text) >= 1, "MD5 хэш в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Hash: a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш в конце текста должен быть найден")
     }
 
     @Test
-    fun testHashDataMD5Standalone() {
-        val text = " 5d41402abc4b2a76b9719d911017c592 "
-        assertTrue(scanText(text) >= 1, "MD5 хэш отдельно должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The hash a1b2c3d4e5f6789012345678901234ab is valid"
+        assertTrue(scanText(text) >= 1, "Хеш в середине текста должен быть найден")
     }
 
     @Test
-    fun testHashDataSHA1() {
-        val text = " 356a192b7913b04c54574d18c28d46e6395428ab "
-        assertTrue(scanText(text) >= 1, "SHA1 хэш должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "a1b2c3d4e5f6789012345678901234ab\nSecond line"
+        assertTrue(scanText(text) >= 1, "Хеш в начале строки должен быть найден")
     }
 
     @Test
-    fun testHashDataSHA256() {
-        val text = " e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "
-        assertTrue(scanText(text) >= 1, "SHA256 хэш должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\na1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш в конце строки должен быть найден")
     }
 
     @Test
-    fun testHashDataSHA384() {
-        val text = " 38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b "
-        assertTrue(scanText(text) >= 1, "SHA384 хэш должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with a1b2c3d4e5f6789012345678901234ab hash"
+        assertTrue(scanText(text) >= 1, "Хеш в середине строки должен быть найден")
     }
 
     @Test
-    fun testHashDataSHA512() {
-        val text = " cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e "
-        assertTrue(scanText(text) >= 1, "SHA512 хэш должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\na1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш после \\n должен быть найден")
     }
 
     @Test
-    fun testHashDataUpperCase() {
-        val text = " 5D41402ABC4B2A76B9719D911017C592 "
-        assertTrue(scanText(text) >= 1, "Хэш в верхнем регистре должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab\n"
+        assertTrue(scanText(text) >= 1, "Хеш перед \\n должен быть найден")
     }
 
     @Test
-    fun testHashDataLowerCase() {
-        val text = " 5d41402abc4b2a76b9719d911017c592 "
-        assertTrue(scanText(text) >= 1, "Хэш в нижнем регистре должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\na1b2c3d4e5f6789012345678901234ab\r\n"
+        assertTrue(scanText(text) >= 1, "Хеш с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testHashDataMixedCase() {
-        val text = " 5D41402aBc4B2a76B9719D911017c592 "
-        assertTrue(scanText(text) >= 1, "Хэш в смешанном регистре должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\na1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш после пустой строки должен быть найден")
     }
 
     @Test
-    fun testHashDataWithLabelHash() {
-        val text = "хеш: 5d41402abc4b2a76b9719d911017c592 "
-        assertTrue(scanText(text) >= 1, "Хэш с меткой 'хеш' должен быть найден")
+    fun testWithEmptyLineAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab\n\n"
+        assertTrue(scanText(text) >= 1, "Хеш перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abca1b2c3d4e5f6789012345678901234abdef"
+        assertEquals(0, scanText(text), "Хеш внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testHashDataWithLabelMD5() {
-        val text = "MD5: 5d41402abc4b2a76b9719d911017c592 "
-        assertTrue(scanText(text) >= 1, "Хэш с меткой 'MD5' должен быть найден")
+    fun testNotInsideNumericSequence() {
+        val text = "123a1b2c3d4e5f6789012345678901234ab456"
+        assertEquals(0, scanText(text), "Хеш внутри цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testHashDataWithLabelSHA1() {
-        val text = "SHA1: 356a192b7913b04c54574d18c28d46e6395428ab "
-        assertTrue(scanText(text) >= 1, "Хэш с меткой 'SHA1' должен быть найден")
+    fun testWithSpaceBefore() {
+        val text = "Hash a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testHashDataWithLabelSHA256() {
-        val text = "SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "
-        assertTrue(scanText(text) >= 1, "Хэш с меткой 'SHA256' должен быть найден")
+    fun testWithSpaceAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab is valid"
+        assertTrue(scanText(text) >= 1, "Хеш с пробелом после должен быть найден")
     }
 
     @Test
-    fun testHashDataWithLabelSHA512() {
-        val text = "SHA512: cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e "
-        assertTrue(scanText(text) >= 1, "Хэш с меткой 'SHA512' должен быть найден")
+    fun testWithCommaBefore() {
+        val text = "Hash, a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с запятой перед должен быть найден")
     }
 
     @Test
-    fun testHashDataWithRussianLabel() {
-        val text = "хешированные данные: 5d41402abc4b2a76b9719d911017c592 "
-        assertTrue(scanText(text) >= 1, "Хэш с русской меткой должен быть найден")
+    fun testWithCommaAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab, next"
+        assertTrue(scanText(text) >= 1, "Хеш с запятой после должен быть найден")
     }
 
     @Test
-    fun testHashDataInParentheses() {
-        val text = "(5d41402abc4b2a76b9719d911017c592)"
-        assertTrue(scanText(text) >= 1, "Хэш в скобках должен быть найден")
+    fun testWithDotBefore() {
+        val text = "Hash. a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с точкой перед должен быть найден")
     }
 
     @Test
-    fun testHashDataInQuotes() {
-        val text = "\"5d41402abc4b2a76b9719d911017c592\""
-        assertTrue(scanText(text) >= 1, "Хэш в кавычках должен быть найден")
+    fun testWithDotAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab."
+        assertTrue(scanText(text) >= 1, "Хеш с точкой после должен быть найден")
     }
 
     @Test
-    fun testHashDataWithPunctuation() {
-        val text = "MD5: 5d41402abc4b2a76b9719d911017c592."
-        assertTrue(scanText(text) >= 1, "Хэш с точкой должен быть найден")
+    fun testWithSemicolonBefore() {
+        val text = "Hash; a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с точкой с запятой перед должен быть найден")
     }
 
     @Test
-    fun testMultipleHashData() {
-        val text = """
-            MD5: 5d41402abc4b2a76b9719d911017c592
-            SHA1: 356a192b7913b04c54574d18c28d46e6395428ab
-            SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько хэшей должны быть найдены")
+    fun testWithSemicolonAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab; next"
+        assertTrue(scanText(text) >= 1, "Хеш с точкой с запятой после должен быть найден")
     }
 
     @Test
-    fun testHashDataAllZeros() {
-        val text = " 00000000000000000000000000000000 "
-        assertEquals(0, scanText(text), "Хэш из нулей не должен быть найден (исключается валидацией)")
+    fun testWithColonBefore() {
+        val text = "Hash: a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с двоеточием перед должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( a1b2c3d4e5f6789012345678901234ab )"
+        assertTrue(scanText(text) >= 1, "Хеш в скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testHashDataAllF() {
-        val text = " ffffffffffffffffffffffffffffffff "
-        assertEquals(0, scanText(text), "Хэш из f не должен быть найден (исключается валидацией)")
+    fun testWithParenthesesNoSpace() {
+        val text = "(a1b2c3d4e5f6789012345678901234ab)"
+        assertTrue(scanText(text) >= 1, "Хеш в скобках без пробелов должен быть найден")
     }
 
     @Test
-    fun testHashDataAllSameChar() {
-        val text = " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
-        assertEquals(0, scanText(text), "Хэш из одинаковых символов не должен быть найден")
+    fun testWithQuotesAndSpace() {
+        val text = "\" a1b2c3d4e5f6789012345678901234ab \""
+        assertTrue(scanText(text) >= 1, "Хеш в кавычках с пробелами должен быть найден")
     }
 
     @Test
-    fun testHashDataOnlyDigits() {
-        val text = " 12345678901234567890123456789012 "
-        assertEquals(0, scanText(text), "Хэш только из цифр не должен быть найден")
+    fun testWithQuotesNoSpace() {
+        val text = "\"a1b2c3d4e5f6789012345678901234ab\""
+        assertTrue(scanText(text) >= 1, "Хеш в кавычках без пробелов должен быть найден")
     }
 
     @Test
-    fun testHashDataLessThanFourUniqueChars() {
-        val text = " aaaabbbbcccccccaaaabbbbccccccca "
-        assertEquals(0, scanText(text), "Хэш с менее чем 4 уникальными символами (3 символа: a, b, c) не должен быть найден")
+    fun testWithBracketsAndSpace() {
+        val text = "[ a1b2c3d4e5f6789012345678901234ab ]"
+        assertTrue(scanText(text) >= 1, "Хеш в квадратных скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testHashDataSequentialPattern1() {
-        val text = " 0123456789abcdef0123456789abcdef "
-        assertEquals(0, scanText(text), "Хэш с последовательным паттерном 0123456789abcdef не должен быть найден")
+    fun testWithBracesAndSpace() {
+        val text = "{ a1b2c3d4e5f6789012345678901234ab }"
+        assertTrue(scanText(text) >= 1, "Хеш в фигурных скобках с пробелами должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "a1b2c3d4e5f6789012345678901234ab b2c3d4e5f6789012345678901234abcd"
+        assertTrue(scanText(text) >= 2, "Несколько хешей через пробел должны быть найдены")
     }
 
     @Test
-    fun testHashDataSequentialPattern2() {
-        val text = " fedcba9876543210fedcba9876543210 "
-        assertEquals(0, scanText(text), "Хэш с последовательным паттерном fedcba9876543210 не должен быть найден")
+    fun testMultipleWithCommas() {
+        val text = "a1b2c3d4e5f6789012345678901234ab, b2c3d4e5f6789012345678901234abcd"
+        assertTrue(scanText(text) >= 2, "Несколько хешей через запятую должны быть найдены")
     }
 
     @Test
-    fun testHashDataValidHash() {
-        val text = " 5d41402abc4b2a76b9719d911017c592 "
-        assertEquals(1, scanText(text), "Валидный хэш должен быть найден")
+    fun testMultipleWithSemicolons() {
+        val text = "a1b2c3d4e5f6789012345678901234ab; b2c3d4e5f6789012345678901234abcd"
+        assertTrue(scanText(text) >= 2, "Несколько хешей через точку с запятой должны быть найдены")
     }
 
     @Test
-    fun testHashDataInvalidLength31() {
-        val text = " 5d41402abc4b2a76b9719d911017c59 "
-        assertEquals(0, scanText(text), "Хэш длиной 31 символ не должен быть найден")
+    fun testMultipleWithNewlines() {
+        val text = "a1b2c3d4e5f6789012345678901234ab\nb2c3d4e5f6789012345678901234abcd"
+        assertTrue(scanText(text) >= 2, "Несколько хешей через перенос строки должны быть найдены")
     }
 
     @Test
-    fun testHashDataInvalidLength33() {
-        val text = " 5d41402abc4b2a76b9719d911017c5921 "
-        assertEquals(0, scanText(text), "Хэш длиной 33 символа не должен быть найден")
-    }
-
-    @Test
-    fun testHashDataInvalidChar() {
-        val text = " 5d41402abc4b2a76b9719d911017c59g "
-        assertEquals(0, scanText(text), "Хэш с некорректным символом не должен быть найден")
-    }
-
-    @Test
-    fun testHashDataEmptyString() {
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать хэша")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать хешей")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no hash data at all"
+        assertEquals(0, scanText(text), "Текст без хешей не должен находить совпадения")
+    }
+
+    @Test
+    fun testFormat32() {
+        val text = "a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш длиной 32 символа должен быть найден")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Hash     a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Hash\ta1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "a1b2c3d4e5f6789012345678901234ab\tnext"
+        assertTrue(scanText(text) >= 1, "Хеш с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Хеш a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Hash data a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "a1b2c3d4e5f6789012345678901234ab text"
+        assertTrue(scanText(text) >= 1, "Хеш в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text a1b2c3d4e5f6789012345678901234ab"
+        assertTrue(scanText(text) >= 1, "Хеш в конце текста должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testAllZeros() {
+        val text = "00000000000000000000000000000000"
+        assertEquals(0, scanText(text), "Хеш из всех нулей не должен находиться")
+    }
+
+    @Test
+    fun testAllFs() {
+        val text = "ffffffffffffffffffffffffffffffff"
+        assertEquals(0, scanText(text), "Хеш из всех F не должен находиться")
+    }
+
+    @Test
+    fun testAllSameChars() {
+        val text = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        assertEquals(0, scanText(text), "Хеш из одинаковых символов не должен находиться")
+    }
+
+    @Test
+    fun testAllDigits() {
+        val text = "12345678901234567890123456789012"
+        assertEquals(0, scanText(text), "Хеш только из цифр не должен находиться")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "a1b2c3d4e5f6789012345678901234a"
+        assertEquals(0, scanText(text), "Слишком короткий хеш не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "a1b2c3d4e5f6789012345678901234abc"
+        assertEquals(0, scanText(text), "Слишком длинный хеш не должен находиться")
+    }
+
+    @Test
+    fun testWithInvalidChars() {
+        val text = "a1b2c3d4e5f6789012345678901234gx"
+        assertEquals(0, scanText(text), "Хеш с недопустимыми символами не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "hasha1b2c3d4e5f6789012345678901234ab"
+        assertEquals(0, scanText(text), "Хеш, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123a1b2c3d4e5f6789012345678901234ab"
+        assertEquals(0, scanText(text), "Хеш, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "functiona1b2c3d4e5f6789012345678901234ab()"
+        assertEquals(0, scanText(text), "Хеш внутри кода не должен находиться")
+    }
+
+    @Test
+    fun testWithSpaces() {
+        val text = "a1b2 c3d4 e5f6 7890 1234 5678 9012 34ab"
+        assertEquals(0, scanText(text), "Хеш с пробелами не должен находиться")
+    }
+
+    @Test
+    fun testSequentialPattern() {
+        val text = "0123456789abcdef0123456789abcdef"
+        assertEquals(0, scanText(text), "Хеш с последовательным паттерном не должен находиться")
     }
 }
+

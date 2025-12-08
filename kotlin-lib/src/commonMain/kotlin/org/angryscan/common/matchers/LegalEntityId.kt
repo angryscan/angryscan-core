@@ -5,11 +5,18 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for legal entity identifiers (LEI - Legal Entity Identifier).
+ * Matches LEI codes in formats:
+ * - 20 characters: XXXX00XXXXXXXXXXXXXX (with checksum validation)
+ * - 8 or 11 characters: XXXX followed by country code
+ * Validates checksum using MOD 97 algorithm for 20-character codes.
+ */
 @Serializable
 object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     override val name = "Legal Entity ID"
     override val javaPatterns = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?:^|[^a-zA-Z0-9])[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:[^a-zA-Z0-9]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +24,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """(?:^|[^a-zA-Z0-9])[A-Z0-9]{4}0{2}[A-Z0-9]{12}[0-9]{2}(?:[^a-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -33,7 +40,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
 
         if (s.any { it.isLetter() && it.isLowerCase() }) return false
 
-        val cleanValue = s.replace(" ", "")
+        val cleanValue = s.replace(Regex("\\s"), "")
         
         if (cleanValue.length == 20) {
             val body = cleanValue.substring(0, 18)

@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian state registration contract numbers (государственная регистрация договора).
+ * Matches contract numbers in format: XX:XX:XX / XXX-XXXX / XXXX:XXX
+ * Used for real estate contracts registered in Rosreestr.
+ * May be preceded by keywords like "номер государственной регистрации договора", "номер регистрации договора в Росреестре".
+ */
 @Serializable
 object StateRegContract : IHyperMatcher, IKotlinMatcher {
     override val name = "State Registration Contract"

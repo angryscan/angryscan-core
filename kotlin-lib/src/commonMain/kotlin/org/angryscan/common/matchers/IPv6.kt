@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for IPv6 addresses.
+ * Matches standard IPv6 format: XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX
+ * Each segment is 4 hexadecimal digits.
+ */
 @Serializable
 object IPv6 : IHyperMatcher, IKotlinMatcher {
     override val name = "IPv6"

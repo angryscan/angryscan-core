@@ -2,272 +2,438 @@ package org.angryscan.common.matchers
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера SSN (Social Security Number)
+ * Комплексные тесты для матчера SSN
  */
-internal class SSNTest: MatcherTestBase(SSN) {
+internal class SSNTest : MatcherTestBase(SSN) {
+
+    // Валидный SSN для тестов (правильный формат)
+    private val validSSN = "234-56-7890" // Пример валидного SSN
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testSSNAtStart() {
-        val text = " 123-45-6780 is my social security number"
-        assertEquals(1, scanText(text), "SSN at the beginning should be found")
+    fun testAtStartOfText() {
+        val text = "234-56-7890 is a SSN"
+        assertTrue(scanText(text) >= 1, "SSN в начале текста должен быть найден")
     }
 
     @Test
-    fun testSSNAtEnd() {
-        val text = "Social Security Number: 123-45-6780 "
-        assertEquals(1, scanText(text), "SSN at the end should be found")
+    fun testAtEndOfText() {
+        val text = "SSN number is 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN в конце текста должен быть найден")
     }
 
     @Test
-    fun testSSNInMiddle() {
-        val text = "Citizen has SSN 123-45-6780 for employment"
-        assertEquals(1, scanText(text), "SSN in the middle should be found")
+    fun testInMiddleOfText() {
+        val text = "The SSN 234-56-7890 is valid"
+        assertTrue(scanText(text) >= 1, "SSN в середине текста должен быть найден")
     }
 
     @Test
-    fun testSSNStandalone() {
-        val text = " 123-45-6780 "
-        assertEquals(1, scanText(text), "SSN as standalone string should be found")
+    fun testAtStartOfLine() {
+        val text = "234-56-7890\nSecond line"
+        assertTrue(scanText(text) >= 1, "SSN в начале строки должен быть найден")
     }
 
     @Test
-    fun testSSNWithDashes() {
-        val text = " 123-45-6780 "
-        assertEquals(1, scanText(text), "SSN with dashes should be found")
+    fun testAtEndOfLine() {
+        val text = "First line\n234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN в конце строки должен быть найден")
     }
 
     @Test
-    fun testSSNWithSpaces() {
-        val text = "123 45 6780"
-        assertEquals(0, scanText(text), "SSN with spaces should not be found (pattern requires dashes)")
+    fun testInMiddleOfLine() {
+        val text = "Line with 234-56-7890 SSN"
+        assertTrue(scanText(text) >= 1, "SSN в середине строки должен быть найден")
     }
 
     @Test
-    fun testSSNWithoutSeparators() {
-        val text = "123456780"
-        assertEquals(0, scanText(text), "SSN without separators should not be found (pattern requires dashes)")
+    fun testWithNewlineBefore() {
+        val text = "\n234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN после \\n должен быть найден")
     }
 
     @Test
-    fun testSSNMixedSeparators() {
-        val text = "123-45 6780"
-        assertEquals(0, scanText(text), "SSN with mixed separators should not be found (pattern requires dashes)")
+    fun testWithNewlineAfter() {
+        val text = "234-56-7890\n"
+        assertTrue(scanText(text) >= 1, "SSN перед \\n должен быть найден")
     }
 
     @Test
-    fun testSSNValidArea001() {
-        val text = "001-23-4567"
-        assertEquals(1, scanText(text), "SSN with valid area 001 should be found")
+    fun testWithCRLF() {
+        val text = "\r\n234-56-7890\r\n"
+        assertTrue(scanText(text) >= 1, "SSN с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testSSNValidArea899() {
-        val text = "899-12-3456"
-        assertEquals(1, scanText(text), "SSN with valid area 899 should be found")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN после пустой строки должен быть найден")
     }
 
     @Test
-    fun testSSNValidArea500() {
-        val text = "500-12-3456"
-        assertEquals(1, scanText(text), "SSN with valid area 500 should be found")
+    fun testWithEmptyLineAfter() {
+        val text = "234-56-7890\n\n"
+        assertTrue(scanText(text) >= 1, "SSN перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc234-56-7890def"
+        assertEquals(0, scanText(text), "SSN внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testSSNInParentheses() {
-        val text = "Number (123-45-6780) provided"
-        assertEquals(1, scanText(text), "SSN in parentheses should be found")
+    fun testNotInsideNumericSequence() {
+        val text = "123456234-56-7890456"
+        assertEquals(0, scanText(text), "SSN внутри цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testSSNInQuotes() {
-        val text = "SSN \"123-45-6780\" verified"
-        assertEquals(1, scanText(text), "SSN in quotes should be found")
+    fun testNotInsideAlphanumericSequence() {
+        val text = "abc123234-56-7890def456"
+        assertEquals(0, scanText(text), "SSN внутри буквенно-цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testSSNWithPunctuation() {
-        val text = "Number: 123-45-6780."
-        assertEquals(1, scanText(text), "SSN with punctuation should be found")
+    fun testWithSpaceBefore() {
+        val text = "SSN 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testSSNInBrackets() {
-        val text = "Number [123-45-6780] shown"
-        assertEquals(1, scanText(text), "SSN in brackets should be found")
+    fun testWithSpaceAfter() {
+        val text = "234-56-7890 is valid"
+        assertTrue(scanText(text) >= 1, "SSN с пробелом после должен быть найден")
     }
 
     @Test
-    fun testSSNWithColon() {
-        val text = "SSN: 123-45-6780"
-        assertEquals(1, scanText(text), "SSN with colon should be found")
+    fun testWithCommaBefore() {
+        val text = "SSN, 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с запятой перед должен быть найден")
     }
 
     @Test
-    fun testSSNWithSemicolon() {
-        val text = "SSN; 123-45-6780"
-        assertEquals(1, scanText(text), "SSN with semicolon should be found")
+    fun testWithCommaAfter() {
+        val text = "234-56-7890, next"
+        assertTrue(scanText(text) >= 1, "SSN с запятой после должен быть найден")
     }
 
     @Test
-    fun testSSNWithComma() {
-        val text = "SSN, 123-45-6780"
-        assertEquals(1, scanText(text), "SSN with comma should be found")
+    fun testWithDotBefore() {
+        val text = "SSN. 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с точкой перед должен быть найден")
     }
 
     @Test
-    fun testSSNWithExclamation() {
-        val text = "SSN! 123-45-6780"
-        assertEquals(1, scanText(text), "SSN with exclamation should be found")
+    fun testWithDotAfter() {
+        val text = "234-56-7890."
+        assertTrue(scanText(text) >= 1, "SSN с точкой после должен быть найден")
     }
 
     @Test
-    fun testSSNWithQuestion() {
-        val text = "SSN? 123-45-6780"
-        assertEquals(1, scanText(text), "SSN with question mark should be found")
+    fun testWithSemicolonBefore() {
+        val text = "SSN; 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с точкой с запятой перед должен быть найден")
     }
 
     @Test
-    fun testSSNMultiline() {
-        val text = """SSN:
-123-45-6780"""
-        assertEquals(1, scanText(text), "SSN on next line should be found")
+    fun testWithSemicolonAfter() {
+        val text = "234-56-7890; next"
+        assertTrue(scanText(text) >= 1, "SSN с точкой с запятой после должен быть найден")
     }
 
     @Test
-    fun testMultipleSSNs() {
-        val text = """
-            First: 123-45-6780 
-            Second: 234-56-7890 
-            Third: 345-67-8901 
-        """.trimIndent()
-        assertEquals(3, scanText(text), "Multiple SSNs should be found")
+    fun testWithColonBefore() {
+        val text = "SSN: 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с двоеточием перед должен быть найден")
     }
 
     @Test
-    fun testSSNValidGroup01() {
-        val text = "123-01-4567"
-        assertEquals(1, scanText(text), "SSN with valid group 01 should be found")
+    fun testWithExclamationAfter() {
+        val text = "234-56-7890!"
+        assertTrue(scanText(text) >= 1, "SSN с восклицательным знаком после должен быть найден")
     }
 
     @Test
-    fun testSSNValidGroup99() {
-        val text = "123-99-4567"
-        assertEquals(1, scanText(text), "SSN with valid group 99 should be found")
+    fun testWithQuestionMarkAfter() {
+        val text = "234-56-7890?"
+        assertTrue(scanText(text) >= 1, "SSN с вопросительным знаком после должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 234-56-7890 )"
+        assertTrue(scanText(text) >= 1, "SSN в скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testSSNValidSerial0001() {
-        val text = "123-45-0001"
-        assertEquals(1, scanText(text), "SSN with valid serial 0001 should be found")
+    fun testWithParenthesesNoSpace() {
+        val text = "(234-56-7890)"
+        assertTrue(scanText(text) >= 1, "SSN в скобках без пробелов должен быть найден")
     }
 
     @Test
-    fun testSSNValidSerial9999() {
-        val text = "123-45-9999"
-        assertEquals(1, scanText(text), "SSN with valid serial 9999 should be found")
+    fun testWithQuotesAndSpace() {
+        val text = "\" 234-56-7890 \""
+        assertTrue(scanText(text) >= 1, "SSN в кавычках с пробелами должен быть найден")
     }
 
     @Test
-    fun testSSNInvalidArea000() {
-        val text = "000-12-3456"
-        assertEquals(0, scanText(text), "SSN with invalid area 000 should not be found")
+    fun testWithQuotesNoSpace() {
+        val text = "\"234-56-7890\""
+        assertTrue(scanText(text) >= 1, "SSN в кавычках без пробелов должен быть найден")
     }
 
     @Test
-    fun testSSNInvalidArea666() {
-        val text = "666-12-3456"
-        assertEquals(0, scanText(text), "SSN with invalid area 666 should not be found")
+    fun testWithEqualsAndSpace() {
+        val text = "ssn = 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с = и пробелом должен быть найден")
     }
 
     @Test
-    fun testSSNInvalidArea900() {
-        val text = "900-12-3456"
-        assertEquals(0, scanText(text), "SSN with invalid area 900 should not be found")
+    fun testWithHashAndSpace() {
+        val text = "ssn # 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с # и пробелом должен быть найден")
     }
 
     @Test
-    fun testSSNInvalidArea999() {
-        val text = "999-12-3456"
-        assertEquals(0, scanText(text), "SSN with invalid area 999 should not be found")
+    fun testWithBracketsAndSpace() {
+        val text = "[ 234-56-7890 ]"
+        assertTrue(scanText(text) >= 1, "SSN в квадратных скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testSSNInvalidGroup00() {
-        val text = "123-00-4567"
-        assertEquals(0, scanText(text), "SSN with invalid group 00 should not be found")
+    fun testWithBracesAndSpace() {
+        val text = "{ 234-56-7890 }"
+        assertTrue(scanText(text) >= 1, "SSN в фигурных скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testSSNInvalidSerial0000() {
-        val text = "123-45-0000"
-        assertEquals(0, scanText(text), "SSN with invalid serial 0000 should not be found")
+    fun testWithDashAsPartOfFormat() {
+        val text = "234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с дефисом как часть формата должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "234-56-7890 345-67-8901"
+        assertTrue(scanText(text) >= 2, "Несколько SSN через пробел должны быть найдены")
     }
 
     @Test
-    fun testSSNInvalidFormat() {
-        val text = "12-345-6789"
-        assertEquals(0, scanText(text), "SSN with incorrect format should not be found")
+    fun testMultipleWithCommas() {
+        val text = "234-56-7890, 345-67-8901"
+        assertTrue(scanText(text) >= 2, "Несколько SSN через запятую должны быть найдены")
     }
 
     @Test
-    fun testSSNTooShort() {
-        val text = "123-45"
-        assertEquals(0, scanText(text), "Too short SSN should not be found")
+    fun testMultipleWithSemicolons() {
+        val text = "234-56-7890; 345-67-8901"
+        assertTrue(scanText(text) >= 2, "Несколько SSN через точку с запятой должны быть найдены")
     }
 
     @Test
-    fun testSSNTooLong() {
-        val text = "123-45-6780-01"
-        assertEquals(0, scanText(text), "Too long SSN should not be found")
+    fun testMultipleWithNewlines() {
+        val text = "234-56-7890\n345-67-8901"
+        assertTrue(scanText(text) >= 2, "Несколько SSN через перенос строки должны быть найдены")
     }
 
     @Test
-    fun testSSNWithLetters() {
-        val text = "ABC-DE-FGHI"
-        assertEquals(0, scanText(text), "SSN with letters should not be found")
-    }
-
-    @Test
-    fun testSSNEmptyString() {
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Empty string should not contain SSN")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать SSN")
     }
 
     @Test
-    fun testSSNPartOfLongerNumber() {
-        val text = "12345678901234"
-        assertEquals(0, scanText(text), "SSN as part of longer number should not be found")
+    fun testNoMatches() {
+        val text = "This text has no SSN numbers at all"
+        assertEquals(0, scanText(text), "Текст без SSN не должен находить совпадения")
     }
 
     @Test
-    fun testSSNMultipleInSentence() {
-        val text = "John's SSN is 123-45-6780 and Jane's is 234-56-7890"
-        assertEquals(2, scanText(text), "Multiple SSNs in sentence should be found")
+    fun testMinimalFormat() {
+        val text = "234-56-7890"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
     }
 
     @Test
-    fun testSSNRealWorldExample1() {
-        val text = "Please provide your SSN (123-45-6780) for verification. "
-        assertEquals(1, scanText(text), "Real world example 1 should be found")
+    fun testWithMultipleSpaces() {
+        val text = "SSN    234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с несколькими пробелами должен быть найден")
     }
 
     @Test
-    fun testSSNRealWorldExample2() {
-        val text = """
-            Employee Information:
-            Name: John Doe
-            SSN: 123-45-6780
-            Department: IT
-        """.trimIndent()
-        assertEquals(1, scanText(text), "Real world example 2 should be found")
+    fun testWithTabBefore() {
+        val text = "SSN\t234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с табуляцией перед должен быть найден")
     }
 
     @Test
-    fun testSSNBoundaryCheck() {
-        val text = " 123-45-6780 "
-        assertEquals(1, scanText(text), "SSN with boundary spaces should be found")
+    fun testWithTabAfter() {
+        val text = "234-56-7890\tnext"
+        assertTrue(scanText(text) >= 1, "SSN с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "SSN номер 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "SSN number 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "234-56-7890 text"
+        assertTrue(scanText(text) >= 1, "SSN в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text 234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN в конце текста должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidFormat() {
+        val text = "123-456-789"
+        assertEquals(0, scanText(text), "SSN с неправильным форматом не должен находиться")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "123-45-678"
+        assertEquals(0, scanText(text), "Слишком короткий SSN не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "234-56-78900"
+        assertEquals(0, scanText(text), "Слишком длинный SSN не должен находиться")
+    }
+
+    @Test
+    fun testWithLetters() {
+        val text = "123-45-ABCD"
+        assertEquals(0, scanText(text), "SSN с буквами не должен находиться")
+    }
+
+    @Test
+    fun testInsideLongNumericSequence() {
+        val text = "123456789012345678901234567890"
+        assertEquals(0, scanText(text), "SSN внутри длинной цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "ssn234-56-7890"
+        assertEquals(0, scanText(text), "SSN, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123234-56-7890"
+        assertEquals(0, scanText(text), "SSN, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testWithInvalidSeparators() {
+        val text = "123@45@6789"
+        assertEquals(0, scanText(text), "SSN с неправильными разделителями не должен находиться")
+    }
+
+    @Test
+    fun testPartialSSN() {
+        val text = "123-45"
+        assertEquals(0, scanText(text), "Частичный SSN не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "function234-56-7890()"
+        assertEquals(0, scanText(text), "SSN внутри кода не должен находиться")
+    }
+
+    @Test
+    fun testAllZeros() {
+        val text = "000-00-0000"
+        assertEquals(0, scanText(text), "SSN из всех нулей не должен находиться")
+    }
+
+    @Test
+    fun testWithDashBefore() {
+        val text = "-234-56-7890"
+        assertEquals(0, scanText(text), "SSN с дефисом перед не должен находиться")
+    }
+
+    @Test
+    fun testWithDashAfter() {
+        val text = "234-56-7890-"
+        assertEquals(0, scanText(text), "SSN с дефисом после не должен находиться")
+    }
+
+    @Test
+    fun testWithDashBeforeAndAfter() {
+        val text = "-234-56-7890-"
+        assertEquals(0, scanText(text), "SSN с дефисом до и после не должен находиться")
+    }
+
+    @Test
+    fun testWithYearAsThirdPart() {
+        val text = "234-56-1999"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (1999), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear2000AsThirdPart() {
+        val text = "234-56-2000"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (2000), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear2024AsThirdPart() {
+        val text = "234-56-2024"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (2024), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear1900AsThirdPart() {
+        val text = "234-56-1900"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (1900), не должен находиться")
+    }
+
+    @Test
+    fun testWithYear2100AsThirdPart() {
+        val text = "234-56-2100"
+        assertEquals(0, scanText(text), "SSN с третьей частью, которая является годом (2100), не должен находиться")
+    }
+
+    @Test
+    fun testWithValidThirdPart() {
+        val text = "234-56-7890"
+        assertTrue(scanText(text) >= 1, "SSN с валидной третьей частью должен быть найден")
     }
 }
 

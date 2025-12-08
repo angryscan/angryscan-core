@@ -85,7 +85,7 @@ fun detectBankAccountLE(text: String): Int {
 
 @Suppress("Unused")
 fun detectBirthCert(text: String): Int {
-    return KotlinEngine(listOf(BirthCert)).scan(text).count()
+    return KotlinEngine(listOf(Certificate)).scan(text).count()
 }
 
 @Suppress("Unused")
@@ -124,11 +124,6 @@ fun detectEducationLicense(text: String): Int {
 }
 
 @Suppress("Unused")
-fun detectEpCertificateNumber(text: String): Int {
-    return KotlinEngine(listOf(EpCertificateNumber)).scan(text).count()
-}
-
-@Suppress("Unused")
 fun detectExecDocNumber(text: String): Int {
     return KotlinEngine(listOf(ExecDocNumber)).scan(text).count()
 }
@@ -159,11 +154,6 @@ fun detectIdentityDocType(text: String): Int {
 }
 
 @Suppress("Unused")
-fun detectInheritanceDoc(text: String): Int {
-    return KotlinEngine(listOf(InheritanceDoc)).scan(text).count()
-}
-
-@Suppress("Unused")
 fun detectLegalEntityId(text: String): Int {
     return KotlinEngine(listOf(LegalEntityId)).scan(text).count()
 }
@@ -180,7 +170,7 @@ fun detectMaritalStatus(text: String): Int {
 
 @Suppress("Unused")
 fun detectMarriageCert(text: String): Int {
-    return KotlinEngine(listOf(MarriageCert)).scan(text).count()
+    return KotlinEngine(listOf(Certificate)).scan(text).count()
 }
 
 @Suppress("Unused")
@@ -251,16 +241,6 @@ fun detectSSN(text: String): Int {
 @Suppress("Unused")
 fun detectStateRegContract(text: String): Int {
     return KotlinEngine(listOf(StateRegContract)).scan(text).count()
-}
-
-@Suppress("Unused")
-fun detectTemporaryID(text: String): Int {
-    return KotlinEngine(listOf(TemporaryID)).scan(text).count()
-}
-
-@Suppress("Unused")
-fun detectUidContractBankBki(text: String): Int {
-    return KotlinEngine(listOf(UidContractBankBki)).scan(text).count()
 }
 
 @Suppress("Unused")

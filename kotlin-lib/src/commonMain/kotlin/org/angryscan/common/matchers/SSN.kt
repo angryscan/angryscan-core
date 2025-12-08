@@ -5,21 +5,36 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for US Social Security Numbers (SSN).
+ * Matches SSN in format: XXX-XX-XXXX (9 digits with hyphens)
+ * Validates area number (001-899, excluding 000, 666, 900-999),
+ * group number (01-99, excluding 00), and serial number (0001-9999, excluding 0000).
+ * Filters out fake patterns (all same digits, sequential numbers, test values, years).
+ */
 @Serializable
 object SSN : IHyperMatcher, IKotlinMatcher {
     override val name = "SSN"
     override val javaPatterns = listOf(
-        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?![-0-9\p{L}\d])"""
+        """
+        (?ix)
+        (?<![\p{L}\d\-])
+        ([0-9]{3}-[0-9]{2}-[0-9]{4})
+        (?![\p{L}\d\-])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
-        RegexOption.MULTILINE
+        RegexOption.MULTILINE,
+        RegexOption.IGNORE_CASE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\r\n\(\)\[\]\"'.,;:!?\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?:[\s\r\n\(\)\[\]\"'.,;:!?]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9\-])[0-9]{3}-[0-9]{2}-[0-9]{4}(?:[^а-яА-Яa-zA-Z0-9\-]|$)"""
     )
     override val expressionOptions = setOf(
-        ExpressionOption.MULTILINE
+        ExpressionOption.MULTILINE,
+        ExpressionOption.CASELESS,
+        ExpressionOption.UTF8
     )
 
     override fun check(value: String): Boolean {
@@ -41,6 +56,8 @@ object SSN : IHyperMatcher, IKotlinMatcher {
         if (area == 0 || area == 666 || area >= 900) return false
         if (group == 0) return false
         if (serial == 0) return false
+
+        if (serial in 1900..2100) return false
 
         return true
     }

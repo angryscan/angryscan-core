@@ -7,6 +7,12 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
 expect fun readResource(path: String): String?
 
+/**
+ * Matcher for US full names.
+ * Matches names in format: FirstName LastName
+ * Validates against common US first and last names from resource files.
+ * Filters out false positives like city names, days of week, technical terms.
+ */
 @Serializable
 object FullNameUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Full Name US"
@@ -32,14 +38,17 @@ object FullNameUS : IHyperMatcher, IKotlinMatcher {
     }
 
     override val javaPatterns = listOf(
-        """(?:^|[\s\r\n])([A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15})(?=[\s\r\n.,;:!?\-]|$)"""
+        """^[A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15}(?=[\s\r\n\t.,;:!?\-\)\]\}\"]|$)""",
+        """(?<=[^A-Za-z0-9])[A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15}(?=[\s\r\n\t.,;:!?\-\)\]\}\"]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """[\s\r\n][A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15}[\s\r\n.,;:!?\-]"""
+        """\A[A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15}""",
+        """[\s\r\n\t][A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15}""",
+        """[^A-Za-z][A-Z][a-z]{1,15}(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]{2,15}"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -51,7 +60,10 @@ object FullNameUS : IHyperMatcher, IKotlinMatcher {
             return false
         }
         
-        val words = value.trim().split(Regex("\\s+")).filter { it.isNotEmpty() && it != "." }
+        // Remove leading and trailing punctuation marks and spaces
+        val cleanedValue = value.trim().trimStart { it in "([{\"'" }.trimEnd { it in ")]}\"'" }
+        
+        val words = cleanedValue.split(Regex("\\s+")).filter { it.isNotEmpty() && it != "." }
         if (words.size < 2) return false
         
         val cities = setOf("new", "los", "san", "las", "washington", "ocean")

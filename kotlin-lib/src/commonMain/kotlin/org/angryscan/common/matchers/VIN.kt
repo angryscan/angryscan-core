@@ -5,11 +5,17 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Vehicle Identification Numbers (VIN).
+ * Matches 17-character VIN codes (letters and digits, excluding I, O, Q).
+ * Validates checksum digit (position 9) using weighted algorithm.
+ * Filters out invalid patterns (all digits, all same character, only 0s and 1s).
+ */
 @Serializable
 object VIN : IHyperMatcher, IKotlinMatcher {
     override val name = "VIN"
     override val javaPatterns = listOf(
-        """(?i)(?:^|[\s\(\)\[\]\"':])(?<![\p{L}\d])([A-HJ-NPR-Z0-9]{17})(?![\p{L}\d])(?:[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
+        """(?i)(?<![\p{L}\d])([A-HJ-NPR-Z0-9]{17})(?![\p{L}\d])(?=[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +23,7 @@ object VIN : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[\s\(\)\[\]\"':])[A-HJ-NPR-Z0-9]{17}(?:[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
+        """(?:^|[\s\(\)\[\]\"'.,;:])[A-HJ-NPR-Z0-9]{17}(?:[\s\r\n\(\)\[\]\"'.,;:!?\-]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -30,6 +36,14 @@ object VIN : IHyperMatcher, IKotlinMatcher {
         if (cleaned.length != 17) return false
         
         if (cleaned.contains('I') || cleaned.contains('O') || cleaned.contains('Q')) return false
+        
+        // Cannot consist only of digits, at least one letter is required
+        if (cleaned.all { it.isDigit() }) return false
+        
+        // Cannot have only one digit, or combination of 0 and 1
+        val digits = cleaned.filter { it.isDigit() }
+        if (digits.length == 1) return false
+        if (digits.isNotEmpty() && digits.all { it == '0' || it == '1' }) return false
         
         val weights = intArrayOf(8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2)
         

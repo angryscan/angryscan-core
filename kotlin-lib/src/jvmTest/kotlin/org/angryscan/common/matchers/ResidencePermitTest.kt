@@ -5,150 +5,390 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера ResidencePermit
+ * Комплексные тесты для матчера ResidencePermit
  */
-internal class ResidencePermitTest: MatcherTestBase(ResidencePermit) {
+internal class ResidencePermitTest : MatcherTestBase(ResidencePermit) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testResidencePermitAtStart() {
-        val text = " 82 1234567 ВНЖ документ"
-        assertTrue(scanText(text) >= 1, "ВНЖ в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ в начале текста должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitAtEnd() {
-        val text = "Вид на жительство: 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Residence permit: ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ в конце текста должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInMiddle() {
-        val text = "Иностранец с ВНЖ: 82 1234567 проживает"
-        assertTrue(scanText(text) >= 1, "ВНЖ в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The permit ВНЖ 82 1234567 is valid"
+        assertTrue(scanText(text) >= 1, "ВНЖ в середине текста должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitStandalone() {
-        val text = " 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ отдельной строкой должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "ВНЖ 82 1234567\nSecond line"
+        assertTrue(scanText(text) >= 1, "ВНЖ в начале строки должно быть найдено")
     }
 
     @Test
-    fun testResidencePermit82() {
-        val text = " 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с кодом 82 должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\nВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ в конце строки должно быть найдено")
     }
 
     @Test
-    fun testResidencePermit83() {
-        val text = " 83 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с кодом 83 должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with ВНЖ 82 1234567 permit"
+        assertTrue(scanText(text) >= 1, "ВНЖ в середине строки должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitWithSpace() {
-        val text = " 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с пробелом должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\nВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ после \\n должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitWithoutSpace() {
-        val text = " 821234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ без пробела должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "ВНЖ 82 1234567\n"
+        assertTrue(scanText(text) >= 1, "ВНЖ перед \\n должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitWithNumber() {
-        val text = " 82 № 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с № должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\nВНЖ 82 1234567\r\n"
+        assertTrue(scanText(text) >= 1, "ВНЖ с \\r\\n должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitWithNumberN() {
-        val text = " 82 N 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с N должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ после пустой строки должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitWithLabel() {
-        val text = "вид на жительство: 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с полной меткой должен быть найден")
+    fun testWithEmptyLineAfter() {
+        val text = "ВНЖ 82 1234567\n\n"
+        assertTrue(scanText(text) >= 1, "ВНЖ перед пустой строкой должно быть найдено")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc82 1234567def"
+        assertEquals(0, scanText(text), "ВНЖ внутри буквенной последовательности не должно находиться")
     }
 
     @Test
-    fun testResidencePermitWithVNZh() {
-        val text = "ВНЖ: 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ с аббревиатурой должен быть найден")
+    fun testNotInsideNumericSequence() {
+        val text = "12382 1234567456"
+        assertEquals(0, scanText(text), "ВНЖ внутри цифровой последовательности не должно находиться")
     }
 
     @Test
-    fun testResidencePermitUpperCase() {
-        val text = "ВИД НА ЖИТЕЛЬСТВО: 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ в верхнем регистре должен быть найден")
+    fun testWithSpaceBefore() {
+        val text = "Permit ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с пробелом перед должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitLowerCase() {
-        val text = "вид на жительство: 82 1234567 "
-        assertTrue(scanText(text) >= 1, "ВНЖ в нижнем регистре должен быть найден")
+    fun testWithSpaceAfter() {
+        val text = "ВНЖ 82 1234567 is valid"
+        assertTrue(scanText(text) >= 1, "ВНЖ с пробелом после должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInParentheses() {
-        val text = "(82 1234567) "
-        assertTrue(scanText(text) >= 1, "ВНЖ в скобках должен быть найден")
+    fun testWithCommaBefore() {
+        val text = "Permit, ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInQuotes() {
-        val text = "\"82 1234567\" "
-        assertTrue(scanText(text) >= 1, "ВНЖ в кавычках должен быть найден")
+    fun testWithCommaAfter() {
+        val text = "ВНЖ 82 1234567, next"
+        assertTrue(scanText(text) >= 1, "ВНЖ с запятой после должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitWithPunctuation() {
-        val text = "ВНЖ: 82 1234567. "
-        assertTrue(scanText(text) >= 1, "ВНЖ с точкой должен быть найден")
+    fun testWithDotBefore() {
+        val text = "Permit. ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с точкой перед должно быть найдено")
     }
 
     @Test
-    fun testMultipleResidencePermits() {
-        val text = """
-            Первый: 82 1234567
-            Второй: 83 2345678
-            Третий: 82 3456789
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько ВНЖ должны быть найдены")
+    fun testWithDotAfter() {
+        val text = "ВНЖ 82 1234567."
+        assertTrue(scanText(text) >= 1, "ВНЖ с точкой после должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInvalidCode81() {
-        val text = " 81 1234567 "
-        assertEquals(0, scanText(text), "ВНЖ с неверным кодом 81 не должен быть найден")
+    fun testWithSemicolonBefore() {
+        val text = "Permit; ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с точкой с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInvalidCode84() {
-        val text = " 84 1234567 "
-        assertEquals(0, scanText(text), "ВНЖ с неверным кодом 84 не должен быть найден")
+    fun testWithSemicolonAfter() {
+        val text = "ВНЖ 82 1234567; next"
+        assertTrue(scanText(text) >= 1, "ВНЖ с точкой с запятой после должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInvalidTooShort() {
-        val text = " 82 123456 "
-        assertEquals(0, scanText(text), "ВНЖ со слишком коротким номером не должен быть найден")
+    fun testWithColonBefore() {
+        val text = "Permit: ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с двоеточием перед должно быть найдено")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( ВНЖ 82 1234567 )"
+        assertTrue(scanText(text) >= 1, "ВНЖ в скобках с пробелами должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitInvalidTooLong() {
-        val text = " 82 12345678 "
-        assertEquals(0, scanText(text), "ВНЖ со слишком длинным номером не должен быть найден")
+    fun testWithParenthesesNoSpace() {
+        val text = "(ВНЖ 82 1234567)"
+        assertTrue(scanText(text) >= 1, "ВНЖ в скобках без пробелов должно быть найдено")
     }
 
     @Test
-    fun testResidencePermitEmptyString() {
+    fun testWithQuotesAndSpace() {
+        val text = "\" ВНЖ 82 1234567 \""
+        assertTrue(scanText(text) >= 1, "ВНЖ в кавычках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"ВНЖ 82 1234567\""
+        assertTrue(scanText(text) >= 1, "ВНЖ в кавычках без пробелов должно быть найдено")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ ВНЖ 82 1234567 ]"
+        assertTrue(scanText(text) >= 1, "ВНЖ в квадратных скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ ВНЖ 82 1234567 }"
+        assertTrue(scanText(text) >= 1, "ВНЖ в фигурных скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithNumberSignAsPartOfFormat() {
+        val text = "ВНЖ 82 № 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ со знаком № как часть формата должно быть найдено")
+    }
+
+    @Test
+    fun testWithNAsPartOfFormat() {
+        val text = "ВНЖ 82 N 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с N как часть формата должно быть найдено")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "ВНЖ 82 1234567 ВНЖ 83 7654321"
+        assertTrue(scanText(text) >= 2, "Несколько ВНЖ через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "ВНЖ 82 1234567, ВНЖ 83 7654321"
+        assertTrue(scanText(text) >= 2, "Несколько ВНЖ через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "ВНЖ 82 1234567; ВНЖ 83 7654321"
+        assertTrue(scanText(text) >= 2, "Несколько ВНЖ через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "ВНЖ 82 1234567\nВНЖ 83 7654321"
+        assertTrue(scanText(text) >= 2, "Несколько ВНЖ через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
         assertEquals(0, scanText(text), "Пустая строка не должна содержать ВНЖ")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no residence permits at all"
+        assertEquals(0, scanText(text), "Текст без ВНЖ не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWith82Series() {
+        val text = "ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с серией 82 должно быть найдено")
+    }
+
+    @Test
+    fun testWith83Series() {
+        val text = "ВНЖ 83 7654321"
+        assertTrue(scanText(text) >= 1, "ВНЖ с серией 83 должно быть найдено")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Permit    ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с несколькими пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Permit\tВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с табуляцией перед должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "ВНЖ 82 1234567\tnext"
+        assertTrue(scanText(text) >= 1, "ВНЖ с табуляцией после должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Вид на жительство 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с кириллицей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Residence permit ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с латиницей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ отдельной строкой должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "ВНЖ 82 1234567 text"
+        assertTrue(scanText(text) >= 1, "ВНЖ в начале текста должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ в конце текста должно быть найдено")
+    }
+
+    @Test
+    fun testWithVidNaZhitelstvoKeyword() {
+        val text = "вид на жительство: 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'вид на жительство' должно быть найдено")
+    }
+
+    @Test
+    fun testWithVNJKeyword() {
+        val text = "ВНЖ: 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'ВНЖ' должно быть найдено")
+    }
+
+    @Test
+    fun testWithNomerVidaNaZhitelstvoKeyword() {
+        val text = "номер вида на жительство 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'номер вида на жительство' должно быть найдено")
+    }
+
+    @Test
+    fun testWithSeriyaINomerVidaNaZhitelstvoKeyword() {
+        val text = "серия и номер вида на жительство 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'серия и номер вида на жительство' должно быть найдено")
+    }
+
+    @Test
+    fun testWithSeriyaINomerVNJKeyword() {
+        val text = "серия и номер ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'серия и номер ВНЖ' должно быть найдено")
+    }
+
+    @Test
+    fun testWithNomerVNJKeyword() {
+        val text = "номер ВНЖ 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'номер ВНЖ' должно быть найдено")
+    }
+
+    @Test
+    fun testWithDokumentVidaNaZhitelstvoKeyword() {
+        val text = "документ вида на жительство 82 1234567"
+        assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'документ вида на жительство' должно быть найдено")
+    }
+
+    @Test
+    fun testWithoutKeywords() {
+        val text = "82 1234567"
+        assertEquals(0, scanText(text), "ВНЖ без ключевых слов не должно находиться")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testTooShort() {
+        val text = "ВНЖ 82 123456"
+        assertEquals(0, scanText(text), "Слишком короткое ВНЖ не должно находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "ВНЖ 82 12345678"
+        assertEquals(0, scanText(text), "Слишком длинное ВНЖ не должно находиться")
+    }
+
+    @Test
+    fun testWithInvalidSeries() {
+        val text = "ВНЖ 99 1234567"
+        assertEquals(0, scanText(text), "ВНЖ с недопустимой серией не должно находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "permitВНЖ 82 1234567"
+        assertEquals(0, scanText(text), "ВНЖ, прилипшее к буквам, не должно находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123ВНЖ 82 1234567"
+        assertEquals(0, scanText(text), "ВНЖ, прилипшее к цифрам, не должно находиться")
+    }
+
+    @Test
+    fun testPartialResidencePermit() {
+        val text = "ВНЖ 82"
+        assertEquals(0, scanText(text), "Частичное ВНЖ не должно находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "functionВНЖ 82 1234567()"
+        assertEquals(0, scanText(text), "ВНЖ внутри кода не должно находиться")
     }
 }
 
