@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for US Social Security Numbers (SSN).
+ * Matches SSN in format: XXX-XX-XXXX (9 digits with hyphens)
+ * Validates area number (001-899, excluding 000, 666, 900-999),
+ * group number (01-99, excluding 00), and serial number (0001-9999, excluding 0000).
+ * Filters out fake patterns (all same digits, sequential numbers, test values, years).
+ */
 @Serializable
 object SSN : IHyperMatcher, IKotlinMatcher {
     override val name = "SSN"

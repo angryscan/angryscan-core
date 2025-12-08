@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian legal entity bank account numbers.
+ * Matches account numbers starting with 407 followed by 17 digits (total 20 digits).
+ * Format: 407XXXXXXXXXXXXXXX
+ */
 @Serializable
 object BankAccountLE : IHyperMatcher, IKotlinMatcher {
     override val name = "Bank Account LE"

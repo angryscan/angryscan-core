@@ -5,6 +5,14 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian education documents (diplomas, certificates, attestations).
+ * Matches document numbers in formats:
+ * - 123456 1234567 (6 digits space 7 digits)
+ * - 12 АБ 1234567 (2 digits space 2 Cyrillic letters space 6-7 digits)
+ * May be preceded by keywords like "диплом", "аттестат", "свидетельство об образовании".
+ * Validates against common fake patterns (all same digits, sequential numbers, repeating patterns).
+ */
 @Serializable
 object EducationDoc : IHyperMatcher, IKotlinMatcher {
     override val name = "Education Document"

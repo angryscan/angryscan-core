@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian cadastral numbers.
+ * Matches cadastral numbers in format: XX:XX:XXXXXX:XXXX or XX:XX:XXXXXXX:XXXXX
+ * Used for real estate property identification in Russia.
+ */
 @Serializable
 object CadastralNumber : IHyperMatcher, IKotlinMatcher {
     override val name = "Cadastral Number"

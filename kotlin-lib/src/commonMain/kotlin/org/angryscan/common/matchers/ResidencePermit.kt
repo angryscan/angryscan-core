@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian residence permit numbers (ВНЖ - Вид на жительство).
+ * Matches permit numbers in format: 82 № 1234567 or 83 № 1234567
+ * Series: 82 or 83, followed by 7-digit number.
+ * May be preceded by keywords like "ВНЖ", "вид на жительство", "номер ВНЖ".
+ * Filters out invalid patterns (all zeros, all same digits, all zeros/ones).
+ */
 @Serializable
 object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     override val name = "Residence Permit"
@@ -41,12 +48,12 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        // Извлекаем номер ВНЖ из значения (которое может содержать ключевые слова)
+        // Extract residence permit number from the value (which may contain keywords)
         val numberPattern = Regex("""(?:82|83)\s*(?:№|N)?\s*(\d{7})""")
         val match = numberPattern.find(value) ?: return false
         val numberPart = match.groupValues[1]
         
-        // Формируем полный номер: серия + номер
+        // Form the full number: series + number
         val seriesMatch = Regex("""(82|83)""").find(value)
         val series = seriesMatch?.value ?: return false
         

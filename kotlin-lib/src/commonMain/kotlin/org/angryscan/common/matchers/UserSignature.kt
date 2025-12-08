@@ -5,6 +5,11 @@ import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for user signatures.
+ * Matches custom signature patterns provided in searchSignatures list.
+ * Used for detecting specific user signatures or text patterns.
+ */
 @Serializable
 @Suppress("Unused")
 class UserSignature(

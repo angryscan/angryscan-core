@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian passport numbers.
+ * Matches passport numbers in format: XX XX XXXXXX (2 digits, space, 2 digits, space, 6 digits)
+ * May be preceded by keyword "паспорт" or "серия" (series).
+ * Format: series (4 digits) and number (6 digits).
+ */
 @Serializable
 object Passport : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport"

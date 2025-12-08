@@ -5,6 +5,13 @@ import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian OMS (Обязательное медицинское страхование) insurance policy numbers.
+ * Matches 16-digit policy numbers in format: XXXX XXXX XXXX XXXX
+ * Validates checksum using Luhn-like algorithm.
+ * Filters out fake patterns (all same digits, all zeros/ones, years in chunks).
+ * May be preceded by keywords like "полис ОМС", "номер полиса ОМС", "страховка".
+ */
 @Serializable
 object OMS : IHyperMatcher, IKotlinMatcher {
     override val name = "OMS"

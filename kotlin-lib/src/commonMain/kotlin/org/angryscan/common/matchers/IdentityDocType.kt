@@ -5,6 +5,19 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian identity document types.
+ * Matches various identity document types including:
+ * - Russian passport (паспорт гражданина РФ)
+ * - Foreign citizen passport (паспорт иностранного гражданина)
+ * - International passport (загранпаспорт)
+ * - Diplomatic/service passport
+ * - Birth certificate (свидетельство о рождении)
+ * - Residence permit (вид на жительство, ВНЖ)
+ * - Temporary residence permit (разрешение на временное проживание, РВП)
+ * - Military ID (военный билет)
+ * May be preceded by keywords like "вид документа удостоверяющего личность".
+ */
 @Serializable
 object IdentityDocType : IHyperMatcher, IKotlinMatcher {
     override val name = "Identity Document Type"

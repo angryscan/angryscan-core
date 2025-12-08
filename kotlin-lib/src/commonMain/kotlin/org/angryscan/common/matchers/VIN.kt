@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Vehicle Identification Numbers (VIN).
+ * Matches 17-character VIN codes (letters and digits, excluding I, O, Q).
+ * Validates checksum digit (position 9) using weighted algorithm.
+ * Filters out invalid patterns (all digits, all same character, only 0s and 1s).
+ */
 @Serializable
 object VIN : IHyperMatcher, IKotlinMatcher {
     override val name = "VIN"
@@ -31,10 +37,10 @@ object VIN : IHyperMatcher, IKotlinMatcher {
         
         if (cleaned.contains('I') || cleaned.contains('O') || cleaned.contains('Q')) return false
         
-        // Не может состоять только из цифр, нужна минимум одна буква
+        // Cannot consist only of digits, at least one letter is required
         if (cleaned.all { it.isDigit() }) return false
         
-        // Не может быть только одна цифра, либо комбинация из 0 и 1
+        // Cannot have only one digit, or combination of 0 and 1
         val digits = cleaned.filter { it.isDigit() }
         if (digits.length == 1) return false
         if (digits.isNotEmpty() && digits.all { it == '0' || it == '1' }) return false

@@ -7,6 +7,12 @@ import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.IMask
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for credit/debit card numbers.
+ * Matches 16-digit card numbers in format: XXXX XXXX XXXX XXXX or XXXXXXXXXXXXXXXX
+ * Validates using Luhn algorithm and optionally checks against known BIN (Bank Identification Number) database.
+ * Supports masking of middle digits (positions 7-12) for data protection.
+ */
 @Serializable
 class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatcher, IMask {
     override val name = "Card number"

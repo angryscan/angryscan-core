@@ -5,6 +5,14 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian vehicle registration numbers (госномер).
+ * Matches license plates in formats:
+ * - А123БВ 77 (1 letter, 3 digits, 2 letters, region code)
+ * - 1234АБ 77 (4 digits, 2 letters, region code)
+ * Validates against list of valid Russian region codes.
+ * May be preceded by keywords like "госномер", "номер автомобиля", "регистрационный номер ТС".
+ */
 @Serializable
 object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     override val name = "Vehicle Registration Number"

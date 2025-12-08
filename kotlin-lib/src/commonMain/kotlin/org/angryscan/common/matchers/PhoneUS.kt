@@ -5,6 +5,15 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for US phone numbers.
+ * Matches phone numbers in formats:
+ * - (XXX) XXX-XXXX
+ * - XXX-XXX-XXXX
+ * - +1 XXX XXX XXXX
+ * Validates area code (3 digits, cannot start with 0 or 1), exchange code (3 digits), and number (4 digits).
+ * Filters out fake patterns (sequential, repeating, dates, test numbers like 555-0100 to 555-0199).
+ */
 @Serializable
 object PhoneUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Phone US"

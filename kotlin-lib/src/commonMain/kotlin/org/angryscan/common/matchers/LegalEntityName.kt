@@ -5,6 +5,16 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian legal entity names.
+ * Matches company names starting with legal entity prefixes:
+ * - ООО (Limited Liability Company)
+ * - ПАО, ЗАО, НАО (Public/Joint Stock Companies)
+ * - ИП (Individual Entrepreneur)
+ * - ФГУП, ГУП, МУП (State/Municipal Unitary Enterprises)
+ * - Фонд, Ассоциация, Союз (Fund, Association, Union)
+ * Validates name structure, filters out invalid patterns, and checks for proper Russian text.
+ */
 @Serializable
 object LegalEntityName : IHyperMatcher, IKotlinMatcher {
     override val name = "Legal Entity Name"
@@ -53,7 +63,7 @@ object LegalEntityName : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        // Удаляем кавычки и скобки из начала и конца для проверки
+        // Remove quotes and brackets from start and end for validation
         var text = value.trim()
         text = text.trimStart('"', '\'', '(', '[', '{', '«')
         text = text.trimEnd('"', '\'', ')', ']', '}', '»')
@@ -61,10 +71,10 @@ object LegalEntityName : IHyperMatcher, IKotlinMatcher {
         
         if (text.length < 5) return false
         
-        // Проверка на отсутствие цифр
+        // Check for absence of digits
         if (text.any { it.isDigit() }) return false
         
-        // Проверка на отсутствие знаков пунктуации (кроме пробелов)
+        // Check for absence of punctuation marks (except spaces)
         if (text.any { !it.isLetter() && !it.isWhitespace() }) return false
         
         val legalEntityPrefixes = setOf("ооо", "пао", "зао", "нао", "ип", "фгуп", "гуп", "муп", "фонд", "ассоциация", "союз")

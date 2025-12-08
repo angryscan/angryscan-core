@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian birth/marriage certificates.
+ * Matches certificate numbers in format: IVX-АБ 123456
+ * Where IVX is Roman numeral series, АБ are Cyrillic letters, and 123456 is the number.
+ * May be preceded by keywords like "свидетельство о рождении", "свидетельство о браке".
+ */
 @Serializable
 object Certificate : IHyperMatcher, IKotlinMatcher {
     override val name = "Certificate"

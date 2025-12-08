@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian full names (ФИО).
+ * Matches names in format: LastName FirstName Patronymic
+ * Validates Russian name structure with proper case (capitalized first letter).
+ * Filters out false positives like geographical names (Республика, Область, etc.).
+ */
 @Serializable
 object FullName : IHyperMatcher, IKotlinMatcher {
     override val name = "Full name"

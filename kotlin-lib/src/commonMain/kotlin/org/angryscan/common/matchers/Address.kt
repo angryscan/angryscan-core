@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian addresses.
+ * Matches addresses containing city/district/region abbreviations (г., р-н, обл.) or street abbreviations (ул., гор.)
+ * followed by address text and house number (д., дом).
+ */
 @Serializable
 object Address : IHyperMatcher, IKotlinMatcher {
     override val name = "Address"

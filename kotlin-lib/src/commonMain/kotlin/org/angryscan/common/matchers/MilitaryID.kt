@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian military ID numbers (УЛВ - Удостоверение личности военнослужащего).
+ * Matches ID numbers in format: АБ1234567 (2 Cyrillic letters followed by 7 digits)
+ * May be preceded by keywords like "удостоверение личности военнослужащего", "номер УЛВ", "военный билет".
+ * Validates against fake patterns (sequential, repeating, all same digits).
+ */
 @Serializable
 object MilitaryID : IHyperMatcher, IKotlinMatcher {
     override val name = "Military ID"
@@ -63,8 +69,8 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     }
 
     override fun check(value: String): Boolean {
-        // Извлекаем только номер (2 буквы + 7 цифр) из совпадения
-        // Совпадение может включать ключевые слова, поэтому ищем паттерн номера
+        // Extract only the number (2 letters + 7 digits) from the match
+        // The match may include keywords, so we search for the number pattern
         val numberPattern = Regex("[А-ЯA-Z]{2}[\\s№\\-]*\\d{7}")
         val match = numberPattern.find(value)
         if (match == null) return false

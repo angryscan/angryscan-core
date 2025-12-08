@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian executive document numbers (исполнительные документы).
+ * Matches document numbers in format: XXXX/XX/XXXXX-XX
+ * Where XX is a document type code (ИП, СВ, ФС, УД, АП, СД, МС, ПД, АС, ИД).
+ * May be preceded by keywords like "номер исполнительного документа", "исполнительный лист".
+ */
 @Serializable
 object ExecDocNumber : IHyperMatcher, IKotlinMatcher {
     override val name = "Executive Document Number"

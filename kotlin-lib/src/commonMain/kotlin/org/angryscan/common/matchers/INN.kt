@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian Tax Identification Number (ИНН - Идентификационный номер налогоплательщика).
+ * Matches 12-digit INN numbers for individuals.
+ * Validates using checksum algorithm and filters out fake patterns (sequential, repeating, all same digits).
+ */
 @Serializable
 object INN : IHyperMatcher, IKotlinMatcher {
     override val name = "INN"

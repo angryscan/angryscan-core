@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for death dates in Russian text.
+ * Matches dates in formats:
+ * - DD.MM.YYYY, DD/MM/YYYY, DD-MM-YYYY (with proper date validation)
+ * - DD Month YYYY (with Russian month names)
+ * Preceded by keywords like "дата смерти", "умер", "скончался", "дата кончины".
+ */
 @Serializable
 object DeathDate : IHyperMatcher, IKotlinMatcher {
     override val name = "Death Date"

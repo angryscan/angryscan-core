@@ -318,5 +318,79 @@ internal class MilitaryRankTest : MatcherTestBase(MilitaryRank) {
         val text = "серж"
         assertEquals(0, scanText(text), "Частичное воинское звание не должно находиться")
     }
+
+    // ========== 6. Тесты для капитанов ==========
+
+    @Test
+    fun testKapitanLeitenant() {
+        val text = "капитан-лейтенант"
+        assertTrue(scanText(text) >= 1, "Капитан-лейтенант должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan1Ranga() {
+        val text = "капитан 1 ранга"
+        assertTrue(scanText(text) >= 1, "Капитан 1 ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan2Ranga() {
+        val text = "капитан 2 ранга"
+        assertTrue(scanText(text) >= 1, "Капитан 2 ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan3Ranga() {
+        val text = "капитан 3 ранга"
+        assertTrue(scanText(text) >= 1, "Капитан 3 ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan1GoRanga() {
+        val text = "капитан 1-го ранга"
+        assertTrue(scanText(text) >= 1, "Капитан 1-го ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan2GoRanga() {
+        val text = "капитан 2-го ранга"
+        assertTrue(scanText(text) >= 1, "Капитан 2-го ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitan3GoRanga() {
+        val text = "капитан 3-го ранга"
+        assertTrue(scanText(text) >= 1, "Капитан 3-го ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitanPervogoRanga() {
+        val text = "капитан первого ранга"
+        assertTrue(scanText(text) >= 1, "Капитан первого ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitanVtorogoRanga() {
+        val text = "капитан второго ранга"
+        assertTrue(scanText(text) >= 1, "Капитан второго ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitanTretjegoRanga() {
+        val text = "капитан третьего ранга"
+        assertTrue(scanText(text) >= 1, "Капитан третьего ранга должно быть найдено")
+    }
+
+    @Test
+    fun testKapitanAlone() {
+        val text = "капитан"
+        assertEquals(0, scanText(text), "Просто 'капитан' без ранга не должно находиться")
+    }
+
+    @Test
+    fun testKapitanWithContext() {
+        val text = "звание: капитан"
+        assertEquals(0, scanText(text), "Просто 'капитан' без ранга не должно находиться")
+    }
 }
 

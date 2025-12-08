@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian OKPO (Общероссийский классификатор предприятий и организаций).
+ * Matches 8 or 10-digit classification codes.
+ * Validates checksum using weighted sum algorithm.
+ * Filters out fake patterns (sequential, repeating, all same digits, years).
+ * May be preceded by keywords like "ОКПО", "код ОКПО", "номер ОКПО".
+ */
 @Serializable
 object OKPO : IHyperMatcher, IKotlinMatcher {
     override val name = "OKPO"
@@ -63,7 +70,7 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     }
 
     override fun check(value: String): Boolean {
-        // Извлекаем номер ОКПО из значения (которое может содержать ключевые слова)
+        // Extract OKPO number from the value (which may contain keywords)
         val numberPattern = Regex("""(\d{8}|\d{10})""")
         val match = numberPattern.find(value) ?: return false
         val okpoClean = match.value

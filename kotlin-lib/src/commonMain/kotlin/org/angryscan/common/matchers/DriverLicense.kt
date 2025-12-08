@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian driver's license numbers.
+ * Matches license numbers in format: XX XX XXXXXX (2 digits, space, 2 digits, space, 6 digits)
+ * May be preceded by keywords like "водительское удостоверение", "номер ВУ", "driver license".
+ */
 @Serializable
 object DriverLicense : IHyperMatcher, IKotlinMatcher {
     override val name = "Driver License"

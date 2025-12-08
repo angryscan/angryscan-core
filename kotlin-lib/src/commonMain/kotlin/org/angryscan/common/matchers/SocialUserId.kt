@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for social media user IDs/usernames.
+ * Matches usernames in format: @username (3-32 characters: letters, digits, underscore)
+ * May be preceded by keywords like "ID в VK", "username в Telegram", "аккаунт в Instagram".
+ * Filters out CSS at-rules, reserved names (admin, test, etc.), and numeric-only usernames.
+ */
 @Serializable
 object SocialUserId : IHyperMatcher, IKotlinMatcher {
     override val name = "Social User ID"

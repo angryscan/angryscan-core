@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for hash values (MD5, SHA-1, SHA-256, SHA-384, SHA-512).
+ * Matches hexadecimal hash strings of lengths: 32, 40, 64, 96, or 128 characters.
+ * Validates that hashes are not all zeros, all F's, all same character, or sequential patterns.
+ */
 @Serializable
 object HashData : IHyperMatcher, IKotlinMatcher {
     override val name = "Hash Data"

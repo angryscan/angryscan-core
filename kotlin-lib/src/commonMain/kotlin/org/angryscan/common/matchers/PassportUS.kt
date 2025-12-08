@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for US passport numbers.
+ * Matches passport numbers in format: A12345678 (1 letter followed by 8 digits)
+ * Valid letter prefixes: A or C (excluding I and O).
+ * May be preceded by keywords like "passport", "pass no", "pass number".
+ * Filters out invalid patterns like all same characters or common test values.
+ */
 @Serializable
 object PassportUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport US"
@@ -28,7 +35,7 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        // Извлекаем номер паспорта из совпадения (может включать ключевые слова)
+        // Extract passport number from the match (may include keywords)
         val numberPattern = Regex("[A-Z][0-9]{8}")
         val match = numberPattern.find(value)
         if (match == null) return false

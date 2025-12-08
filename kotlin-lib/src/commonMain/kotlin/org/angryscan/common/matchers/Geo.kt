@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for geographic coordinates (latitude, longitude).
+ * Matches coordinates in format: latitude, longitude
+ * Validates coordinate ranges: latitude -90 to 90, longitude -180 to 180.
+ * Filters out invalid coordinates (0,0), coordinates with low precision, and mathematical expressions.
+ */
 @Serializable
 object Geo : IHyperMatcher, IKotlinMatcher {
     override val name = "Geo"
@@ -93,10 +99,10 @@ object Geo : IHyperMatcher, IKotlinMatcher {
         
         if (lat == 0.0 && lon == 0.0) return false
         
-        // Не брать в расчет координаты <= 11 градусов
+        // Do not consider coordinates <= 11 degrees
         if (kotlin.math.abs(lat) <= 11.0 || kotlin.math.abs(lon) <= 11.0) return false
         
-        // Координаты должны отличаться больше чем на 1 градус
+        // Coordinates must differ by more than 1 degree
         val diff = kotlin.math.abs(lat - lon)
         if (diff <= 1.0) return false
         
@@ -105,7 +111,7 @@ object Geo : IHyperMatcher, IKotlinMatcher {
             val isLonInteger = lon == lon.toInt().toDouble()
             
             if (isLatInteger && isLonInteger && kotlin.math.abs(lat) < 100.0 && kotlin.math.abs(lon) < 100.0) {
-                // Эта проверка уже не нужна, так как мы проверили diff <= 1.0 выше
+                // This check is no longer needed, as we already checked diff <= 1.0 above
             }
         }
         

@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian educational institution licenses.
+ * Matches license numbers in format: Л 035-XXXXX-XX / XXXXXXXX
+ * Where Л is the license prefix, followed by series and number separated by dashes and slash.
+ * May be preceded by keywords like "лицензия на образовательную деятельность".
+ */
 @Serializable
 object EducationLicense : IHyperMatcher, IKotlinMatcher {
     override val name = "Education License"

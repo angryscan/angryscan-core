@@ -5,6 +5,12 @@ import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for US Medicare Beneficiary Identifier (MBI).
+ * Matches MBI numbers in format: 1A2B3C4D5E6F7G8H9I0J1 (11 characters: digit-letter-digit-letter-letter-digit-letter-letter-letter-digit-digit)
+ * May be preceded by keywords: "medicare", "mbi", "health insurance", "medical insurance".
+ * Validates character positions and excludes certain letters (S, L, O, I, B, Z).
+ */
 @Serializable
 object MedicareUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Medicare US"

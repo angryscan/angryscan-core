@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for legal entity identifiers (LEI - Legal Entity Identifier).
+ * Matches LEI codes in formats:
+ * - 20 characters: XXXX00XXXXXXXXXXXXXX (with checksum validation)
+ * - 8 or 11 characters: XXXX followed by country code
+ * Validates checksum using MOD 97 algorithm for 20-character codes.
+ */
 @Serializable
 object LegalEntityId : IHyperMatcher, IKotlinMatcher {
     override val name = "Legal Entity ID"

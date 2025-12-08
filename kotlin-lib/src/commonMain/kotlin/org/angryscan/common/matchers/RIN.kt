@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Chinese Resident Identity Number (RIN).
+ * Matches 18-character ID numbers: 17 digits followed by 1 digit or X (checksum).
+ * Validates date of birth (positions 6-13: YYYYMMDD), checksum using weighted algorithm.
+ * May be preceded by keywords like "китайский идентификационный номер", "Chinese ID", "TIN China".
+ */
 @Serializable
 object RIN : IHyperMatcher, IKotlinMatcher {
     override val name = "RIN"

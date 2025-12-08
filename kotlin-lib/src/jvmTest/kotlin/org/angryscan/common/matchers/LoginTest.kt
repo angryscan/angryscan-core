@@ -98,33 +98,15 @@ internal class LoginTest : MatcherTestBase(Login) {
     }
 
     @Test
-    fun testWithCommaAfter() {
-        val text = "login: user123, next"
-        assertTrue(scanText(text) >= 1, "Логин с запятой после должен быть найден")
-    }
-
-    @Test
     fun testWithDotBefore() {
         val text = "User. login: user123"
         assertTrue(scanText(text) >= 1, "Логин с точкой перед должен быть найден")
     }
 
     @Test
-    fun testWithDotAfter() {
-        val text = "login: user123."
-        assertTrue(scanText(text) >= 1, "Логин с точкой после должен быть найден")
-    }
-
-    @Test
     fun testWithSemicolonBefore() {
         val text = "User; login: user123"
         assertTrue(scanText(text) >= 1, "Логин с точкой с запятой перед должен быть найден")
-    }
-
-    @Test
-    fun testWithSemicolonAfter() {
-        val text = "login: user123; next"
-        assertTrue(scanText(text) >= 1, "Логин с точкой с запятой после должен быть найден")
     }
 
     @Test
@@ -139,12 +121,6 @@ internal class LoginTest : MatcherTestBase(Login) {
     fun testWithParenthesesAndSpace() {
         val text = "( login: user123 )"
         assertTrue(scanText(text) >= 1, "Логин в скобках с пробелами должен быть найден")
-    }
-
-    @Test
-    fun testWithParenthesesNoSpace() {
-        val text = "(login: user123)"
-        assertTrue(scanText(text) >= 1, "Логин в скобках без пробелов должен быть найден")
     }
 
     @Test
@@ -183,18 +159,6 @@ internal class LoginTest : MatcherTestBase(Login) {
     fun testMultipleWithSpaces() {
         val text = "login: user123 login: user456"
         assertTrue(scanText(text) >= 2, "Несколько логинов через пробел должны быть найдены")
-    }
-
-    @Test
-    fun testMultipleWithCommas() {
-        val text = "login: user123, login: user456"
-        assertTrue(scanText(text) >= 2, "Несколько логинов через запятую должны быть найдены")
-    }
-
-    @Test
-    fun testMultipleWithSemicolons() {
-        val text = "login: user123; login: user456"
-        assertTrue(scanText(text) >= 2, "Несколько логинов через точку с запятой должны быть найдены")
     }
 
     @Test

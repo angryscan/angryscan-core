@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian OSAGO (Обязательное страхование автогражданской ответственности) insurance policy numbers.
+ * Matches policy numbers in format: АБВ № 1234567890 (3 Cyrillic letters followed by 10 digits)
+ * Validates that series contains only letters and number is not all zeros or same digits.
+ * May be preceded by keywords like "полис ОСАГО", "номер полиса ОСАГО", "страховка ОСАГО".
+ */
 @Serializable
 object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     override val name = "OSAGO Policy"
@@ -41,7 +47,7 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        // Извлекаем только номер полиса ОСАГО из совпадения (может включать ключевые слова)
+        // Extract only the OSAGO policy number from the match (may include keywords)
         val numberPattern = Regex("[A-ZА-Я]{3}\\s+№?\\s*\\d{10}")
         val match = numberPattern.find(value)
         if (match == null) return false

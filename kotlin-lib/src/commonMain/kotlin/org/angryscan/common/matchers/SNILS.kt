@@ -5,6 +5,13 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian SNILS (Страховой номер индивидуального лицевого счёта).
+ * Matches 11-digit insurance account numbers in format: XXX-XXX-XXX-XX
+ * Validates checksum using weighted sum algorithm (positions 1-9 multiplied by weights 9-1, sum MOD 101).
+ * Filters out fake patterns (sequential, repeating, all same digits, all zeros/ones).
+ * May be preceded by keywords like "СНИЛС", "страховой номер", "номер СНИЛС".
+ */
 @Serializable
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
@@ -22,8 +29,9 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
           номер\s+СНИЛС|
           серия\s+и\s+номер\s+СНИЛС
         )
-        \s*[:\-]?\s*
-        ([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2})
+        \s*[:\-/\s]*\s*
+        (?:[^0-9]*?\([^0-9]*?|["']*|.*?)
+        ([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}|[0-9]{11})
         (?![\p{L}\d])
         """.trimIndent()
     )
@@ -33,7 +41,7 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^а-яА-Яa-zA-Z0-9])(?:СНИЛС|страховой\s+номер\s+индивидуального\s+лицевого\s+счёта|страховой\s+номер\s+индивидуального\s+лицевого\s+счета|страховой\s+номер|номер\s+индивидуального\s+лицевого\s+счёта|номер\s+индивидуального\s+лицевого\s+счета|номер\s+СНИЛС|серия\s+и\s+номер\s+СНИЛС)\s*[:\-]?\s*[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}(?:[^а-яА-Яa-zA-Z0-9]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9])(?:СНИЛС|страховой\s+номер\s+индивидуального\s+лицевого\s+счёта|страховой\s+номер\s+индивидуального\s+лицевого\s+счета|страховой\s+номер|номер\s+индивидуального\s+лицевого\s+счёта|номер\s+индивидуального\s+лицевого\s+счета|номер\s+СНИЛС|серия\s+и\s+номер\s+СНИЛС)\s*[:\-/\s]*\s*[^0-9]*?([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}|[0-9]{11})(?:[^а-яА-Яa-zA-Z0-9]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -67,8 +75,8 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
         if(value.length <= 2)
             return false
         var summ = 0
-        // Извлекаем только номер СНИЛС из совпадения (может включать ключевые слова)
-        val numberPattern = Regex("[0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{2}")
+        // Extract only the SNILS number from the match (may include keywords)
+        val numberPattern = Regex("([0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{2}|[0-9]{11})")
         val match = numberPattern.find(value)
         if (match == null) return false
         

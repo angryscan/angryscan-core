@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian OGRNIP (Основной государственный регистрационный номер индивидуального предпринимателя).
+ * Matches 15-digit registration numbers starting with 3 or 4.
+ * Validates checksum using MOD 13 algorithm.
+ * May be preceded by keywords like "ОГРНИП", "номер ОГРНИП".
+ */
 @Serializable
 object OGRNIP : IHyperMatcher, IKotlinMatcher {
     override val name = "OGRNIP"

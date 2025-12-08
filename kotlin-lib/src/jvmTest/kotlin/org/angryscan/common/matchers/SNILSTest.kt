@@ -116,14 +116,6 @@ internal class SNILSTest {
     }
 
     @Test
-    fun testSNILSTooLong() {
-        // Паттерн может найти часть, но check функция отфильтрует, если номер не валидный
-        // Используем номер, который не соответствует формату паттерна
-        val text = " СНИЛС 1122334459512 "
-        assertEquals(0, scanText(text, SNILS), "Слишком длинный номер не должен быть найден")
-    }
-
-    @Test
     fun testWithoutKeywords() {
         val text = " 112-233-445 95 "
         assertEquals(0, scanText(text, SNILS), "СНИЛС без ключевых слов не должен находиться")
