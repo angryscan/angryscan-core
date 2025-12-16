@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for email addresses.
+ * Matches standard email format: username@domain.tld
+ * Validates domain structure with at least one dot and valid TLD (2+ characters).
+ */
 @Serializable
 object Email : IHyperMatcher, IKotlinMatcher {
     override val name = "Email"

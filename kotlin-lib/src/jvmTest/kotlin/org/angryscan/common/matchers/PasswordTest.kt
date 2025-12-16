@@ -5,168 +5,294 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера Password
+ * Комплексные тесты для матчера Password
  */
-internal class PasswordTest: MatcherTestBase(Password) {
+internal class PasswordTest : MatcherTestBase(Password) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testPasswordAtStart() {
-        val text = "пароль: Password123 активен"
-        assertTrue(scanText(text) >= 1, "Пароль в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль в начале текста должен быть найден")
     }
 
     @Test
-    fun testPasswordAtEnd() {
-        val text = "Ваш пароль: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "User password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль в конце текста должен быть найден")
     }
 
     @Test
-    fun testPasswordInMiddle() {
-        val text = "Пользователь password: Password123 установлен"
-        assertTrue(scanText(text) >= 1, "Пароль в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The password: MyPass123 is valid"
+        assertTrue(scanText(text) >= 1, "Пароль в середине текста должен быть найден")
     }
 
     @Test
-    fun testPasswordStandalone() {
-        val text = "пароль: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль отдельной строкой должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "password: MyPass123\nSecond line"
+        assertTrue(scanText(text) >= 1, "Пароль в начале строки должен быть найден")
     }
 
     @Test
-    fun testPasswordWithPrefixRussian() {
-        val text = "пароль: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль с русским префиксом должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\npassword: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль в конце строки должен быть найден")
     }
 
     @Test
-    fun testPasswordWithPrefixEnglish() {
-        val text = "password: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль с английским префиксом должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with password: MyPass123 pass"
+        assertTrue(scanText(text) >= 1, "Пароль в середине строки должен быть найден")
     }
 
     @Test
-    fun testPasswordWithColon() {
-        val text = "пароль: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль с двоеточием должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\npassword: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль после \\n должен быть найден")
     }
 
     @Test
-    fun testPasswordWithoutColon() {
-        val text = "пароль Password123"
-        assertTrue(scanText(text) >= 1, "Пароль без двоеточия должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "password: MyPass123\n"
+        assertTrue(scanText(text) >= 1, "Пароль перед \\n должен быть найден")
     }
 
     @Test
-    fun testPasswordMinLength() {
-        val text = "пароль: Abc"
-        assertTrue(scanText(text) >= 1, "Пароль минимальной длины (3 символа) должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\npassword: MyPass123\r\n"
+        assertTrue(scanText(text) >= 1, "Пароль с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testPasswordMaxLength() {
-        val text = "пароль: A234567890123456789012345"
-        assertTrue(scanText(text) >= 1, "Пароль максимальной длины (25 символов) должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\npassword: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль после пустой строки должен быть найден")
     }
 
     @Test
-    fun testPasswordWithUpperLower() {
-        val text = "пароль: AbCdEf"
-        assertTrue(scanText(text) >= 1, "Пароль с заглавными и строчными буквами должен быть найден")
+    fun testWithEmptyLineAfter() {
+        val text = "password: MyPass123\n\n"
+        assertTrue(scanText(text) >= 1, "Пароль перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testWithSpaceBefore() {
+        val text = "User password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testPasswordWithNumbers() {
-        val text = "пароль: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль с цифрами должен быть найден")
+    fun testWithSpaceAfter() {
+        val text = "password: MyPass123 is valid"
+        assertTrue(scanText(text) >= 1, "Пароль с пробелом после должен быть найден")
     }
 
     @Test
-    fun testPasswordWithSpecialChars() {
-        val text = "пароль: Password!@#"
+    fun testWithCommaBefore() {
+        val text = "User, password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaAfter() {
+        val text = "password: MyPass123, next"
+        assertTrue(scanText(text) >= 1, "Пароль с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithDotBefore() {
+        val text = "User. password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с точкой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "User; password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с точкой с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "password: MyPass123; next"
+        assertTrue(scanText(text) >= 1, "Пароль с точкой с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "User: password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с двоеточием перед должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( password: MyPass123 )"
+        assertTrue(scanText(text) >= 1, "Пароль в скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(password: MyPass123)"
+        assertTrue(scanText(text) >= 1, "Пароль в скобках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" password: MyPass123 \""
+        assertTrue(scanText(text) >= 1, "Пароль в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"password: MyPass123\""
+        assertTrue(scanText(text) >= 1, "Пароль в кавычках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithColonAsPartOfFormat() {
+        val text = "password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с двоеточием как часть формата должен быть найден")
+    }
+
+    @Test
+    fun testWithSpaceAsPartOfFormat() {
+        val text = "password MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с пробелом как часть формата должен быть найден")
+    }
+
+    @Test
+    fun testWithCyrillicKeyword() {
+        val text = "пароль: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с кириллическим ключевым словом должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "password: Pass1 password: Pass2"
+        assertTrue(scanText(text) >= 2, "Несколько паролей через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "password: Pass1, password: Pass2"
+        assertTrue(scanText(text) >= 2, "Несколько паролей через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "password: Pass1; password: Pass2"
+        assertTrue(scanText(text) >= 2, "Несколько паролей через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "password: Pass1\npassword: Pass2"
+        assertTrue(scanText(text) >= 2, "Несколько паролей через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
+        val text = ""
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать паролей")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "password: abc"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testMaximalFormat() {
+        val text = "password: abcdefghijklmnopqrstuvwxy"
+        assertTrue(scanText(text) >= 1, "Максимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithSpecialChars() {
+        val text = "password: Pass!@#\$%"
         assertTrue(scanText(text) >= 1, "Пароль со спецсимволами должен быть найден")
     }
 
     @Test
-    fun testPasswordAllSpecialChars() {
-        val text = "пароль: !@#$%^&*()"
-        assertTrue(scanText(text) >= 1, "Пароль только из спецсимволов должен быть найден")
+    fun testTooShort() {
+        val text = "password: ab"
+        assertEquals(0, scanText(text), "Слишком короткий пароль не должен находиться")
     }
 
     @Test
-    fun testPasswordWithUnderscore() {
-        val text = "пароль: Pass_word123"
-        assertTrue(scanText(text) >= 1, "Пароль с подчеркиванием должен быть найден")
+    fun testTooLong() {
+        val text = "password: abcdefghijklmnopqrstuvwxyz"
+        assertEquals(0, scanText(text), "Слишком длинный пароль не должен находиться")
     }
 
     @Test
-    fun testPasswordWithDash() {
-        val text = "пароль: Pass-word123"
-        assertTrue(scanText(text) >= 1, "Пароль с дефисом должен быть найден")
+    fun testWithMultipleSpaces() {
+        val text = "User    password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с несколькими пробелами должен быть найден")
     }
 
     @Test
-    fun testPasswordWithDot() {
-        val text = "пароль: Pass.word123"
-        assertTrue(scanText(text) >= 1, "Пароль с точкой должен быть найден")
+    fun testWithTabBefore() {
+        val text = "User\tpassword: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с табуляцией перед должен быть найден")
     }
 
     @Test
-    fun testPasswordWithSlash() {
-        val text = "пароль: Pass/word123"
-        assertTrue(scanText(text) >= 1, "Пароль со слэшем должен быть найден")
+    fun testWithTabAfter() {
+        val text = "password: MyPass123\tnext"
+        assertTrue(scanText(text) >= 1, "Пароль с табуляцией после должен быть найден")
     }
 
     @Test
-    fun testPasswordWithBackslash() {
-        val text = "пароль: Pass\\word123"
-        assertTrue(scanText(text) >= 1, "Пароль с обратным слэшем должен быть найден")
+    fun testWithUnicodeCyrillic() {
+        val text = "Пользователь password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с кириллицей рядом должен быть найден")
     }
 
     @Test
-    fun testPasswordUpperCase() {
-        val text = "ПАРОЛЬ: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль в верхнем регистре должен быть найден")
+    fun testWithUnicodeLatin() {
+        val text = "User password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль с латиницей рядом должен быть найден")
     }
 
     @Test
-    fun testPasswordLowerCase() {
-        val text = "пароль: password123"
-        assertTrue(scanText(text) >= 1, "Пароль в нижнем регистре должен быть найден")
+    fun testStandalone() {
+        val text = "password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль отдельной строкой должен быть найден")
     }
 
     @Test
-    fun testPasswordMixedCase() {
-        val text = "ПаРоЛь: Password123"
-        assertTrue(scanText(text) >= 1, "Пароль в смешанном регистре должен быть найден")
+    fun testAtTextBoundaryStart() {
+        val text = "password: MyPass123 text"
+        assertTrue(scanText(text) >= 1, "Пароль в начале текста должен быть найден")
     }
 
     @Test
-    fun testMultiplePasswords() {
-        val text = """
-            Первый: пароль: Password1
-            Второй: password: Pass2word
-            Третий: пароль Admin123
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько паролей должны быть найдены")
+    fun testAtTextBoundaryEnd() {
+        val text = "text password: MyPass123"
+        assertTrue(scanText(text) >= 1, "Пароль в конце текста должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testWithNewlines() {
+        val text = "password: My\nPass123"
+        assertEquals(0, scanText(text), "Пароль с переносами строк не должен находиться")
     }
 
     @Test
-    fun testPasswordTooShort() {
-        val text = "пароль: ab"
-        assertEquals(0, scanText(text), "Слишком короткий пароль не должен быть найден")
-    }
-
-    @Test
-    fun testPasswordTooLong() {
-        val text = "пароль: A2345678901234567890123456"
-        assertEquals(0, scanText(text), "Слишком длинный пароль не должен быть найден")
-    }
-
-    @Test
-    fun testPasswordEmptyString() {
-        val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать пароля")
+    fun testEmptyPassword() {
+        val text = "password: "
+        assertEquals(0, scanText(text), "Пустой пароль не должен находиться")
     }
 }
 

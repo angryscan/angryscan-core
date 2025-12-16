@@ -5,6 +5,14 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian phone numbers.
+ * Matches phone numbers in formats:
+ * - +7 (XXX) XXX-XX-XX
+ * - 8 (XXX) XXX-XX-XX
+ * - 7 XXX XXX XX XX
+ * Country code: +7 or 8, area code starts with 4, 8, or 9, followed by 10 digits total.
+ */
 @Serializable
 object Phone : IHyperMatcher, IKotlinMatcher {
     override val name = "Phone"

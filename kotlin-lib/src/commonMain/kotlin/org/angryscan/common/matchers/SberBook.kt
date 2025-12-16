@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Sberbank savings book numbers (сберкнижка).
+ * Matches account numbers in format: 423XX XXX X XXXX XXXXXXX
+ * Starts with 423 followed by specific digit groups.
+ * May be preceded by keywords like "номер сберкнижки", "номер сберегательной книжки ФЛ".
+ */
 @Serializable
 object SberBook : IHyperMatcher, IKotlinMatcher {
     override val name = "Sberbank Book"
@@ -24,7 +30,7 @@ object SberBook : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """\b423\d{2}[\s\-]?\d{3}[\s\-]?\d{1}[\s\-]?\d{4}[\s\-]?\d{7}\b"""
+        """(?:^|[^\p{L}\d])423\d{2}[\s\-]?\d{3}[\s\-]?\d{1}[\s\-]?\d{4}[\s\-]?\d{7}(?:[^\p{L}\d]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

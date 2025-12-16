@@ -5,166 +5,360 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера OSAGOPolicy
+ * Комплексные тесты для матчера OSAGOPolicy
  */
-internal class OSAGOPolicyTest: MatcherTestBase(OSAGOPolicy) {
+internal class OSAGOPolicyTest : MatcherTestBase(OSAGOPolicy) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testOSAGOPolicyAtStart() {
-        val text = " ХХХ 1234567890 полис ОСАГО"
-        assertTrue(scanText(text) >= 1, "Полис ОСАГО в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в начале текста должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyAtEnd() {
-        val text = "Номер полиса ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис ОСАГО в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "OSAGO policy: номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в конце текста должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyInMiddle() {
-        val text = "Автомобиль застрахован по полису ХХХ 1234567890 на год"
-        assertTrue(scanText(text) >= 1, "Полис ОСАГО в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The policy полис ОСАГО BBB 1234567890 is valid"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в середине текста должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyStandalone() {
-        val text = " ХХХ 1234567890 "
+    fun testAtStartOfLine() {
+        val text = "серия и номер полиса ОСАГО BBB 1234567890\nSecond line"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в начале строки должен быть найден")
+    }
+
+    @Test
+    fun testAtEndOfLine() {
+        val text = "First line\nстраховой полис ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в конце строки должен быть найден")
+    }
+
+    @Test
+    fun testInMiddleOfLine() {
+        val text = "Line with страховка ОСАГО BBB 1234567890 policy"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в середине строки должен быть найден")
+    }
+
+    @Test
+    fun testWithNewlineBefore() {
+        val text = "\nполис обязательного страхования автогражданской ответственности BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО после \\n должен быть найден")
+    }
+
+    @Test
+    fun testWithNewlineAfter() {
+        val text = "ОСАГО BBB 1234567890\n"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО перед \\n должен быть найден")
+    }
+
+    @Test
+    fun testWithCRLF() {
+        val text = "\r\nномер полиса ОСАГО BBB 1234567890\r\n"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с \\r\\n должен быть найден")
+    }
+
+    @Test
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nсерия и номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО после пустой строки должен быть найден")
+    }
+
+    @Test
+    fun testWithEmptyLineAfter() {
+        val text = "страховой полис ОСАГО BBB 1234567890\n\n"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abcBBB 1234567890def"
+        assertEquals(0, scanText(text), "Полис ОСАГО внутри буквенной последовательности не должен находиться")
+    }
+
+    @Test
+    fun testNotInsideNumericSequence() {
+        val text = "123BBB 1234567890456"
+        assertEquals(0, scanText(text), "Полис ОСАГО внутри цифровой последовательности не должен находиться")
+    }
+
+    @Test
+    fun testWithSpaceBefore() {
+        val text = "Policy ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с пробелом перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSpaceAfter() {
+        val text = "полис ОСАГО BBB 1234567890 is valid"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с пробелом после должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaBefore() {
+        val text = "Policy, номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithCommaAfter() {
+        val text = "серия и номер полиса ОСАГО BBB 1234567890, next"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithDotBefore() {
+        val text = "Policy. страховой полис ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с точкой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithDotAfter() {
+        val text = "страховка ОСАГО BBB 1234567890."
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с точкой после должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "Policy; полис обязательного страхования автогражданской ответственности BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с точкой с запятой перед должен быть найден")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "ОСАГО BBB 1234567890; next"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с точкой с запятой после должен быть найден")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "Policy: номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с двоеточием перед должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( полис обязательного страхования автогражданской ответственности BBB 1234567890 )"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(номер полиса ОСАГО BBB 1234567890)"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в скобках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" серия и номер полиса ОСАГО BBB 1234567890 \""
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в кавычках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"страховой полис ОСАГО BBB 1234567890\""
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в кавычках без пробелов должен быть найден")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ страховка ОСАГО BBB 1234567890 ]"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в квадратных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ ОСАГО BBB 1234567890 }"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в фигурных скобках с пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithSpaceAsPartOfFormat() {
+        val text = "полис ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с пробелом как часть формата должен быть найден")
+    }
+
+    @Test
+    fun testWithNumberSign() {
+        val text = "номер полиса ОСАГО BBB № 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с знаком № должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testEmptyString() {
+        val text = ""
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать полисов ОСАГО")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no OSAGO policies at all"
+        assertEquals(0, scanText(text), "Текст без полисов ОСАГО не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithLatinLetters() {
+        val text = "полис ОСАГО AAA 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с латинскими буквами должен быть найден")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "BBB 123456789"
+        assertEquals(0, scanText(text), "Слишком короткий полис не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "BBB 12345678901"
+        assertEquals(0, scanText(text), "Слишком длинный полис не должен находиться")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Policy    номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Policy\tсерия и номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "страховой полис ОСАГО BBB 1234567890\tnext"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Полис страховка ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "OSAGO policy полис ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "полис обязательного страхования автогражданской ответственности BBB 1234567890"
         assertTrue(scanText(text) >= 1, "Полис ОСАГО отдельной строкой должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyWithSpace() {
-        val text = " ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис ОСАГО с пробелом должен быть найден")
+    fun testAtTextBoundaryStart() {
+        val text = "ОСАГО BBB 1234567890 text"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в начале текста должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyWithoutSpace() {
-        val text = " ХХХ1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис ОСАГО без пробела должен быть найден")
+    fun testAtTextBoundaryEnd() {
+        val text = "text номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО в конце текста должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyWithNumber() {
-        val text = " ХХХ № 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис ОСАГО с № должен быть найден")
+    fun testWithoutKeywords() {
+        val text = "BBB 1234567890"
+        assertEquals(0, scanText(text), "Полис ОСАГО без ключевых слов не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyWithLabel() {
-        val text = "полис ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис с меткой 'полис ОСАГО' должен быть найден")
+    fun testWithOSAGOKeyword() {
+        val text = "ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с ключевым словом 'ОСАГО' должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyWithOSAGO() {
-        val text = "ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис с меткой 'ОСАГО' должен быть найден")
+    fun testWithPolisOSAGOKeyword() {
+        val text = "полис ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с ключевым словом 'полис ОСАГО' должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyWithNomer() {
-        val text = "номер полиса ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис с меткой 'номер полиса ОСАГО' должен быть найден")
+    fun testWithPolniyNomer() {
+        val text = "полис обязательного страхования автогражданской ответственности BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с полным ключевым словом должен быть найден")
     }
 
     @Test
-    fun testOSAGOPolicyElectronic() {
-        val text = "е-ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Электронный полис должен быть найден")
+    fun testWithNomerPolisaOSAGO() {
+        val text = "номер полиса ОСАГО BBB 1234567890"
+        assertTrue(scanText(text) >= 1, "Полис ОСАГО с ключевым словом 'номер полиса ОСАГО' должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testWithLettersInNumber() {
+        val text = "BBB ABCDEFGHIJ"
+        assertEquals(0, scanText(text), "Полис ОСАГО с буквами в номере не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyElectronicFull() {
-        val text = "электронный полис ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полное название электронного полиса должно быть найдено")
+    fun testWithInvalidSeries() {
+        val text = "999 1234567890"
+        assertEquals(0, scanText(text), "Полис ОСАГО с недопустимой серией не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyStrakhovka() {
-        val text = "страховка ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис с меткой 'страховка' должен быть найден")
+    fun testInsideLongSequence() {
+        val text = "ABCBBB 1234567890DEF"
+        assertEquals(0, scanText(text), "Полис ОСАГО внутри длинной последовательности не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyUpperCase() {
-        val text = "ОСАГО: ХХХ 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис в верхнем регистре должен быть найден")
+    fun testStickingToAlphabeticChar() {
+        val text = "policyBBB 1234567890"
+        assertEquals(0, scanText(text), "Полис ОСАГО, прилипший к буквам, не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyLowerCase() {
-        val text = "осаго: ххх 1234567890 "
-        assertTrue(scanText(text) >= 1, "Полис в нижнем регистре должен быть найден")
+    fun testStickingToNumericChar() {
+        val text = "123BBB 1234567890"
+        assertEquals(0, scanText(text), "Полис ОСАГО, прилипший к цифрам, не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyDifferentSeries() {
-        val text = """
-            ААА 1234567890 
-            ВВВ 2345678901 
-            МММ 3456789012 
-        """.trimIndent()
-        assertTrue(scanText(text) >= 2, "Полисы с разными сериями должны быть найдены")
+    fun testWithInvalidSeparators() {
+        val text = "BBB@1234567890"
+        assertEquals(0, scanText(text), "Полис ОСАГО с неправильными разделителями не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyInParentheses() {
-        val text = "(ХХХ 1234567890) "
-        assertTrue(scanText(text) >= 1, "Полис в скобках должен быть найден")
+    fun testPartialOSAGOPolicy() {
+        val text = "BBB"
+        assertEquals(0, scanText(text), "Частичный полис ОСАГО не должен находиться")
     }
 
     @Test
-    fun testOSAGOPolicyInQuotes() {
-        val text = "\"ХХХ 1234567890\" "
-        assertTrue(scanText(text) >= 1, "Полис в кавычках должен быть найден")
-    }
-
-    @Test
-    fun testOSAGOPolicyWithPunctuation() {
-        val text = "ОСАГО: ХХХ 1234567890. "
-        assertTrue(scanText(text) >= 1, "Полис с точкой должен быть найден")
-    }
-
-    @Test
-    fun testMultipleOSAGOPolicies() {
-        val text = """
-            Первый: ХХХ 1234567890 
-            Второй: ААА 9876543210 
-            Третий: МММ 1111111111 
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько полисов должны быть найдены")
-    }
-
-    @Test
-    fun testOSAGOPolicyInvalidSeries2Letters() {
-        val text = " ХХ 1234567890 "
-        assertEquals(0, scanText(text), "Полис с 2 буквами не должен быть найден")
-    }
-
-    @Test
-    fun testOSAGOPolicyInvalidSeries4Letters() {
-        val text = " ХХХХ 1234567890 "
-        assertEquals(0, scanText(text), "Полис с 4 буквами не должен быть найден")
-    }
-
-    @Test
-    fun testOSAGOPolicyInvalidNumberShort() {
-        val text = " ХХХ 123456789 "
-        assertEquals(0, scanText(text), "Полис со слишком коротким номером не должен быть найден")
-    }
-
-    @Test
-    fun testOSAGOPolicyInvalidNumberLong() {
-        val text = " ХХХ 12345678901 "
-        assertEquals(0, scanText(text), "Полис со слишком длинным номером не должен быть найден")
-    }
-
-    @Test
-    fun testOSAGOPolicyEmptyString() {
-        val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать полиса ОСАГО")
+    fun testInCode() {
+        val text = "functionBBB 1234567890()"
+        assertEquals(0, scanText(text), "Полис ОСАГО внутри кода не должен находиться")
     }
 }
 

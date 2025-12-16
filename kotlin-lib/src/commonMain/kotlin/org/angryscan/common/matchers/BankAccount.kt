@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian bank account numbers.
+ * Matches account numbers starting with 408 followed by 17 digits (total 20 digits).
+ * Format: 408XXXXXXXXXXXXXXX
+ */
 @Serializable
 object BankAccount : IHyperMatcher, IKotlinMatcher {
     override val name = "Bank Account"

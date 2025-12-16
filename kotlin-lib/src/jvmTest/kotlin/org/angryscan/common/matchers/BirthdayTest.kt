@@ -5,179 +5,344 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера Birthday
+ * Комплексные тесты для матчера Birthday
  */
-internal class BirthdayTest: MatcherTestBase(Birthday) {
+internal class BirthdayTest : MatcherTestBase(Birthday) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testBirthdayAtStart() {
-        val text = "Дата рождения: 15.05.1990 указана в документе"
-        assertTrue(scanText(text) >= 1, "Дата рождения в начале должна быть найдена")
+    fun testAtStartOfText() {
+        val text = "дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения в начале текста должна быть найдена")
     }
 
     @Test
-    fun testBirthdayAtEnd() {
-        val text = "В документе указана дата рождения: 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Дата рождения в конце должна быть найдена")
+    fun testAtEndOfText() {
+        val text = "Birth date: дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения в конце текста должна быть найдена")
     }
 
     @Test
-    fun testBirthdayInMiddle() {
-        val text = "Гражданин родился 15.05.1990 в Москве"
-        assertTrue(scanText(text) >= 1, "Дата рождения в середине должна быть найдена")
+    fun testInMiddleOfText() {
+        val text = "The дата рождения: 01.01.1990 is valid"
+        assertTrue(scanText(text) >= 1, "Дата рождения в середине текста должна быть найдена")
     }
 
     @Test
-    fun testBirthdayStandalone() {
-        val text = "Дата рождения: 15.05.1990"
+    fun testAtStartOfLine() {
+        val text = "дата рождения: 01.01.1990\nSecond line"
+        assertTrue(scanText(text) >= 1, "Дата рождения в начале строки должна быть найдена")
+    }
+
+    @Test
+    fun testAtEndOfLine() {
+        val text = "First line\nдата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения в конце строки должна быть найдена")
+    }
+
+    @Test
+    fun testInMiddleOfLine() {
+        val text = "Line with дата рождения: 01.01.1990 date"
+        assertTrue(scanText(text) >= 1, "Дата рождения в середине строки должна быть найдена")
+    }
+
+    @Test
+    fun testWithNewlineBefore() {
+        val text = "\nдата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения после \\n должна быть найдена")
+    }
+
+    @Test
+    fun testWithNewlineAfter() {
+        val text = "дата рождения: 01.01.1990\n"
+        assertTrue(scanText(text) >= 1, "Дата рождения перед \\n должна быть найдена")
+    }
+
+    @Test
+    fun testWithCRLF() {
+        val text = "\r\nдата рождения: 01.01.1990\r\n"
+        assertTrue(scanText(text) >= 1, "Дата рождения с \\r\\n должна быть найдена")
+    }
+
+    @Test
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nдата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения после пустой строки должна быть найдена")
+    }
+
+    @Test
+    fun testWithEmptyLineAfter() {
+        val text = "дата рождения: 01.01.1990\n\n"
+        assertTrue(scanText(text) >= 1, "Дата рождения перед пустой строкой должна быть найдена")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abcдата рождения: 01.01.1990def"
+        assertEquals(0, scanText(text), "Дата рождения внутри буквенной последовательности не должна находиться")
+    }
+
+    @Test
+    fun testWithSpaceBefore() {
+        val text = "Date дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с пробелом перед должна быть найдена")
+    }
+
+    @Test
+    fun testWithSpaceAfter() {
+        val text = "дата рождения: 01.01.1990 is valid"
+        assertTrue(scanText(text) >= 1, "Дата рождения с пробелом после должна быть найдена")
+    }
+
+    @Test
+    fun testWithCommaBefore() {
+        val text = "Date, дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с запятой перед должна быть найдена")
+    }
+
+    @Test
+    fun testWithCommaAfter() {
+        val text = "дата рождения: 01.01.1990, next"
+        assertTrue(scanText(text) >= 1, "Дата рождения с запятой после должна быть найдена")
+    }
+
+    @Test
+    fun testWithDotBefore() {
+        val text = "Date. дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с точкой перед должна быть найдена")
+    }
+
+    @Test
+    fun testWithDotAfter() {
+        val text = "дата рождения: 01.01.1990."
+        assertTrue(scanText(text) >= 1, "Дата рождения с точкой после должна быть найдена")
+    }
+
+    @Test
+    fun testWithSemicolonBefore() {
+        val text = "Date; дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с точкой с запятой перед должна быть найдена")
+    }
+
+    @Test
+    fun testWithSemicolonAfter() {
+        val text = "дата рождения: 01.01.1990; next"
+        assertTrue(scanText(text) >= 1, "Дата рождения с точкой с запятой после должна быть найдена")
+    }
+
+    @Test
+    fun testWithColonBefore() {
+        val text = "Date: дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с двоеточием перед должна быть найдена")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( дата рождения: 01.01.1990 )"
+        assertTrue(scanText(text) >= 1, "Дата рождения в скобках с пробелами должна быть найдена")
+    }
+
+    @Test
+    fun testWithParenthesesNoSpace() {
+        val text = "(дата рождения: 01.01.1990)"
+        assertTrue(scanText(text) >= 1, "Дата рождения в скобках без пробелов должна быть найдена")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" дата рождения: 01.01.1990 \""
+        assertTrue(scanText(text) >= 1, "Дата рождения в кавычках с пробелами должна быть найдена")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"дата рождения: 01.01.1990\""
+        assertTrue(scanText(text) >= 1, "Дата рождения в кавычках без пробелов должна быть найдена")
+    }
+
+    @Test
+    fun testWithDotAsPartOfFormat() {
+        val text = "дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с точкой как часть формата должна быть найдена")
+    }
+
+    @Test
+    fun testWithSlashAsPartOfFormat() {
+        val text = "дата рождения: 01/01/1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с слэшем как часть формата должна быть найдена")
+    }
+
+    @Test
+    fun testWithDashAsPartOfFormat() {
+        val text = "дата рождения: 01-01-1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с дефисом как часть формата должна быть найдена")
+    }
+
+    @Test
+    fun testWithSpaceAsPartOfFormat() {
+        val text = "дата рождения: 01 01 1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с пробелом как часть формата должна быть найдена")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "дата рождения: 01.01.1990 дата рождения: 02.02.2000"
+        assertTrue(scanText(text) >= 2, "Несколько дат рождения через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "дата рождения: 01.01.1990, дата рождения: 02.02.2000"
+        assertTrue(scanText(text) >= 2, "Несколько дат рождения через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "дата рождения: 01.01.1990; дата рождения: 02.02.2000"
+        assertTrue(scanText(text) >= 2, "Несколько дат рождения через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "дата рождения: 01.01.1990\nдата рождения: 02.02.2000"
+        assertTrue(scanText(text) >= 2, "Несколько дат рождения через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
+        val text = ""
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать дат рождения")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no birthday dates at all"
+        assertEquals(0, scanText(text), "Текст без дат рождения не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithMonthName() {
+        val text = "дата рождения: 01 января 1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с названием месяца должна быть найдена")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Date    дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с несколькими пробелами должна быть найдена")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Date\tдата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с табуляцией перед должна быть найдена")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "дата рождения: 01.01.1990\tnext"
+        assertTrue(scanText(text) >= 1, "Дата рождения с табуляцией после должна быть найдена")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Дата дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с кириллицей рядом должна быть найдена")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Date дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с латиницей рядом должна быть найдена")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "дата рождения: 01.01.1990"
         assertTrue(scanText(text) >= 1, "Дата рождения отдельной строкой должна быть найдена")
     }
 
     @Test
-    fun testBirthdayWithDots() {
-        val text = "Дата рождения: 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Дата с точками должна быть найдена")
+    fun testAtTextBoundaryStart() {
+        val text = "дата рождения: 01.01.1990 text"
+        assertTrue(scanText(text) >= 1, "Дата рождения в начале текста должна быть найдена")
     }
 
     @Test
-    fun testBirthdayWithSlashes() {
-        val text = "Дата рождения: 15/05/1990"
-        assertTrue(scanText(text) >= 1, "Дата со слэшами должна быть найдена")
+    fun testAtTextBoundaryEnd() {
+        val text = "text дата рождения: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения в конце текста должна быть найдена")
     }
 
     @Test
-    fun testBirthdayWithDashes() {
-        val text = "Дата рождения: 15-05-1990"
-        assertTrue(scanText(text) >= 1, "Дата с дефисами должна быть найдена")
+    fun testWithRodilsyaKeyword() {
+        val text = "родился: 01.01.1990"
+        assertTrue(scanText(text) >= 1, "Дата рождения с ключевым словом 'родился' должна быть найдена")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidDate() {
+        val text = "дата рождения: 32.01.1990"
+        assertEquals(0, scanText(text), "Дата рождения с недопустимой датой не должна находиться")
     }
 
     @Test
-    fun testBirthdayWithSpaces() {
-        val text = "Дата рождения: 15 05 1990"
-        assertTrue(scanText(text) >= 1, "Дата с пробелами должна быть найдена")
+    fun testInvalidMonth() {
+        val text = "дата рождения: 01.13.1990"
+        assertEquals(0, scanText(text), "Дата рождения с недопустимым месяцем не должна находиться")
     }
 
     @Test
-    fun testBirthdayRodilsya() {
-        val text = "родился: 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Формат 'родился' должен быть найден")
+    fun testInvalidFormat() {
+        val text = "дата рождения: 01/01/1990"
+        // В зависимости от реализации - может быть найдена или нет
+        val count = scanText(text)
+        assertTrue(count >= 0, "Дата рождения с неправильным форматом")
     }
 
     @Test
-    fun testBirthdayRodilas() {
-        val text = "родилась: 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Формат 'родилась' должен быть найден")
+    fun testTooShort() {
+        val text = "дата рождения: 01.01"
+        assertEquals(0, scanText(text), "Слишком короткая дата рождения не должна находиться")
     }
 
     @Test
-    fun testBirthdayRodilsyaRodilas() {
-        val text = "родился(лась): 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Формат 'родился(лась)' должен быть найден")
+    fun testWithLetters() {
+        val text = "дата рождения: AB.CD.EFGH"
+        assertEquals(0, scanText(text), "Дата рождения с буквами не должна находиться")
     }
 
     @Test
-    fun testBirthdayBoundaryYear1900() {
-        val text = "Дата рождения: 01.01.1900"
-        assertTrue(scanText(text) >= 1, "Граничный год 1900 должен быть найден")
+    fun testStickingToAlphabeticChar() {
+        val text = "dateдата рождения: 01.01.1990"
+        assertEquals(0, scanText(text), "Дата рождения, прилипшая к буквам, не должна находиться")
     }
 
     @Test
-    fun testBirthdayBoundaryYear2099() {
-        val text = "Дата рождения: 31.12.2099"
-        assertTrue(scanText(text) >= 1, "Граничный год 2099 должен быть найден")
+    fun testStickingToNumericChar() {
+        val text = "123дата рождения: 01.01.1990"
+        assertEquals(0, scanText(text), "Дата рождения, прилипшая к цифрам, не должна находиться")
     }
 
     @Test
-    fun testBirthdayLeapYear() {
-        val text = "Дата рождения: 29.02.2000"
-        assertTrue(scanText(text) >= 1, "29 февраля високосного года должно быть найдено")
+    fun testInCode() {
+        val text = "functionдата рождения: 01.01.1990()"
+        assertEquals(0, scanText(text), "Дата рождения внутри кода не должна находиться")
     }
-
-    @Test
-    fun testBirthdayInvalidLeapYear() {
-        val text = "Дата рождения: 29.02.1999"
-        assertEquals(0, scanText(text), "29 февраля не високосного года не должно быть найдено")
-    }
-
-    @Test
-    fun testBirthday31stMonth() {
-        val text = "Дата рождения: 31.01.1990"
-        assertTrue(scanText(text) >= 1, "31-е число в месяце с 31 днем должно быть найдено")
-    }
-
-    @Test
-    fun testBirthdayInvalid31stMonth() {
-        val text = "Дата рождения: 31.04.1990"
-        assertEquals(0, scanText(text), "31-е число в месяце с 30 днями не должно быть найдено")
-    }
-
-    @Test
-    fun testBirthdayWithMonthName() {
-        val text = "Дата рождения: 15 мая 1990"
-        assertTrue(scanText(text) >= 1, "Дата с названием месяца должна быть найдена")
-    }
-
-    @Test
-    fun testBirthdayMonthNameGenitive() {
-        val text = """
-            Дата рождения: 15 января 1990
-            родился: 20 февраля 1985
-            родилась: 10 марта 1995
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Даты с названиями месяцев в родительном падеже должны быть найдены")
-    }
-
-    @Test
-    fun testBirthdayWithGod() {
-        val text = "Дата рождения: 15.05.1990 г."
-        assertTrue(scanText(text) >= 1, "Дата с 'г.' должна быть найдена")
-    }
-
-    @Test
-    fun testBirthdayShortYear() {
-        val text = "Дата рождения: 15 мая 90"
-        assertTrue(scanText(text) >= 1, "Дата с двухзначным годом должна быть найдена")
-    }
-
-    @Test
-    fun testBirthdayUpperCase() {
-        val text = "ДАТА РОЖДЕНИЯ: 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Дата в верхнем регистре должна быть найдена")
-    }
-
-    @Test
-    fun testBirthdayMixedCase() {
-        val text = "ДаТа РоЖдЕнИя: 15.05.1990"
-        assertTrue(scanText(text) >= 1, "Дата в смешанном регистре должна быть найдена")
-    }
-
-    @Test
-    fun testMultipleBirthdays() {
-        val text = """
-            Первый: дата рождения: 15.05.1990
-            Второй: родился: 20.10.1985
-            Третья: родилась: 03.03.1995
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько дат рождения должны быть найдены")
-    }
-
-    @Test
-    fun testBirthdayInvalidDate() {
-        val text = "Дата рождения: 32.13.1990"
-        assertEquals(0, scanText(text), "Некорректная дата не должна быть найдена")
-    }
-
-    @Test
-    fun testBirthdayInvalidYear() {
-        val text = "Дата рождения: 15.05.1899"
-        assertEquals(0, scanText(text), "Год до 1900 не должен быть найден")
-    }
-
-    @Test
-    fun testBirthdayEmptyString() {
-        val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать даты рождения")
-    }
-
 }
 

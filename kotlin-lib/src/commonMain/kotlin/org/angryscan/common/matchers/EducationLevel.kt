@@ -5,6 +5,14 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for education levels in Russian text.
+ * Matches various education levels including:
+ * - Preschool, primary, secondary, vocational, higher education
+ * - Bachelor's, Master's, Specialist, PhD degrees
+ * - Additional professional education
+ * Matches both full names and abbreviations (СПО, НПО, ДПО).
+ */
 @Serializable
 object EducationLevel : IHyperMatcher, IKotlinMatcher {
     override val name = "Education Level"
@@ -34,7 +42,6 @@ object EducationLevel : IHyperMatcher, IKotlinMatcher {
         """(?:^|[\r\n])специалист(?:$|[\r\n])""",
         """(?:^|[\r\n])СПО(?:$|[\r\n])""",
         """(?:^|[\r\n])НПО(?:$|[\r\n])""",
-        """(?:^|[\r\n])ВО(?:$|[\r\n])""",
         """(?:^|[\r\n])ДПО(?:$|[\r\n])""",
         """(?:^|[\s\r\n\(\[\{«"'])дополнительно[ея]\s+профессионально[ея]\s+образовани[ея](?:$|[\s\r\n\)\]\}»"'.,;:!?])""",
         """(?:^|[\s\r\n\(\[\{«"'])дополнительно[ея]\s+образовани[ея](?:$|[\s\r\n\)\]\}»"'.,;:!?])""",

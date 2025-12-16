@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for passwords.
+ * Matches passwords preceded by keywords "password" or "пароль" followed by colon or space.
+ * Format: password: value or пароль: value
+ * Password must be 3-25 non-whitespace characters.
+ */
 @Serializable
 object Password : IHyperMatcher, IKotlinMatcher {
     override val name = "Password"

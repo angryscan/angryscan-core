@@ -5,6 +5,19 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian identity document types.
+ * Matches various identity document types including:
+ * - Russian passport (паспорт гражданина РФ)
+ * - Foreign citizen passport (паспорт иностранного гражданина)
+ * - International passport (загранпаспорт)
+ * - Diplomatic/service passport
+ * - Birth certificate (свидетельство о рождении)
+ * - Residence permit (вид на жительство, ВНЖ)
+ * - Temporary residence permit (разрешение на временное проживание, РВП)
+ * - Military ID (военный билет)
+ * May be preceded by keywords like "вид документа удостоверяющего личность".
+ */
 @Serializable
 object IdentityDocType : IHyperMatcher, IKotlinMatcher {
     override val name = "Identity Document Type"
@@ -21,7 +34,7 @@ object IdentityDocType : IHyperMatcher, IKotlinMatcher {
         (
           (?:паспорт\s+гражданина\s+(?:российской\s+федерации|рф|россии))|
           (?:паспорт\s+иностранного\s+гражданина)|
-          (?:загран(?:ичный|паспорт))|
+          (?:загран(?:ичный\s+паспорт|паспорт))|
           (?:дипломатический\s+паспорт)|
           (?:служебный\s+паспорт)|
           (?:временное\s+удостоверение\s+личности\s+гражданина\s+(?:рф|российской\s+федерации))|
@@ -43,7 +56,7 @@ object IdentityDocType : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns: List<String> = listOf(
         """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?паспорт[аеуом]?\s+гражданин[ауом]\s+(?:российско[йгемя]\s+федераци[ия]|рф|росси[ия])(?:$|[\s\)\]\}»"'\.,;:!?])""",
         """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?паспорт[аеуом]?\s+иностранного\s+гражданин[ауом](?:$|[\s\)\]\}»"'\.,;:!?])""",
-        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?загран(?:ичн[ыойемя][йгемя]?|паспорт[аеуом]?)(?:$|[\s\)\]\}»"'\.,;:!?])""",
+        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?загран(?:ичн[ыойемя][йгемя]?\s+паспорт[аеуом]?|паспорт[аеуом]?)(?:$|[\s\)\]\}»"'\.,;:!?])""",
         """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?(?:дипломатическ[ийогемя][йгемя]?|служебн[ыойемя][йгемя]?)\s+паспорт[аеуом]?(?:$|[\s\)\]\}»"'\.,;:!?])""",
         """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?временно[ея]\s+удостоверени[еяум]\s+личност[ия](?:$|[\s\)\]\}»"'\.,;:!?])""",
         """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?свидетельств[оаеум]\s+о\s+рождени[ия](?:$|[\s\)\]\}»"'\.,;:!?])""",

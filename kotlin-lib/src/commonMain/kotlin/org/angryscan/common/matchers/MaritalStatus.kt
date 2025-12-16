@@ -5,6 +5,16 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for marital status in Russian text.
+ * Matches various marital statuses including:
+ * - Married (женат, замужем, состоит в браке)
+ * - Single (холост, одинок, не женат, не замужем)
+ * - Divorced (разведен, в разводе)
+ * - Widowed (вдовец, вдова)
+ * - Civil marriage (гражданский брак)
+ * May be preceded by keywords like "семейное положение", "семейный статус".
+ */
 @Serializable
 object MaritalStatus : IHyperMatcher, IKotlinMatcher {
     override val name = "Marital Status"

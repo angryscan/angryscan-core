@@ -5,11 +5,32 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian driver's license numbers.
+ * Matches license numbers in format: XX XX XXXXXX (2 digits, space, 2 digits, space, 6 digits)
+ * May be preceded by keywords like "водительское удостоверение", "номер ВУ", "driver license".
+ */
 @Serializable
 object DriverLicense : IHyperMatcher, IKotlinMatcher {
     override val name = "Driver License"
     override val javaPatterns = listOf(
-        """(?<!\w)(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*\d{2}\s?\d{2}\s\d{6}(?:\.\s|\s|\n|[)\]}"'»]\s|$)"""
+        """
+        (?ix)
+        (?:(?<=^)|(?<=[\s\(\[\{«"'])|(?<![\p{L}\d]))
+        (?:
+          водительское\s+удостоверение|
+          номер\s+водительского\s+удостоверения|
+          номер\s+удостоверения|
+          номер\s+ВУ|
+          ВУ\s+№|
+          driver\s+license|
+          license\s+number|
+          driving\s+license
+        )
+        \s*[:\-]?\s*
+        (\d{2}\s\d{2}\s\d{6})
+        (?![\p{L}\d])
+        """.trimIndent()
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -17,7 +38,7 @@ object DriverLicense : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|[^\w])(?:[^\w\s]\s|\s|\n|[\(\[\{"']|«)\s*\d{2}\s?\d{2}\s\d{6}(?:\.\s|\s|\n|[)\]}"'»]\s|$)"""
+        """(?:^|[\s\(\[\{«"'])(?:водительское\s+удостоверение|номер\s+водительского\s+удостоверения|номер\s+удостоверения|номер\s+ВУ|ВУ\s+№|driver\s+license|license\s+number|driving\s+license)\s*[:\-]?\s*\d{2}\s\d{2}\s\d{6}(?:[^0-9a-zA-ZА-ЯЁа-яё]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

@@ -5,6 +5,11 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for CVV/CVC card security codes.
+ * Matches 3-digit security codes preceded by keywords: cvc, cvv, cav, cvc2, cvv2, cav2
+ * Format: keyword: 123 or keyword 123
+ */
 @Serializable
 object CVV : IHyperMatcher, IKotlinMatcher {
     override val name = "CVV"

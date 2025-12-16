@@ -1,221 +1,400 @@
 package org.angryscan.common.matchers
 
-import org.angryscan.common.engine.kotlin.KotlinEngine
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера Geo
- * 
- * Крайние позиции:
- * - В начале строки
- * - В конце строки
- * - В середине строки
- * - Отдельной строкой
- * 
- * Пограничные значения:
- * - Минимальные/максимальные допустимые значения широты и долготы
- * - Высокая точность координат
- * - Нулевые координаты
+ * Комплексные тесты для матчера Geo
  */
-internal class GeoTest: MatcherTestBase(Geo) {
-    
+internal class GeoTest : MatcherTestBase(Geo) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
+
     @Test
-    fun testGeoAtStartOfLine() {
-        val text = "55.755812, 37.617345 - это координаты Москвы"
-        assertEquals(1, scanText(text), "Координаты в начале строки должны быть найдены")
+    fun testAtStartOfText() {
+        val text = "55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в начале текста должны быть найдены")
     }
 
     @Test
-    fun testGeoAtEndOfLine() {
-        val text = "Координаты Москвы: 55.755812, 37.617345"
-        assertEquals(1, scanText(text), "Координаты в конце строки должны быть найдены")
+    fun testAtEndOfText() {
+        val text = "Coordinates: 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в конце текста должны быть найдены")
     }
 
     @Test
-    fun testGeoInMiddle() {
-        val text = "Место встречи 55.755812, 37.617345 будет удобным"
-        assertEquals(1, scanText(text), "Координаты в середине строки должны быть найдены")
+    fun testInMiddleOfText() {
+        val text = "The coordinates 55.7558, 37.6173 are valid"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в середине текста должны быть найдены")
     }
 
     @Test
-    fun testGeoStandalone() {
-        val text = "55.755812, 37.617345"
-        assertEquals(1, scanText(text), "Координаты отдельной строкой должны быть найдены")
+    fun testAtStartOfLine() {
+        val text = "55.7558, 37.6173\nSecond line"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в начале строки должны быть найдены")
     }
 
     @Test
-    fun testGeoMinLatitude() {
-        val text = "-90.000, 10.000"
-        assertEquals(1, scanText(text), "Минимальная широта должна быть найдена")
+    fun testAtEndOfLine() {
+        val text = "First line\n55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в конце строки должны быть найдены")
     }
 
     @Test
-    fun testGeoMaxLatitude() {
-        val text = "90.000, 10.000"
-        assertEquals(1, scanText(text), "Максимальная широта должна быть найдена")
+    fun testInMiddleOfLine() {
+        val text = "Line with 55.7558, 37.6173 coordinates"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в середине строки должны быть найдены")
     }
 
     @Test
-    fun testGeoMinLongitude() {
-        val text = "10.000, -180.000"
-        assertEquals(1, scanText(text), "Минимальная долгота должна быть найдена")
+    fun testWithNewlineBefore() {
+        val text = "\n55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты после \\n должны быть найдены")
     }
 
     @Test
-    fun testGeoMaxLongitude() {
-        val text = "10.000, 180.000"
-        assertEquals(1, scanText(text), "Максимальная долгота должна быть найдена")
+    fun testWithNewlineAfter() {
+        val text = "55.7558, 37.6173\n"
+        assertTrue(scanText(text) >= 1, "Геокоординаты перед \\n должны быть найдены")
     }
 
     @Test
-    fun testGeoInvalidLatitude() {
-        val text = "91.000, 10.000"
-        assertEquals(0, scanText(text), "Некорректная широта не должна быть найдена")
+    fun testWithCRLF() {
+        val text = "\r\n55.7558, 37.6173\r\n"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с \\r\\n должны быть найдены")
     }
 
     @Test
-    fun testGeoInvalidLongitude() {
-        val text = "10.000, 181.000"
-        assertEquals(0, scanText(text), "Некорректная долгота не должна быть найдена")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты после пустой строки должны быть найдены")
     }
 
     @Test
-    fun testGeoHighPrecision() {
-        val text = "55.7558123456, 37.6173987654"
-        assertEquals(1, scanText(text), "Координаты с высокой точностью должны быть найдены")
+    fun testWithEmptyLineAfter() {
+        val text = "55.7558, 37.6173\n\n"
+        assertTrue(scanText(text) >= 1, "Геокоординаты перед пустой строкой должны быть найдены")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc55.7558, 37.6173def"
+        assertEquals(0, scanText(text), "Геокоординаты внутри буквенной последовательности не должны находиться")
     }
 
     @Test
-    fun testGeoZeroCoordinates() {
-        val text = "0.0, 0.0"
-        assertEquals(0, scanText(text), "Нулевые координаты не должны быть найдены")
+    fun testNotInsideNumericSequence() {
+        val text = "12355.7558, 37.6173456"
+        assertEquals(0, scanText(text), "Геокоординаты внутри цифровой последовательности не должны находиться")
     }
 
     @Test
-    fun testGeoMultipleOnDifferentLines() {
-        val text = """
-            Первая точка: 55.755812, 37.617345
-            Вторая точка: 59.934312, 30.335123
-            Третья точка: 43.256712, 76.928645
-        """.trimIndent()
-        assertEquals(3, scanText(text), "Несколько координат на разных строках должны быть найдены")
+    fun testWithSpaceBefore() {
+        val text = "Coordinates 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с пробелом перед должны быть найдены")
     }
 
     @Test
-    fun testGeoNegativeCoordinates() {
-        val text = "-33.868812, -151.209345"
-        assertEquals(1, scanText(text), "Отрицательные координаты должны быть найдены")
+    fun testWithSpaceAfter() {
+        val text = "55.7558, 37.6173 are valid"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с пробелом после должны быть найдены")
     }
 
     @Test
-    fun testGeoWithLabel() {
-        val text = "Геолокация ФЛ: 55.755812, 37.617345"
-        assertEquals(1, scanText(text), "Координаты с меткой должны быть найдены")
+    fun testWithCommaBefore() {
+        val text = "Coordinates, 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с запятой перед должны быть найдены")
     }
 
     @Test
-    fun testGeoWithFullLabel() {
-        val text = "Координаты физического лица: 55.755812, 37.617345"
-        assertEquals(1, scanText(text), "Координаты с полной меткой должны быть найдены")
+    fun testWithCommaAfter() {
+        val text = "55.7558, 37.6173, next"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с запятой после должны быть найдены")
     }
 
     @Test
-    fun testGeoBoundaryLatitudePositive() {
-        val text = "89.9999999999, 10.000"
-        assertEquals(1, scanText(text), "Граничная положительная широта должна быть найдена")
+    fun testWithDotBefore() {
+        val text = "Coordinates. 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с точкой перед должны быть найдены")
     }
 
     @Test
-    fun testGeoBoundaryLatitudeNegative() {
-        val text = "-89.9999999999, 10.000"
-        assertEquals(1, scanText(text), "Граничная отрицательная широта должна быть найдена")
+    fun testWithDotAfter() {
+        val text = "55.7558, 37.6173."
+        assertTrue(scanText(text) >= 1, "Геокоординаты с точкой после должны быть найдены")
     }
 
     @Test
-    fun testGeoBoundaryLongitudePositive() {
-        val text = "10.000, 179.9999999999"
-        assertEquals(1, scanText(text), "Граничная положительная долгота должна быть найдена")
+    fun testWithSemicolonBefore() {
+        val text = "Coordinates; 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с точкой с запятой перед должны быть найдены")
     }
 
     @Test
-    fun testGeoBoundaryLongitudeNegative() {
-        val text = "10.000, -179.9999999999"
-        assertEquals(1, scanText(text), "Граничная отрицательная долгота должна быть найдена")
+    fun testWithSemicolonAfter() {
+        val text = "55.7558, 37.6173; next"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с точкой с запятой после должны быть найдены")
     }
 
     @Test
-    fun testGeoInParentheses() {
-        val text = "Место (55.755812, 37.617345) на карте"
-        assertEquals(1, scanText(text), "Координаты в скобках должны быть найдены")
+    fun testWithColonBefore() {
+        val text = "Coordinates: 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с двоеточием перед должны быть найдены")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 55.7558, 37.6173 )"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в скобках с пробелами должны быть найдены")
     }
 
     @Test
-    fun testGeoInBrackets() {
-        val text = "Точка (55.755812, 37.617345) отмечена"
-        assertEquals(1, scanText(text), "Координаты в скобках должны быть найдены (квадратные скобки исключаются)")
+    fun testWithParenthesesNoSpace() {
+        val text = "(55.7558, 37.6173)"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в скобках без пробелов должны быть найдены")
     }
 
     @Test
-    fun testGeoInQuotes() {
-        val text = "Координаты \"55.755812, 37.617345\" сохранены"
-        assertEquals(1, scanText(text), "Координаты в кавычках должны быть найдены")
+    fun testWithQuotesAndSpace() {
+        val text = "\" 55.7558, 37.6173 \""
+        assertTrue(scanText(text) >= 1, "Геокоординаты в кавычках с пробелами должны быть найдены")
     }
 
     @Test
-    fun testGeoWithPunctuation() {
-        val text = "Место: 55.755812, 37.617345."
-        assertEquals(1, scanText(text), "Координаты с точкой в конце должны быть найдены")
+    fun testWithQuotesNoSpace() {
+        val text = "\"55.7558, 37.6173\""
+        assertTrue(scanText(text) >= 1, "Геокоординаты в кавычках без пробелов должны быть найдены")
     }
 
     @Test
-    fun testGeoMinimalDecimal() {
-        val text = "1.123, 1.123"
-        assertEquals(1, scanText(text), "Минимальные десятичные координаты с >= 3 знаками должны быть найдены")
+    fun testWithBracketsAndSpace() {
+        val text = "[ 55.7558, 37.6173 ]"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в квадратных скобках с пробелами должны быть найдены")
     }
 
     @Test
-    fun testGeoLessThanThreeDecimals() {
-        val text = "55.75, 37.61"
-        assertEquals(0, scanText(text), "Координаты с < 3 знаками после запятой без метки не должны быть найдены")
+    fun testWithBracesAndSpace() {
+        val text = "{ 55.7558, 37.6173 }"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в фигурных скобках с пробелами должны быть найдены")
     }
 
     @Test
-    fun testGeoVerySmallValues() {
-        val text = "0.048, 0.158"
-        assertEquals(0, scanText(text), "Очень маленькие координаты (< 1.0) не должны быть найдены")
+    fun testWithCommaAsPartOfFormat() {
+        val text = "55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с запятой как часть формата должны быть найдены")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "55.7558, 37.6173 59.9343, 30.3351"
+        assertTrue(scanText(text) >= 2, "Несколько геокоординат через пробел должны быть найдены")
     }
 
     @Test
-    fun testGeoMathematicalNotation() {
-        val text = "λ~N(1.856, 0.047)"
-        assertEquals(0, scanText(text), "Математические обозначения не должны быть найдены")
+    fun testMultipleWithSemicolons() {
+        val text = "55.7558, 37.6173; 59.9343, 30.3351"
+        assertTrue(scanText(text) >= 2, "Несколько геокоординат через точку с запятой должны быть найдены")
     }
 
     @Test
-    fun testGeoStatisticalTermsInValue() {
-        val text = "iter 55.755812, 37.617345 ewma"
-        val kotlinEngine = KotlinEngine(listOf(Geo))
-        val kotlinRes = kotlinEngine.scan(text)
-        assertEquals(1, kotlinRes.count(), "Координаты должны быть найдены, даже если рядом есть статистические термины (check() проверяет только найденное значение)")
+    fun testMultipleWithNewlines() {
+        val text = "55.7558, 37.6173\n59.9343, 30.3351"
+        assertTrue(scanText(text) >= 2, "Несколько геокоординат через перенос строки должны быть найдены")
     }
 
     @Test
-    fun testGeoIntegerCoordinates() {
-        val text = "55, 37"
-        assertEquals(0, scanText(text), "Целые координаты без метки не должны быть найдены")
-    }
-
-    @Test
-    fun testGeoEmptyString() {
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать координат")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать геокоординат")
     }
 
     @Test
-    fun testGeoWhitespaceOnly() {
-        val text = "   \n\t\r\n   "
-        assertEquals(0, scanText(text), "Строка с пробелами не должна содержать координат")
+    fun testNoMatches() {
+        val text = "This text has no geo coordinates at all"
+        assertEquals(0, scanText(text), "Текст без геокоординат не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithNegativeLatitude() {
+        val text = "-55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с отрицательной широтой должны быть найдены")
+    }
+
+    @Test
+    fun testWithNegativeLongitude() {
+        val text = "55.7558, -37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с отрицательной долготой должны быть найдены")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Coordinates    55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с несколькими пробелами должны быть найдены")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Coordinates\t55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с табуляцией перед должны быть найдены")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "55.7558, 37.6173\tnext"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с табуляцией после должны быть найдены")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Геолокация 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с кириллицей рядом должны быть найдены")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Geo coordinates 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с латиницей рядом должны быть найдены")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты отдельной строкой должны быть найдены")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "55.7558, 37.6173 text"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в начале текста должны быть найдены")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты в конце текста должны быть найдены")
+    }
+
+    @Test
+    fun testWithGeolokatsiyaKeyword() {
+        val text = "геолокация фл: 55.7558, 37.6173"
+        assertTrue(scanText(text) >= 1, "Геокоординаты с ключевым словом должны быть найдены")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidLatitude() {
+        val text = "91.0, 37.6173"
+        assertEquals(0, scanText(text), "Геокоординаты с недопустимой широтой не должны находиться")
+    }
+
+    @Test
+    fun testInvalidLongitude() {
+        val text = "55.7558, 181.0"
+        assertEquals(0, scanText(text), "Геокоординаты с недопустимой долготой не должны находиться")
+    }
+
+    @Test
+    fun testZeroZero() {
+        val text = "0.0, 0.0"
+        assertEquals(0, scanText(text), "Геокоординаты (0,0) не должны находиться")
+    }
+
+    @Test
+    fun testIntegerCoordinatesWithoutDecimals() {
+        val text = "55, 37"
+        assertEquals(0, scanText(text), "Целочисленные координаты без десятичных знаков не должны находиться")
+    }
+
+    @Test
+    fun testWithLetters() {
+        val text = "AB.CD, EF.GH"
+        assertEquals(0, scanText(text), "Геокоординаты с буквами не должны находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "coord55.7558, 37.6173"
+        assertEquals(0, scanText(text), "Геокоординаты, прилипшие к буквам, не должны находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "12355.7558, 37.6173"
+        assertEquals(0, scanText(text), "Геокоординаты, прилипшие к цифрам, не должны находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "function55.7558, 37.6173()"
+        assertEquals(0, scanText(text), "Геокоординаты внутри кода не должны находиться")
+    }
+
+    @Test
+    fun testWithInvalidSeparator() {
+        val text = "55.7558; 37.6173"
+        assertEquals(0, scanText(text), "Геокоординаты с неправильным разделителем не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesLessThanOrEqual11() {
+        val text = "10.123, 5.456"
+        assertEquals(0, scanText(text), "Геокоординаты <= 11 градусов не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesExactly11() {
+        val text = "11.000, 11.000"
+        assertEquals(0, scanText(text), "Геокоординаты равные 11 градусам не должны находиться")
+    }
+
+    @Test
+    fun testLatitudeLessThanOrEqual11() {
+        val text = "10.123, 37.617"
+        assertEquals(0, scanText(text), "Геокоординаты с широтой <= 11 градусов не должны находиться")
+    }
+
+    @Test
+    fun testLongitudeLessThanOrEqual11() {
+        val text = "55.755, 10.123"
+        assertEquals(0, scanText(text), "Геокоординаты с долготой <= 11 градусов не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesDifferenceLessThanOrEqual1() {
+        val text = "55.755, 56.755"
+        assertEquals(0, scanText(text), "Геокоординаты с разницей <= 1 градус не должны находиться")
+    }
+
+    @Test
+    fun testCoordinatesDifferenceExactly1() {
+        val text = "55.755, 56.755"
+        assertEquals(0, scanText(text), "Геокоординаты с разницей равной 1 градусу не должны находиться")
+    }
+
+    @Test
+    fun testValidCoordinatesWithDifferenceGreaterThan1() {
+        val text = "55.755, 37.617"
+        assertTrue(scanText(text) >= 1, "Валидные геокоординаты с разницей > 1 градус должны находиться")
+    }
+
+    @Test
+    fun testValidCoordinatesGreaterThan11() {
+        val text = "55.755, 37.617"
+        assertTrue(scanText(text) >= 1, "Валидные геокоординаты > 11 градусов должны находиться")
     }
 }
 

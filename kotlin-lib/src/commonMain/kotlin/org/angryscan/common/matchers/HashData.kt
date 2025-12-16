@@ -5,12 +5,17 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for hash values (MD5, SHA-1, SHA-256, SHA-384, SHA-512).
+ * Matches hexadecimal hash strings of lengths: 32, 40, 64, 96, or 128 characters.
+ * Validates that hashes are not all zeros, all F's, all same character, or sequential patterns.
+ */
 @Serializable
 object HashData : IHyperMatcher, IKotlinMatcher {
     override val name = "Hash Data"
     override val javaPatterns = listOf(
-        """(?ix)(?<=:\s)([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?![\p{L}\d])""",
-        """(?ix)(?:^|[^\w\s]\s|[\s({\["'«»])(?<![\p{L}\d])([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?![\p{L}\d])"""
+        """(?ix)\A([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?![\p{L}\d])""",
+        """(?ix)(?:(?<=:\s)|(?<=[\s({\["'«».,;:]))(?<![\p{L}\d])([0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,7 +23,7 @@ object HashData : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«»])(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
+        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'«».,;])(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64}|[0-9a-fA-F]{96}|[0-9a-fA-F]{128})(?:[\s\r\n\.\(\)\[\]\{\}\"'«».,;:!?\-]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,

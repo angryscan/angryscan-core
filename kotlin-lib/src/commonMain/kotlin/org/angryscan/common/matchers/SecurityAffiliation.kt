@@ -5,6 +5,16 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for Russian security service affiliations.
+ * Matches abbreviations and full names of security services:
+ * - МВД (Ministry of Internal Affairs)
+ * - МО (Ministry of Defense)
+ * - СВР (Foreign Intelligence Service)
+ * - ФСБ (Federal Security Service)
+ * - ФСО (Federal Protective Service)
+ * May be preceded by keywords like "сотрудник", "служащий", "принадлежность к".
+ */
 @Serializable
 object SecurityAffiliation : IHyperMatcher, IKotlinMatcher {
     override val name = "Security Affiliation"

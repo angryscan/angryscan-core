@@ -5,6 +5,12 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for geographic coordinates (latitude, longitude).
+ * Matches coordinates in format: latitude, longitude
+ * Validates coordinate ranges: latitude -90 to 90, longitude -180 to 180.
+ * Filters out invalid coordinates (0,0), coordinates with low precision, and mathematical expressions.
+ */
 @Serializable
 object Geo : IHyperMatcher, IKotlinMatcher {
     override val name = "Geo"
@@ -27,7 +33,9 @@ object Geo : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?:^|\s|[\(\[\{«"'])\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})(?:$|[\s\)\]\}»"'\.,;:!?])"""
+        """\A\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})""",
+        """[\s\(\[\{«"']\s*(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})""",
+        """,\s+(?:[\(\[\{«"'])?\s*-?(?:[1-8]\d(?:\.\d{1,10})?|90(?:\.0{1,10})?|\d\.\d{1,10})\s*,\s*-?(?:180(?:\.0{1,10})?|1[0-7]\d(?:\.\d{1,10})?|[1-9]\d(?:\.\d{1,10})?|\d\.\d{1,10})"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -79,7 +87,6 @@ object Geo : IHyperMatcher, IKotlinMatcher {
         val originalLower = originalValue.lowercase()
         
         if (originalValue.contains("~N(") || originalValue.contains("N(")) return false
-        if (originalValue.contains("]") || originalValue.contains("[")) return false
         if (originalValue.contains("λ") || originalValue.contains("∪") || originalValue.contains("∩")) return false
         
         if (originalLower.contains("iter") || originalLower.contains("k-mea") || 
@@ -92,13 +99,19 @@ object Geo : IHyperMatcher, IKotlinMatcher {
         
         if (lat == 0.0 && lon == 0.0) return false
         
+        // Do not consider coordinates <= 11 degrees
+        if (kotlin.math.abs(lat) <= 11.0 || kotlin.math.abs(lon) <= 11.0) return false
+        
+        // Coordinates must differ by more than 1 degree
+        val diff = kotlin.math.abs(lat - lon)
+        if (diff <= 1.0) return false
+        
         if (matchedLabel == null) {
             val isLatInteger = lat == lat.toInt().toDouble()
             val isLonInteger = lon == lon.toInt().toDouble()
             
             if (isLatInteger && isLonInteger && kotlin.math.abs(lat) < 100.0 && kotlin.math.abs(lon) < 100.0) {
-                val diff = kotlin.math.abs(lat - lon)
-                if (diff < 10.0) return false
+                // This check is no longer needed, as we already checked diff <= 1.0 above
             }
         }
         

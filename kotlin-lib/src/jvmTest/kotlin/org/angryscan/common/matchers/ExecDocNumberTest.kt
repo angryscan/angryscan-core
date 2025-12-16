@@ -5,191 +5,354 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера ExecDocNumber
+ * Комплексные тесты для матчера ExecDocNumber
  */
-internal class ExecDocNumberTest: MatcherTestBase(ExecDocNumber) {
+internal class ExecDocNumberTest : MatcherTestBase(ExecDocNumber) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testExecDocNumberAtStart() {
-        val text = " 12345/21/12345-ИП исполнительное производство"
-        assertTrue(scanText(text) >= 1, "Номер ИП в начале должен быть найден")
+    fun testAtStartOfText() {
+        val text = "1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в начале текста должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberAtEnd() {
-        val text = "Номер исполнительного производства: 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер ИП в конце должен быть найден")
+    fun testAtEndOfText() {
+        val text = "Document number: 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в конце текста должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInMiddle() {
-        val text = "Возбуждено производство 12345/21/12345-ИП в суде"
-        assertTrue(scanText(text) >= 1, "Номер ИП в середине должен быть найден")
+    fun testInMiddleOfText() {
+        val text = "The document 1234/12/12345-ИП is valid"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в середине текста должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberStandalone() {
-        val text = " 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер ИП отдельно должен быть найден")
+    fun testAtStartOfLine() {
+        val text = "1234/12/12345-ИП\nSecond line"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в начале строки должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberIP() {
-        val text = " 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер с суффиксом ИП должен быть найден")
+    fun testAtEndOfLine() {
+        val text = "First line\n1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в конце строки должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberSV() {
-        val text = " 12345/21/12345-СВ "
-        assertTrue(scanText(text) >= 1, "Номер с суффиксом СВ должен быть найден")
+    fun testInMiddleOfLine() {
+        val text = "Line with 1234/12/12345-ИП document"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в середине строки должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberFS() {
-        val text = " 12345/21/12345-ФС "
-        assertTrue(scanText(text) >= 1, "Номер с суффиксом ФС должен быть найден")
+    fun testWithNewlineBefore() {
+        val text = "\n1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа после \\n должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberUD() {
-        val text = " 1234/21/12345-УД "
-        assertTrue(scanText(text) >= 1, "Номер с суффиксом УД должен быть найден")
+    fun testWithNewlineAfter() {
+        val text = "1234/12/12345-ИП\n"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа перед \\n должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberAP() {
-        val text = " 12345/21/12345-АП "
-        assertTrue(scanText(text) >= 1, "Номер с суффиксом АП должен быть найден")
+    fun testWithCRLF() {
+        val text = "\r\n1234/12/12345-ИП\r\n"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с \\r\\n должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberSD() {
-        val text = " 12345/21/12345-СД "
-        assertTrue(scanText(text) >= 1, "Номер с суффиксом СД должен быть найден")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\n1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа после пустой строки должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberAllSuffixes() {
-        val text = """
-            12345/21/12345-ИП
-            12345/21/12345-СВ
-            12345/21/12345-ФС
-            12345/21/12345-УД
-            12345/21/12345-АП
-            12345/21/12345-СД
-            12345/21/12345-МС
-            12345/21/12345-ПД
-            12345/21/12345-АС
-            12345/21/12345-ИД
-        """.trimIndent()
-        assertTrue(scanText(text) >= 10, "Все типы исполнительных документов должны быть найдены")
+    fun testWithEmptyLineAfter() {
+        val text = "1234/12/12345-ИП\n\n"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа перед пустой строкой должен быть найден")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abc1234/12/12345-ИПdef"
+        assertEquals(0, scanText(text), "Номер исполнительного документа внутри буквенной последовательности не должен находиться")
     }
 
     @Test
-    fun testExecDocNumber4Digits() {
-        val text = " 1234/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер с 4 цифрами в начале должен быть найден")
+    fun testNotInsideNumericSequence() {
+        val text = "1231234/12/12345-ИП456"
+        assertEquals(0, scanText(text), "Номер исполнительного документа внутри цифровой последовательности не должен находиться")
     }
 
     @Test
-    fun testExecDocNumber5Digits() {
-        val text = " 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер с 5 цифрами в начале должен быть найден")
+    fun testWithSpaceBefore() {
+        val text = "Document 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с пробелом перед должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberWithNumberSign() {
-        val text = " № 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер с № должен быть найден")
+    fun testWithSpaceAfter() {
+        val text = "1234/12/12345-ИП is valid"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с пробелом после должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberWithLabel() {
-        val text = "номер исполнительного документа: 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер с меткой 'документа' должен быть найден")
+    fun testWithCommaBefore() {
+        val text = "Document, 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с запятой перед должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberWithProizvodstvo() {
-        val text = "номер исполнительного производства: 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер с меткой 'производства' должен быть найден")
+    fun testWithCommaAfter() {
+        val text = "1234/12/12345-ИП, next"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с запятой после должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberWithList() {
-        val text = "исполнительный лист: 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Исполнительный лист должен быть найден")
+    fun testWithDotBefore() {
+        val text = "Document. 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с точкой перед должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberUpperCase() {
-        val text = "НОМЕР: 12345/21/12345-ИП "
-        assertTrue(scanText(text) >= 1, "Номер в верхнем регистре должен быть найден")
+    fun testWithDotAfter() {
+        val text = "1234/12/12345-ИП."
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с точкой после должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberLowerCase() {
-        val text = "номер: 12345/21/12345-ип "
-        assertTrue(scanText(text) >= 1, "Номер в нижнем регистре должен быть найден")
+    fun testWithSemicolonBefore() {
+        val text = "Document; 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с точкой с запятой перед должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInParentheses() {
-        val text = "(12345/21/12345-ИП)"
-        assertTrue(scanText(text) >= 1, "Номер в скобках должен быть найден")
+    fun testWithSemicolonAfter() {
+        val text = "1234/12/12345-ИП; next"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с точкой с запятой после должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInQuotes() {
-        val text = "\"12345/21/12345-ИП\""
-        assertTrue(scanText(text) >= 1, "Номер в кавычках должен быть найден")
+    fun testWithColonBefore() {
+        val text = "Document: 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с двоеточием перед должен быть найден")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( 1234/12/12345-ИП )"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в скобках с пробелами должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberWithPunctuation() {
-        val text = "Номер: 12345/21/12345-ИП."
-        assertTrue(scanText(text) >= 1, "Номер с точкой должен быть найден")
+    fun testWithParenthesesNoSpace() {
+        val text = "(1234/12/12345-ИП)"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в скобках без пробелов должен быть найден")
     }
 
     @Test
-    fun testMultipleExecDocNumbers() {
-        val text = """
-            Первое: 12345/21/12345-ИП
-            Второе: 23456/22/23456-УД
-            Третье: 34567/23/34567-ФС
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько номеров должны быть найдены")
+    fun testWithQuotesAndSpace() {
+        val text = "\" 1234/12/12345-ИП \""
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в кавычках с пробелами должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInvalidFormat() {
-        val text = " 12345-21-12345-ИП "
-        assertEquals(0, scanText(text), "Номер с неверным разделителем не должен быть найден")
+    fun testWithQuotesNoSpace() {
+        val text = "\"1234/12/12345-ИП\""
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в кавычках без пробелов должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInvalidSuffix() {
-        val text = " 12345/21/12345-ХХ "
-        assertEquals(0, scanText(text), "Номер с неверным суффиксом не должен быть найден")
+    fun testWithSlashAsPartOfFormat() {
+        val text = "1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа со слэшем как часть формата должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInvalidTooShort() {
-        val text = " 123/21/12345-ИП "
-        assertEquals(0, scanText(text), "Номер со слишком коротким первым блоком не должен быть найден")
+    fun testWithDashAsPartOfFormat() {
+        val text = "1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с дефисом как часть формата должен быть найден")
     }
 
     @Test
-    fun testExecDocNumberInvalidTooLong() {
-        val text = " 123456/21/12345-ИП "
-        assertEquals(0, scanText(text), "Номер со слишком длинным первым блоком не должен быть найден")
+    fun testWithNumberSign() {
+        val text = "№ 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа со знаком № должен быть найден")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "1234/12/12345-ИП 5678/34/56789-СВ"
+        assertTrue(scanText(text) >= 2, "Несколько номеров исполнительных документов через пробел должны быть найдены")
     }
 
     @Test
-    fun testExecDocNumberEmptyString() {
+    fun testMultipleWithCommas() {
+        val text = "1234/12/12345-ИП, 5678/34/56789-СВ"
+        assertTrue(scanText(text) >= 2, "Несколько номеров исполнительных документов через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "1234/12/12345-ИП; 5678/34/56789-СВ"
+        assertTrue(scanText(text) >= 2, "Несколько номеров исполнительных документов через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "1234/12/12345-ИП\n5678/34/56789-СВ"
+        assertTrue(scanText(text) >= 2, "Несколько номеров исполнительных документов через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать номера исполнительного документа")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать номеров исполнительных документов")
+    }
+
+    @Test
+    fun testNoMatches() {
+        val text = "This text has no executive document numbers at all"
+        assertEquals(0, scanText(text), "Текст без номеров исполнительных документов не должен находить совпадения")
+    }
+
+    @Test
+    fun testMinimalFormat() {
+        val text = "1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testMaximalFormat() {
+        val text = "12345/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Максимальный формат должен быть найден")
+    }
+
+    @Test
+    fun testWithIPType() {
+        val text = "1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер с типом ИП должен быть найден")
+    }
+
+    @Test
+    fun testWithSVType() {
+        val text = "1234/12/12345-СВ"
+        assertTrue(scanText(text) >= 1, "Номер с типом СВ должен быть найден")
+    }
+
+    @Test
+    fun testWithMultipleSpaces() {
+        val text = "Document    1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с несколькими пробелами должен быть найден")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "Document\t1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с табуляцией перед должен быть найден")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "1234/12/12345-ИП\tnext"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с табуляцией после должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Документ 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с кириллицей рядом должен быть найден")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Document 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа с латиницей рядом должен быть найден")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа отдельной строкой должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "1234/12/12345-ИП text"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в начале текста должен быть найден")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер исполнительного документа в конце текста должен быть найден")
+    }
+
+    @Test
+    fun testWithIspolnitelnyListKeyword() {
+        val text = "исполнительный лист: 1234/12/12345-ИП"
+        assertTrue(scanText(text) >= 1, "Номер с ключевым словом должен быть найден")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testInvalidFormat() {
+        val text = "1234@12@12345@ИП"
+        assertEquals(0, scanText(text), "Номер исполнительного документа с неправильными разделителями не должен находиться")
+    }
+
+    @Test
+    fun testTooShort() {
+        val text = "123/12/12345-ИП"
+        assertEquals(0, scanText(text), "Слишком короткий номер исполнительного документа не должен находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "123456/12/12345-ИП"
+        assertEquals(0, scanText(text), "Слишком длинный номер исполнительного документа не должен находиться")
+    }
+
+    @Test
+    fun testWithInvalidType() {
+        val text = "1234/12/12345-XX"
+        assertEquals(0, scanText(text), "Номер исполнительного документа с недопустимым типом не должен находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "doc1234/12/12345-ИП"
+        assertEquals(0, scanText(text), "Номер исполнительного документа, прилипший к буквам, не должен находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "1231234/12/12345-ИП"
+        assertEquals(0, scanText(text), "Номер исполнительного документа, прилипший к цифрам, не должен находиться")
+    }
+
+    @Test
+    fun testPartialExecDocNumber() {
+        val text = "1234/12"
+        assertEquals(0, scanText(text), "Частичный номер исполнительного документа не должен находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "function1234/12/12345-ИП()"
+        assertEquals(0, scanText(text), "Номер исполнительного документа внутри кода не должен находиться")
     }
 }
 

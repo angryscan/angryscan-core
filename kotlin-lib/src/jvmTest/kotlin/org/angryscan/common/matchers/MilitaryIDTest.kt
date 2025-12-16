@@ -5,162 +5,441 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Тесты для проверки крайних позиций и пограничных значений матчера MilitaryID
+ * Комплексные тесты для матчера MilitaryID
  */
-internal class MilitaryIDTest: MatcherTestBase(MilitaryID) {
+internal class MilitaryIDTest : MatcherTestBase(MilitaryID) {
+
+    // ========== 1. Позиция совпадения в тексте и строке ==========
 
     @Test
-    fun testMilitaryIDAtStart() {
-        val text = " АБ 1234567 удостоверение военнослужащего"
-        assertTrue(scanText(text) >= 1, "Военное удостоверение в начале должно быть найдено")
+    fun testAtStartOfText() {
+        val text = "удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ в начале текста должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDAtEnd() {
-        val text = "Номер удостоверения: АБ 1234567 "
-        assertTrue(scanText(text) >= 1, "Военное удостоверение в конце должно быть найдено")
+    fun testAtEndOfText() {
+        val text = "Military ID: номер УЛВ АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ в конце текста должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInMiddle() {
-        val text = "Офицер с удостоверением АБ 1234567 на службе"
-        assertTrue(scanText(text) >= 1, "Военное удостоверение в середине должно быть найдено")
+    fun testInMiddleOfText() {
+        val text = "The ID УЛВ № АБ 3847291 is valid"
+        assertTrue(scanText(text) >= 1, "УЛВ в середине текста должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDStandalone() {
-        val text = " АБ 1234567 "
-        assertTrue(scanText(text) >= 1, "Военное удостоверение отдельной строкой должно быть найдено")
+    fun testAtStartOfLine() {
+        val text = "военный билет АБ 3847291\nSecond line"
+        assertTrue(scanText(text) >= 1, "УЛВ в начале строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDWithSpace() {
-        val text = " АБ 1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение с пробелом должно быть найдено")
+    fun testAtEndOfLine() {
+        val text = "First line\nномер военного билета АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ в конце строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDWithoutSpace() {
-        val text = " АБ1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение без пробела должно быть найдено")
+    fun testInMiddleOfLine() {
+        val text = "Line with номер удостоверения личности военнослужащего АБ 3847291 ID"
+        assertTrue(scanText(text) >= 1, "УЛВ в середине строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDWithDash() {
-        val text = " АБ-1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение с дефисом должно быть найдено")
+    fun testWithNewlineBefore() {
+        val text = "\nсерия и номер удостоверения личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ после \\n должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDWithNumber() {
-        val text = " АБ № 1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение с № должно быть найдено")
+    fun testWithNewlineAfter() {
+        val text = "удостоверение личности военнослужащего АБ 3847291\n"
+        assertTrue(scanText(text) >= 1, "УЛВ перед \\n должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDWithLabel() {
-        val text = "Номер: АБ 1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение с меткой должно быть найдено")
+    fun testWithCRLF() {
+        val text = "\r\nномер УЛВ АБ 3847291\r\n"
+        assertTrue(scanText(text) >= 1, "УЛВ с \\r\\n должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDCyrillicLetters() {
-        val text = " АБ 1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение с кириллицей должно быть найдено")
+    fun testWithEmptyLineBefore() {
+        val text = "\n\nУЛВ № АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ после пустой строки должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDLatinLetters() {
-        val text = " AB 1234567 "
-        assertEquals(0, scanText(text), "Удостоверение с латиницей не должно быть найдено (только кириллица)")
+    fun testWithEmptyLineAfter() {
+        val text = "военный билет АБ 3847291\n\n"
+        assertTrue(scanText(text) >= 1, "УЛВ перед пустой строкой должно быть найдено")
+    }
+
+    // ========== 2. Соседние символы (границы токена) ==========
+
+    @Test
+    fun testNotInsideAlphabeticSequence() {
+        val text = "abcАБ 1234567def"
+        assertEquals(0, scanText(text), "УЛВ внутри буквенной последовательности не должно находиться")
     }
 
     @Test
-    fun testMilitaryIDUpperCase() {
-        val text = "УДОСТОВЕРЕНИЕ: АБ 1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение в верхнем регистре должно быть найдено")
+    fun testNotInsideNumericSequence() {
+        val text = "123АБ 1234567456"
+        assertEquals(0, scanText(text), "УЛВ внутри цифровой последовательности не должно находиться")
     }
 
     @Test
-    fun testMilitaryIDLowerCase() {
-        val text = "удостоверение: аб 1234567 "
-        assertTrue(scanText(text) >= 1, "Удостоверение в нижнем регистре должно быть найдено")
+    fun testWithSpaceBefore() {
+        val text = "ID удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с пробелом перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInParentheses() {
-        val text = "(АБ 1234567)"
-        assertTrue(scanText(text) >= 1, "Удостоверение в скобках должно быть найдено")
+    fun testWithSpaceAfter() {
+        val text = "номер УЛВ АБ 3847291 is valid"
+        assertTrue(scanText(text) >= 1, "УЛВ с пробелом после должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInQuotes() {
-        val text = "\"АБ 1234567\""
-        assertTrue(scanText(text) >= 1, "Удостоверение в кавычках должно быть найдено")
+    fun testWithCommaBefore() {
+        val text = "ID, УЛВ № АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDWithPunctuation() {
-        val text = "Номер: АБ 1234567."
-        assertTrue(scanText(text) >= 1, "Удостоверение с точкой должно быть найдено")
+    fun testWithCommaAfter() {
+        val text = "военный билет АБ 3847291, next"
+        assertTrue(scanText(text) >= 1, "УЛВ с запятой после должно быть найдено")
     }
 
     @Test
-    fun testMultipleMilitaryIDs() {
-        val text = """
-            Первое: АБ 1234567
-            Второе: ВГ 2345678
-            Третье: ДЕ 3456789
-        """.trimIndent()
-        assertTrue(scanText(text) >= 3, "Несколько удостоверений должны быть найдены")
+    fun testWithDotBefore() {
+        val text = "ID. номер военного билета АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с точкой перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInvalidTooShort() {
-        val text = " АБ 123456 "
-        assertEquals(0, scanText(text), "Удостоверение со слишком коротким номером не должно быть найдено")
+    fun testWithDotAfter() {
+        val text = "номер удостоверения личности военнослужащего АБ 3847291."
+        assertTrue(scanText(text) >= 1, "УЛВ с точкой после должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInvalidTooLong() {
-        val text = " АБ 12345678 "
-        assertEquals(0, scanText(text), "Удостоверение со слишком длинным номером не должно быть найдено")
+    fun testWithSemicolonBefore() {
+        val text = "ID; серия и номер удостоверения личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с точкой с запятой перед должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInvalidOneLetter() {
-        val text = " А 1234567 "
-        assertEquals(0, scanText(text), "Удостоверение с одной буквой не должно быть найдено")
+    fun testWithSemicolonAfter() {
+        val text = "удостоверение личности военнослужащего АБ 3847291; next"
+        assertTrue(scanText(text) >= 1, "УЛВ с точкой с запятой после должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDInvalidThreeLetters() {
-        val text = " АБВ 1234567 "
-        assertEquals(0, scanText(text), "Удостоверение с тремя буквами не должно быть найдено")
+    fun testWithColonBefore() {
+        val text = "ID: номер УЛВ АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с двоеточием перед должно быть найдено")
+    }
+
+    // ========== 3. Контекст со спецсимволами и пунктуацией ==========
+
+    @Test
+    fun testWithParenthesesAndSpace() {
+        val text = "( удостоверение личности военнослужащего АБ 3847291 )"
+        assertTrue(scanText(text) >= 1, "УЛВ в скобках с пробелами должно быть найдено")
     }
 
     @Test
-    fun testMilitaryIDEmptyString() {
+    fun testWithParenthesesNoSpace() {
+        val text = "(номер УЛВ АБ 3847291)"
+        assertTrue(scanText(text) >= 1, "УЛВ в скобках без пробелов должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesAndSpace() {
+        val text = "\" УЛВ № АБ 3847291 \""
+        assertTrue(scanText(text) >= 1, "УЛВ в кавычках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithQuotesNoSpace() {
+        val text = "\"военный билет АБ 3847291\""
+        assertTrue(scanText(text) >= 1, "УЛВ в кавычках без пробелов должно быть найдено")
+    }
+
+    @Test
+    fun testWithBracketsAndSpace() {
+        val text = "[ номер военного билета АБ 3847291 ]"
+        assertTrue(scanText(text) >= 1, "УЛВ в квадратных скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithBracesAndSpace() {
+        val text = "{ номер удостоверения личности военнослужащего АБ 3847291 }"
+        assertTrue(scanText(text) >= 1, "УЛВ в фигурных скобках с пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithDashAsPartOfFormat() {
+        val text = "серия и номер удостоверения личности военнослужащего АБ-3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с дефисом как часть формата должно быть найдено")
+    }
+
+    @Test
+    fun testWithNumberSignAsPartOfFormat() {
+        val text = "удостоверение личности военнослужащего АБ № 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ со знаком № как часть формата должно быть найдено")
+    }
+
+    // ========== 4. Дополнительные структурные и форматные границы ==========
+
+    @Test
+    fun testMultipleWithSpaces() {
+        val text = "удостоверение личности военнослужащего АБ 3847291 номер УЛВ ВГ 2913847"
+        assertTrue(scanText(text) >= 2, "Несколько УЛВ через пробел должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithCommas() {
+        val text = "УЛВ № АБ 3847291, военный билет ВГ 2913847"
+        assertTrue(scanText(text) >= 2, "Несколько УЛВ через запятую должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithSemicolons() {
+        val text = "номер удостоверения личности военнослужащего АБ 3847291; номер военного билета ВГ 2913847"
+        assertTrue(scanText(text) >= 2, "Несколько УЛВ через точку с запятой должны быть найдены")
+    }
+
+    @Test
+    fun testMultipleWithNewlines() {
+        val text = "серия и номер удостоверения личности военнослужащего АБ 3847291\nномер УЛВ ВГ 2913847"
+        assertTrue(scanText(text) >= 2, "Несколько УЛВ через перенос строки должны быть найдены")
+    }
+
+    @Test
+    fun testEmptyString() {
         val text = ""
-        assertEquals(0, scanText(text), "Пустая строка не должна содержать военного удостоверения")
+        assertEquals(0, scanText(text), "Пустая строка не должна содержать УЛВ")
     }
 
     @Test
-    fun testMilitaryIDAllZeros() {
-        val text = " АБ 0000000 "
-        assertEquals(0, scanText(text), "Удостоверение с нулями не должно быть найдено")
+    fun testNoMatches() {
+        val text = "This text has no military IDs at all"
+        assertEquals(0, scanText(text), "Текст без УЛВ не должен находить совпадения")
     }
 
     @Test
-    fun testMilitaryIDAllSameDigits() {
-        val text = " АБ 1111111 "
-        assertEquals(0, scanText(text), "Удостоверение с одинаковыми цифрами не должно быть найдено")
+    fun testMinimalFormat() {
+        val text = "удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "Минимальный формат должен быть найден")
     }
 
     @Test
-    fun testMilitaryIDAllSameDigits2() {
-        val text = " ВГ 9999999 "
-        assertEquals(0, scanText(text), "Удостоверение с одинаковыми цифрами (9) не должно быть найдено")
+    fun testWithMultipleSpaces() {
+        val text = "ID    номер УЛВ АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с несколькими пробелами должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabBefore() {
+        val text = "ID\tУЛВ № АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с табуляцией перед должно быть найдено")
+    }
+
+    @Test
+    fun testWithTabAfter() {
+        val text = "военный билет АБ 3847291\tnext"
+        assertTrue(scanText(text) >= 1, "УЛВ с табуляцией после должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeCyrillic() {
+        val text = "Удостоверение номер удостоверения личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с кириллицей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testWithUnicodeLatin() {
+        val text = "Military ID удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с латиницей рядом должно быть найдено")
+    }
+
+    @Test
+    fun testStandalone() {
+        val text = "номер военного билета АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ отдельной строкой должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryStart() {
+        val text = "серия и номер удостоверения личности военнослужащего АБ 3847291 text"
+        assertTrue(scanText(text) >= 1, "УЛВ в начале текста должно быть найдено")
+    }
+
+    @Test
+    fun testAtTextBoundaryEnd() {
+        val text = "text удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ в конце текста должно быть найдено")
+    }
+
+    // ========== 5. Негативные сценарии ==========
+
+    @Test
+    fun testTooShort() {
+        val text = "АБ 123456"
+        assertEquals(0, scanText(text), "Слишком короткое УЛВ не должно находиться")
+    }
+
+    @Test
+    fun testTooLong() {
+        val text = "АБ 12345678"
+        assertEquals(0, scanText(text), "Слишком длинное УЛВ не должно находиться")
+    }
+
+    @Test
+    fun testWithInvalidFormat() {
+        val text = "АБ@1234567"
+        assertEquals(0, scanText(text), "УЛВ с неправильными разделителями не должно находиться")
+    }
+
+    @Test
+    fun testStickingToAlphabeticChar() {
+        val text = "idАБ 1234567"
+        assertEquals(0, scanText(text), "УЛВ, прилипшее к буквам, не должно находиться")
+    }
+
+    @Test
+    fun testStickingToNumericChar() {
+        val text = "123АБ 1234567"
+        assertEquals(0, scanText(text), "УЛВ, прилипшее к цифрам, не должно находиться")
+    }
+
+    @Test
+    fun testPartialMilitaryID() {
+        val text = "АБ"
+        assertEquals(0, scanText(text), "Частичное УЛВ не должно находиться")
+    }
+
+    @Test
+    fun testInCode() {
+        val text = "functionАБ 1234567()"
+        assertEquals(0, scanText(text), "УЛВ внутри кода не должно находиться")
+    }
+
+    // ========== 6. Валидация содержимого ==========
+
+    @Test
+    fun testValidMilitaryID() {
+        val text = "удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "Валидное УЛВ должно быть найдено")
+    }
+
+    @Test
+    fun testWithoutKeywords() {
+        val text = "АБ 3847291"
+        assertEquals(0, scanText(text), "УЛВ без ключевых слов не должно находиться")
+    }
+
+    @Test
+    fun testWithUdoverenieLichnosti() {
+        val text = "удостоверение личности военнослужащего АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с ключевым словом 'удостоверение личности военнослужащего' должно быть найдено")
+    }
+
+    @Test
+    fun testWithNomerULV() {
+        val text = "номер УЛВ АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с ключевым словом 'номер УЛВ' должно быть найдено")
+    }
+
+    @Test
+    fun testWithULV() {
+        val text = "УЛВ № АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с ключевым словом 'УЛВ №' должно быть найдено")
+    }
+
+    @Test
+    fun testWithVoenniyBilet() {
+        val text = "военный билет АБ 3847291"
+        assertTrue(scanText(text) >= 1, "УЛВ с ключевым словом 'военный билет' должно быть найдено")
+    }
+
+    @Test
+    fun testTooManyZeros() {
+        val text = "удостоверение личности военнослужащего АБ 0001234"
+        assertEquals(0, scanText(text), "УЛВ с слишком большим количеством нулей не должно находиться")
+    }
+
+    @Test
+    fun testAllSameDigits() {
+        val text = "номер УЛВ АБ 2222222"
+        assertEquals(0, scanText(text), "УЛВ со всеми одинаковыми цифрами не должно находиться")
+    }
+
+    @Test
+    fun testOnlyZerosAndOnes() {
+        val text = "УЛВ № АБ 0101010"
+        assertEquals(0, scanText(text), "УЛВ только с нулями и единицами не должно находиться")
+    }
+
+    @Test
+    fun testSequentialAscending() {
+        val text = "военный билет АБ 1234567"
+        assertEquals(0, scanText(text), "УЛВ с последовательными возрастающими цифрами не должно находиться")
+    }
+
+    @Test
+    fun testSequentialDescending() {
+        val text = "номер военного билета АБ 7654321"
+        assertEquals(0, scanText(text), "УЛВ с последовательными убывающими цифрами не должно находиться")
+    }
+
+    @Test
+    fun testRepeatingPattern2() {
+        val text = "номер удостоверения личности военнослужащего АБ 1212121"
+        assertEquals(0, scanText(text), "УЛВ с повторяющимся паттерном длиной 2 не должно находиться")
+    }
+
+    @Test
+    fun testBlockOfSameDigits3() {
+        val text = "серия и номер удостоверения личности военнослужащего АБ 1112345"
+        assertEquals(0, scanText(text), "УЛВ с блоком из 3 одинаковых цифр не должно находиться")
+    }
+
+    @Test
+    fun testBlockOfSameDigits4() {
+        val text = "удостоверение личности военнослужащего АБ 1234444"
+        assertEquals(0, scanText(text), "УЛВ с блоком из 4 одинаковых цифр не должно находиться")
+    }
+
+    @Test
+    fun testPalindrome() {
+        val text = "номер УЛВ АБ 1234321"
+        assertEquals(0, scanText(text), "УЛВ-палиндром не должно находиться")
+    }
+
+    @Test
+    fun testTooManySameDigits() {
+        val text = "УЛВ № АБ 1111123"
+        assertEquals(0, scanText(text), "УЛВ с слишком большим количеством одинаковых цифр не должно находиться")
+    }
+
+
+    @Test
+    fun testValidComplexNumber() {
+        val text = "военный билет АБ 3847291"
+        assertTrue(scanText(text) >= 1, "Валидное УЛВ со сложным номером должно быть найдено")
+    }
+
+    @Test
+    fun testValidWithSomeZeros() {
+        val text = "номер военного билета АБ 1203456"
+        assertTrue(scanText(text) >= 1, "Валидное УЛВ с некоторым количеством нулей должно быть найдено")
     }
 }
 

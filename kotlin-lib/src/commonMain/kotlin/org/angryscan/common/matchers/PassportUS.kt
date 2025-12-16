@@ -5,12 +5,19 @@ import org.angryscan.common.engine.hyperscan.IHyperMatcher
 import org.angryscan.common.engine.ExpressionOption
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
 
+/**
+ * Matcher for US passport numbers.
+ * Matches passport numbers in format: A12345678 (1 letter followed by 8 digits)
+ * Valid letter prefixes: A or C (excluding I and O).
+ * May be preceded by keywords like "passport", "pass no", "pass number".
+ * Filters out invalid patterns like all same characters or common test values.
+ */
 @Serializable
 object PassportUS : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport US"
     override val javaPatterns = listOf(
-        """(?i)(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?=\.\s|\s|[)\]\}]\s|['"]\s|$)""",
-        """(?i)(?:^|[#:=\-]\s|[\s()\[\]\{\}'"]+)([A-Z][0-9]{8})(?=\.\s|\s|[)\]\}]\s|['"]\s|$)"""
+        """(?i)(?<![\p{L}\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?![\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])""",
+        """(?<![\p{L}\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])([A-Z][0-9]{8})(?![\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])"""
     )
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
@@ -18,8 +25,8 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns: List<String> = listOf(
-        """(?i)(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[\s\r\n\(\)\[\]\{\}\"'.,;:!?\-]|$)""",
-        """(?i)(?:^|[\s\r\n#:=\-\(\)\[\]\{\}\"'])([A-Z][0-9]{8})(?:[\s\r\n\(\)\[\]\{\}\"'.,;:!?\-]|$)"""
+        """(?i)(?:^|[^a-zA-Z0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[^0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\]|$)""",
+        """(?i)(?:^|[^a-zA-Z0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])([A-Z][0-9]{8})(?:[^0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\]|$)"""
     )
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
@@ -28,7 +35,12 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
     )
 
     override fun check(value: String): Boolean {
-        val cleaned = value.replace(Regex("[^A-Z0-9]"), "").uppercase()
+        // Extract passport number from the match (may include keywords)
+        val numberPattern = Regex("[A-Z][0-9]{8}")
+        val match = numberPattern.find(value)
+        if (match == null) return false
+        
+        val cleaned = match.value.replace(Regex("[^A-Z0-9]"), "").uppercase()
 
         if (cleaned.length != 9) return false
 
@@ -37,7 +49,6 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
         if (!isLetterPlusDigits) return false
 
         if (cleaned.all { it == cleaned[0] }) return false
-        if (cleaned == "A12345678" || cleaned == "C12345678") return false
         if (cleaned == "A00000000" || cleaned == "C00000000" || cleaned == "A99999999" || cleaned == "C99999999") return false
 
         val letter = cleaned[0]
