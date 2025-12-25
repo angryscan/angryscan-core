@@ -94,7 +94,7 @@ internal class EngineTest {
                 || attribute.name == "Identity Document Type" || attribute.name == "Phone US" || attribute.name == "Inheritance Document"
                 || attribute.name == "Vehicle Registration Number" || attribute.name == "SNILS" || attribute.name == "Certificate"
                 || attribute.name == "Driver License" || attribute.name == "Education Document" || attribute.name == "Legal Entity Name"
-                || attribute.name == "Military ID" || attribute.name == "OSAGO Policy") {
+                || attribute.name == "Military ID" || attribute.name == "OSAGO Policy" || attribute.name == "Crypto Wallet Address" || attribute.name == "Crypto Seed Phrase") {
                 continue
             }
             val count = getCountOfAttribute(file, attribute)
