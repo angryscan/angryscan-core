@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.1.10"
-mpublish = "0.30.0"
+mpublish = "0.35.0"
 hyperscan = "5.4.11-3.1.0"
 hyperscan-windows = "5.4.0-2.0.0"
 
