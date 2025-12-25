@@ -11,6 +11,7 @@ object Matchers: List<IMatcher> by listOf<IMatcher>(
     CadastralNumber,
     Certificate,
     CardNumber(),
+    CryptoSeedPhrase,
     CryptoWallet,
     CVV,
     DeathDate,
