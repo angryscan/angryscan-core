@@ -24,7 +24,7 @@ object CryptoSeedPhrase : IKotlinMatcher {
     }
     
     override val javaPatterns = listOf(
-        """(?:^|\s) (?:\b[a-z]{3,8}\b\s){11}\b[a-z]{3,8}\b(?=\s|$)""",
+        """(?:^|\s)(?:\b[a-z]{3,8}\b\s){11}\b[a-z]{3,8}\b(?=\s|$)""",
         """(?:^|\s)(?:\b[a-z]{3,8}\b\s){14}\b[a-z]{3,8}\b(?=\s|$)""",
         """(?:^|\s)(?:\b[a-z]{3,8}\b\s){17}\b[a-z]{3,8}\b(?=\s|$)""",
         """(?:^|\s)(?:\b[a-z]{3,8}\b\s){20}\b[a-z]{3,8}\b(?=\s|$)""",
