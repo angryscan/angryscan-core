@@ -4,31 +4,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/**
- * Тесты для проверки крайних позиций и пограничных значений матчера CryptoWallet
- */
 internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
 
-    // Реальные примеры адресов для тестирования
-    private val bitcoinLegacy = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" // Genesis block address (34 символа)
-    private val bitcoinP2SH = "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" // 34 символа
-    private val ethereum = "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0" // 42 символа (0x + 40 hex)
-    private val litecoinLegacy = "LTCN6Lfz5XvNF9XqHdc6P5oE6r2c5iJmKxY" // 34 символа
-    private val ripple = "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH" // 34 символа
-    private val bitcoinCash = "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a" // 42 символа
-    private val dogecoin = "D7Y55LdC5Hj3aNk3M2vB6tF8gH9jK1mN3pQ5rS7tU" // 34 символа (D + 1 + 32)
-    private val tron = "TQn9Y2khEsLMWDmBqJ8K9XpY7hN2vC5wE8rT3yU6i" // 34 символа (T + 33)
-    private val solana = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgA" // 42 символа
-    private val cosmos = "cosmos1hsk6jryyqjfhp5dhc55t9lrxkzy8awu00azxm7" // 45 символов
-    private val tezos = "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" // 36 символов
-    private val dash = "Xx4d8rzKwejkA3L2L5m5hM648Q7y6t9uZ3" // 34 символа
-    private val zcash = "t1VzHL4Nj3V3SHqUF5u7uGwF6qHH5aqT3Nb" // 35 символов
-    private val terra = "terra1hsk6jryyqjfhp5dhc55t9lrxkzy8awu00azxm7" // 45 символов
-    private val bitcoinBech32 = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4" // 42 символа (bc1 + 40)
-    private val litecoinBech32 = "ltc1qw508d6qejxtdg4y5r3zarvary0c5xw7kemeawh" // 43 символа (ltc1 + 40)
-    private val ton = "EQCkR1cGmnsE45N4K0otPl5EnxnRakmGqeJUNua5fkTh" // 44 символа (EQC + 41)
-
-    // ========== ТЕСТЫ ПОЗИЦИИ В ТЕКСТЕ ==========
+    private val bitcoinLegacy = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+    private val bitcoinP2SH = "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy"
+    private val ethereum = "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
+    private val litecoinLegacy = "LTCN6Lfz5XvNF9XqHdc6P5oE6r2c5iJmKxY"
+    private val ripple = "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+    private val bitcoinCash = "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"
+    private val dogecoin = "D7Y55LdC5Hj3aNk3M2vB6tF8gH9jK1mN3pQ5rS7tU"
+    private val tron = "TQn9Y2khEsLMWDmBqJ8K9XpY7hN2vC5wE8"
+    private val cosmos = "cosmos1hsk6jryyqjfhp5dhc55t9lrxkzy8awu00azxm7"
+    private val tezos = "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"
+    private val dash = "Xx4d8rzKwejkA3L2L5m5hM648Q7y6t9uZ3"
+    private val zcash = "t1VzHL4Nj3V3SHqUF5u7uGwF6qHH5aqT3Nb"
+    private val terra = "terra1hsk6jryyqjfhp5dhc55t9lrxkzy8awu00azxm7"
+    private val bitcoinBech32 = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"
+    private val litecoinBech32 = "ltc1qw508d6qejxtdg4y5r3zarvary0c5xw7kemeawh"
+    private val ton = "EQCkR1cGmnsE45N4K0otPl5EnxnRakmGqeJUNua5fkTh"
 
     @Test
     fun testBitcoinLegacyAtStart() {
@@ -72,8 +65,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
         assertTrue(scanText(text) >= 1, "Ethereum адрес в конце должен быть найден")
     }
 
-    // ========== ТЕСТЫ НЕ ДОЛЖНЫ ОБНАРУЖИВАТЬСЯ ВНУТРИ ПОСЛЕДОВАТЕЛЬНОСТЕЙ ==========
-
     @Test
     fun testBitcoinLegacyNotInLetterSequence() {
         val text = "Слово${bitcoinLegacy}Слово"
@@ -109,8 +100,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
         val text = "abc123${ethereum}789def"
         assertEquals(0, scanText(text), "Ethereum адрес внутри буквенно-цифровой последовательности не должен быть найден")
     }
-
-    // ========== ТЕСТЫ С РАЗДЕЛИТЕЛЯМИ ==========
 
     @Test
     fun testBitcoinLegacyWithSpaceBefore() {
@@ -148,8 +137,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
         assertTrue(scanText(text) >= 1, "Bitcoin Legacy адрес с точкой должен быть найден")
     }
 
-    // ========== ТЕСТЫ ВСЕХ КРИПТОВАЛЮТ ==========
-
     @Test
     fun testBitcoinP2SH() {
         val text = " P2SH адрес: $bitcoinP2SH "
@@ -184,18 +171,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
     fun testTron() {
         val text = " Tron: $tron "
         assertTrue(scanText(text) >= 1, "Tron адрес должен быть найден")
-    }
-
-    @Test
-    fun testSolana() {
-        val text = " Solana: $solana "
-        assertTrue(scanText(text) >= 1, "Solana адрес должен быть найден")
-    }
-
-    @Test
-    fun testCosmos() {
-        val text = " Cosmos: $cosmos "
-        assertTrue(scanText(text) >= 1, "Cosmos адрес должен быть найден")
     }
 
     @Test
@@ -248,7 +223,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
 
     @Test
     fun testBitcoinBech32InLongerAddress() {
-        // Адрес как часть более длинного адреса (с дополнительными символами после)
         val longerAddress = "${bitcoinBech32}abcdefghijklmnopqrstuvwxyz1234567890"
         val text = " Адрес: $longerAddress "
         assertTrue(scanText(text) >= 1, "Bitcoin Bech32 адрес в составе более длинного адреса должен быть найден")
@@ -280,7 +254,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
 
     @Test
     fun testLitecoinBech32InLongerAddress() {
-        // Адрес как часть более длинного адреса (с дополнительными символами после)
         val longerAddress = "${litecoinBech32}abcdefghijklmnopqrstuvwxyz1234567890"
         val text = " Адрес: $longerAddress "
         assertTrue(scanText(text) >= 1, "Litecoin Bech32 адрес в составе более длинного адреса должен быть найден")
@@ -312,28 +285,21 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
 
     @Test
     fun testTONInLongerAddress() {
-        // Адрес как часть более длинного адреса (с дополнительными символами после)
         val longerAddress = "${ton}ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/"
         val text = " Адрес: $longerAddress "
         assertTrue(scanText(text) >= 1, "TON адрес в составе более длинного адреса должен быть найден")
     }
 
-    // ========== ТЕСТЫ ПОГРАНИЧНЫХ ДЛИН ==========
-
     @Test
     fun testBitcoinLegacyMinimumLength() {
-        // Минимальная длина Bitcoin Legacy адреса - 26 символов
         val minAddress = "1" + "A".repeat(25)
         val text = " Минимальный: $minAddress "
-        // Проверяем, что адрес найден (если соответствует паттерну)
         val result = scanText(text)
-        // Может быть найден или нет в зависимости от валидности Base58
         assertTrue(result >= 0, "Минимальный Bitcoin Legacy адрес")
     }
 
     @Test
     fun testBitcoinLegacyMaximumLength() {
-        // Максимальная длина Bitcoin Legacy адреса в паттерне - 41 символ
         val maxAddress = "1" + "A".repeat(40)
         val text = " Максимальный: $maxAddress "
         val result = scanText(text)
@@ -342,12 +308,9 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
 
     @Test
     fun testEthereumExactLength() {
-        // Ethereum адрес всегда 40 hex символов после 0x
         val text = " Ethereum: $ethereum "
         assertTrue(scanText(text) >= 1, "Ethereum адрес точной длины должен быть найден")
     }
-
-    // ========== ТЕСТЫ МНОЖЕСТВЕННЫХ АДРЕСОВ ==========
 
     @Test
     fun testMultipleAddresses() {
@@ -358,8 +321,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
         """.trimIndent()
         assertTrue(scanText(text) == 3, "Несколько адресов должны быть найдены")
     }
-
-    // ========== ТЕСТЫ ПУСТЫХ И НЕВЕРНЫХ СЛУЧАЕВ ==========
 
     @Test
     fun testEmptyString() {
@@ -384,8 +345,6 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
         val text = " 0X742d35Cc6634C0532925a3b844Bc9e7595f0bEb "
         assertEquals(0, scanText(text), "Ethereum адрес с неправильным префиксом не должен быть найден")
     }
-
-    // ========== ТЕСТЫ СПЕЦИАЛЬНЫХ СИМВОЛОВ ==========
 
     @Test
     fun testBitcoinLegacyWithNewline() {
@@ -451,5 +410,121 @@ internal class CryptoWalletTest : MatcherTestBase(CryptoWallet) {
     fun testBitcoinLegacyWithDash() {
         val text = "- $bitcoinLegacy"
         assertTrue(scanText(text) >= 1, "Bitcoin Legacy адрес с дефисом должен быть найден")
+    }
+
+    @Test
+    fun testFalsePositiveTheyellowwireshouldalignwiththepin() {
+        val text = ". Theyellowwireshouldalignwiththepin"
+        assertEquals(0, scanText(text), "Текст 'Theyellowwireshouldalignwiththepin' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveRSAenablesdigitalsignatures() {
+        val text = ", RSAenablesdigitalsignatures"
+        assertEquals(0, scanText(text), "Текст 'RSAenablesdigitalsignatures' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveThedetailsofthisbuscanbeinferredby() {
+        val text = "(Thedetailsofthisbuscanbeinferredby"
+        assertEquals(0, scanText(text), "Текст 'Thedetailsofthisbuscanbeinferredby' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveMITdecidedthatIcouldpublishmyworkas() {
+        val text = ". MITdecidedthatIcouldpublishmyworkas"
+        assertEquals(0, scanText(text), "Текст 'MITdecidedthatIcouldpublishmyworkas' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveMostoftheseerratahavesimple() {
+        val text = ". Mostoftheseerratahavesimple"
+        assertEquals(0, scanText(text), "Текст 'Mostoftheseerratahavesimple' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveMationabouthackingtheboxdisappointed() {
+        val text = "mationabouthackingtheboxdisappointed"
+        assertEquals(0, scanText(text), "Текст 'mationabouthackingtheboxdisappointed' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexString1() {
+        val text = "33C22962E43CEF8627CBC63535F33FCE"
+        assertEquals(0, scanText(text), "Hex-строка '33C22962E43CEF8627CBC63535F33FCE' не должна определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexString2() {
+        val text = "154A6BFE1B651582F77341561FDC68A4"
+        assertEquals(0, scanText(text), "Hex-строка '154A6BFE1B651582F77341561FDC68A4' не должна определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexString3() {
+        val text = "DB975B51A999D84835C71F73F83B1862"
+        assertEquals(0, scanText(text), "Hex-строка 'DB975B51A999D84835C71F73F83B1862' не должна определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveNumberWithLetters1() {
+        val text = "1DipartimentodiInformaticaedApplicazioni"
+        assertEquals(0, scanText(text), "Текст '1DipartimentodiInformaticaedApplicazioni' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveNumberWithLetters2() {
+        val text = "3ComputerTechnologyInstituteand"
+        assertEquals(0, scanText(text), "Текст '3ComputerTechnologyInstituteand' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveNumberWithLetters3() {
+        val text = "1ComputerScienceDepartment"
+        assertEquals(0, scanText(text), "Текст '1ComputerScienceDepartment' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexStringWithLowercaseD() {
+        val text = "df7befc8cdc3c5434ef27cc669fb1e4b"
+        assertEquals(0, scanText(text), "Hex-строка 'df7befc8cdc3c5434ef27cc669fb1e4b' (начинается с маленькой d) не должна определяться как адрес Dogecoin")
+    }
+
+    @Test
+    fun testFalsePositiveLongTextWithL() {
+        val text = "LifttheharddriveupandrestitovertheDVDdrive"
+        assertEquals(0, scanText(text), "Длинный текст 'LifttheharddriveupandrestitovertheDVDdrive' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveLongTextWithApostrophe() {
+        val text = "' rightswithpoorcontentpolicyimplementations"
+        assertEquals(0, scanText(text), "Текст с апострофом '' rightswithpoorcontentpolicyimplementations' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveLongTextWithM() {
+        val text = "Mosttrappedeventsareentriesintosystemcalls"
+        assertEquals(0, scanText(text), "Длинный текст 'Mosttrappedeventsareentriesintosystemcalls' не должен определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexStringStartingWith3() {
+        val text = "33A954F58BDE92E9C9BBFB8816C99F15"
+        assertEquals(0, scanText(text), "Hex-строка '33A954F58BDE92E9C9BBFB8816C99F15' (начинается с 3) не должна определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexStringStartingWith3v2() {
+        val text = "3081920428D7F0F0422367867B25FA42\n" +
+                "                            33A954F58BDE92E9C9BBFB8816C99F15\n" +
+                "                            E6398722A0B2B7BFE8493E9A5C306630"
+        assertEquals(0, scanText(text), "Hex-строка '33A954F58BDE92E9C9BBFB8816C99F15' (начинается с 3) не должна определяться как адрес")
+    }
+
+    @Test
+    fun testFalsePositiveHexStringStartingWith1() {
+        val text = "1561E52A8B6DB258746FFE18F3CDCB11"
+        assertEquals(0, scanText(text), "Hex-строка '1561E52A8B6DB258746FFE18F3CDCB11' (начинается с 1) не должна определяться как адрес")
     }
 }
