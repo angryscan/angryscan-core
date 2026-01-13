@@ -12,12 +12,15 @@ import org.angryscan.common.extensions.toExpressionFlag
 import java.util.*
 
 @Serializable
-class HyperScanEngine(@Serializable override val matchers: List<IHyperMatcher>) : IScanEngine {
+class HyperScanEngine(
+    @Serializable override val matchers: List<IHyperMatcher>,
+    private val requireKeywords: Boolean = true
+) : IScanEngine {
     @Transient
     private val expressions =
         matchers
             .flatMap { ip ->
-                ip.hyperPatterns.map { hp ->
+                ip.getHyperPatterns(requireKeywords).map { hp ->
                     hp to ip
                 }
             }.mapIndexed { index, pair ->

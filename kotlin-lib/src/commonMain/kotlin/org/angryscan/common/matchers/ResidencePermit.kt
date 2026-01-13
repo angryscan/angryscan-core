@@ -15,10 +15,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     override val name = "Residence Permit"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d])
+    
+    private val keywordsPattern = """
         (?:
           ВНЖ|
           вид\s+на\s+жительство|
@@ -28,11 +26,39 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
           номер\s+ВНЖ|
           документ\s+вида\s+на\s+жительство
         )
+    """.trimIndent()
+    
+    private val numberPattern = """((?:82|83)\s*(?:№|N)?\s*\d{7})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        $keywordsPattern
         \s*[:\-]?\s*
-        ((?:82|83)\s*(?:№|N)?\s*\d{7})
+        $numberPattern
         (?![\p{L}\d])
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            keywordsPattern
+        } else {
+            """(?:$keywordsPattern)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?<![\p{L}\d])
+            $keywordsPart
+            \s*[:\-]?\s*
+            $numberPattern
+            (?![\p{L}\d])
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -41,6 +67,17 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns: List<String> = listOf(
         """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])(?:ВНЖ|вид\s+на\s+жительство|номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+ВНЖ|номер\s+ВНЖ|документ\s+вида\s+на\s+жительство)\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}(?:[^a-zA-Z0-9А-ЯЁа-яё]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:ВНЖ|вид\s+на\s+жительство|номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+ВНЖ|номер\s+ВНЖ|документ\s+вида\s+на\s+жительство)"""
+        } else {
+            """(?:ВНЖ|вид\s+на\s+жительство|номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+ВНЖ|номер\s+ВНЖ|документ\s+вида\s+на\s+жительство)?"""
+        }
+        return listOf(
+            """(?:^|[^a-zA-Z0-9А-ЯЁа-яё])$keywordsPart\s*[:\-]?\s*(?:82|83)\s*(?:№|N)?\s*\d{7}(?:[^a-zA-Z0-9А-ЯЁа-яё]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

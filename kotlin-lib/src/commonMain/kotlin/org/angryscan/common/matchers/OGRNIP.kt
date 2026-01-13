@@ -14,10 +14,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object OGRNIP : IHyperMatcher, IKotlinMatcher {
     override val name = "OGRNIP"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d])
+    
+    private val keywordsPattern = """
         (?:
           ОГРНИП|
           основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|
@@ -27,11 +25,39 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
           номер\s+ОГРНИП|
           серия\s+и\s+номер\s+ОГРНИП
         )
+    """.trimIndent()
+    
+    private val numberPattern = """([34]\d{14})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        $keywordsPattern
         \s*[:\-]?\s*
-        ([34]\d{14})
+        $numberPattern
         (?![\p{L}\d])
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            keywordsPattern
+        } else {
+            """(?:$keywordsPattern)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?<![\p{L}\d])
+            $keywordsPart
+            \s*[:\-]?\s*
+            $numberPattern
+            (?![\p{L}\d])
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -40,6 +66,17 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns: List<String> = listOf(
         """(?:^|[^\w])(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)\s*[:\-]?\s*[34]\d{14}(?:[^\w]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)"""
+        } else {
+            """(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)?"""
+        }
+        return listOf(
+            """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[34]\d{14}(?:[^\w]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

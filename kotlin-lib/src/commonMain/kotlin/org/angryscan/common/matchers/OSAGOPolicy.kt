@@ -14,10 +14,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     override val name = "OSAGO Policy"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d])
+    
+    private val keywordsPattern = """
         (?:
           ОСАГО|
           полис\s+ОСАГО|
@@ -27,11 +25,39 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
           страховой\s+полис\s+ОСАГО|
           страховка\s+ОСАГО
         )
+    """.trimIndent()
+    
+    private val numberPattern = """([A-ZА-Я]{3}\s+№?\s*\d{10})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        $keywordsPattern
         \s*[:\-]?\s*
-        ([A-ZА-Я]{3}\s+№?\s*\d{10})
+        $numberPattern
         (?![\p{L}\d])
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            keywordsPattern
+        } else {
+            """(?:$keywordsPattern)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?<![\p{L}\d])
+            $keywordsPart
+            \s*[:\-]?\s*
+            $numberPattern
+            (?![\p{L}\d])
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -40,6 +66,17 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns: List<String> = listOf(
         """(?:^|[^\w])(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)\s*[:\-]?\s*[A-ZА-Я]{3}\s+№?\s*\d{10}(?:[^\w]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)"""
+        } else {
+            """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)?"""
+        }
+        return listOf(
+            """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[A-ZА-Я]{3}\s+№?\s*\d{10}(?:[^\w]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

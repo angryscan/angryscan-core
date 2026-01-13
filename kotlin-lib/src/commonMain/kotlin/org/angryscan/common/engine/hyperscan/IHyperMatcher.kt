@@ -20,6 +20,17 @@ interface IHyperMatcher: IMatcher {
      * @see IMatcher for more information about pattern matching
      */
     val hyperPatterns: List<String>
+    
+    /**
+     * Returns hyper patterns with optional keyword requirement.
+     * By default, returns [hyperPatterns]. Can be overridden by matchers that support
+     * optional keywords.
+     *
+     * @param requireKeywords If true, keywords are required (default). If false, keywords are optional.
+     * @return List of hyper patterns
+     */
+    fun getHyperPatterns(requireKeywords: Boolean = true): List<String> = hyperPatterns
+    
     /**
      * A set of options that configure the behavior of the pattern matching.
      *

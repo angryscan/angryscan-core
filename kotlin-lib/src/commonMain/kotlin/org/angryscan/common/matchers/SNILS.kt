@@ -15,10 +15,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object SNILS : IHyperMatcher, IKotlinMatcher {
     override val name = "SNILS"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d])
+    
+    private val keywordsPattern = """
         (?:
           СНИЛС|
           страховой\s+номер\s+индивидуального\s+лицевого\s+счёта|
@@ -29,12 +27,41 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
           номер\s+СНИЛС|
           серия\s+и\s+номер\s+СНИЛС
         )
+    """.trimIndent()
+    
+    private val numberPattern = """([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}|[0-9]{11})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        $keywordsPattern
         \s*[:\-/\s]*\s*
         (?:[^0-9]*?\([^0-9]*?|["']*|.*?)
-        ([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}|[0-9]{11})
+        $numberPattern
         (?![\p{L}\d])
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            keywordsPattern
+        } else {
+            """(?:$keywordsPattern)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?<![\p{L}\d])
+            $keywordsPart
+            \s*[:\-/\s]*\s*
+            (?:[^0-9]*?\([^0-9]*?|["']*|.*?)
+            $numberPattern
+            (?![\p{L}\d])
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.MULTILINE,
         RegexOption.IGNORE_CASE
@@ -43,6 +70,17 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns: List<String> = listOf(
         """(?:^|[^а-яА-Яa-zA-Z0-9])(?:СНИЛС|страховой\s+номер\s+индивидуального\s+лицевого\s+счёта|страховой\s+номер\s+индивидуального\s+лицевого\s+счета|страховой\s+номер|номер\s+индивидуального\s+лицевого\s+счёта|номер\s+индивидуального\s+лицевого\s+счета|номер\s+СНИЛС|серия\s+и\s+номер\s+СНИЛС)\s*[:\-/\s]*\s*[^0-9]*?([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}|[0-9]{11})(?:[^а-яА-Яa-zA-Z0-9]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:СНИЛС|страховой\s+номер\s+индивидуального\s+лицевого\s+счёта|страховой\s+номер\s+индивидуального\s+лицевого\s+счета|страховой\s+номер|номер\s+индивидуального\s+лицевого\s+счёта|номер\s+индивидуального\s+лицевого\s+счета|номер\s+СНИЛС|серия\s+и\s+номер\s+СНИЛС)"""
+        } else {
+            """(?:СНИЛС|страховой\s+номер\s+индивидуального\s+лицевого\s+счёта|страховой\s+номер\s+индивидуального\s+лицевого\s+счета|страховой\s+номер|номер\s+индивидуального\s+лицевого\s+счёта|номер\s+индивидуального\s+лицевого\s+счета|номер\s+СНИЛС|серия\s+и\s+номер\s+СНИЛС)?"""
+        }
+        return listOf(
+            """(?:^|[^а-яА-Яa-zA-Z0-9])$keywordsPart\s*[:\-/\s]*\s*[^0-9]*?([0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}|[0-9]{11})(?:[^а-яА-Яa-zA-Z0-9]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.UTF8,
