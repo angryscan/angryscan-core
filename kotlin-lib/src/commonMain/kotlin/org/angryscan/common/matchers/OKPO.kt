@@ -42,9 +42,9 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
         val keywordsPart = if (requireKeywords) {
-            keywordsPattern
+            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
         } else {
-            """(?:$keywordsPattern)?"""
+            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)?"""
         }
         return listOf(
             """

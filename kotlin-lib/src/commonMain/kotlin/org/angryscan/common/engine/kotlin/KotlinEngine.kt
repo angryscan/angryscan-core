@@ -7,7 +7,7 @@ import org.angryscan.common.engine.Match
 @Serializable
 class KotlinEngine(
     @Serializable override val matchers: List<IKotlinMatcher>,
-    private val requireKeywords: Boolean = true
+    val requireKeywords: Boolean = true
 ) : IScanEngine {
     override fun scan(text: String): List<Match> {
         return matchers.flatMap { pattern ->

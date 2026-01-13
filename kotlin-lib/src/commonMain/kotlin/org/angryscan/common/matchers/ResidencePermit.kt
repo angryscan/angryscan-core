@@ -43,9 +43,9 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
         val keywordsPart = if (requireKeywords) {
-            keywordsPattern
+            """(?:ВНЖ|вид\s+на\s+жительство|номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+ВНЖ|номер\s+ВНЖ|документ\s+вида\s+на\s+жительство)"""
         } else {
-            """(?:$keywordsPattern)?"""
+            """(?:ВНЖ|вид\s+на\s+жительство|номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+вида\s+на\s+жительство|серия\s+и\s+номер\s+ВНЖ|номер\s+ВНЖ|документ\s+вида\s+на\s+жительство)?"""
         }
         return listOf(
             """

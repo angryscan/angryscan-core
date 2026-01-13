@@ -42,9 +42,9 @@ object DriverLicense : IHyperMatcher, IKotlinMatcher {
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
         val keywordsPart = if (requireKeywords) {
-            keywordsPattern
+            """(?:водительское\s+удостоверение|номер\s+водительского\s+удостоверения|номер\s+удостоверения|номер\s+ВУ|ВУ\s+№|driver\s+license|license\s+number|driving\s+license)"""
         } else {
-            """(?:$keywordsPattern)?"""
+            """(?:водительское\s+удостоверение|номер\s+водительского\s+удостоверения|номер\s+удостоверения|номер\s+ВУ|ВУ\s+№|driver\s+license|license\s+number|driving\s+license)?"""
         }
         return listOf(
             """

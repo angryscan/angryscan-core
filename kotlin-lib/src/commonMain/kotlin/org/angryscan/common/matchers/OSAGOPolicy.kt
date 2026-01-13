@@ -42,9 +42,9 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
         val keywordsPart = if (requireKeywords) {
-            keywordsPattern
+            """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)"""
         } else {
-            """(?:$keywordsPattern)?"""
+            """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)?"""
         }
         return listOf(
             """

@@ -42,9 +42,9 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
         val keywordsPart = if (requireKeywords) {
-            keywordsPattern
+            """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
         } else {
-            """(?:$keywordsPattern)?"""
+            """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)?"""
         }
         return listOf(
             """
