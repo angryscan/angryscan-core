@@ -15,10 +15,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object OMS : IHyperMatcher, IKotlinMatcher {
     override val name = "OMS"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d])
+    
+    private val keywordsPattern = """
         (?:
           полис\s+обязательного\s+медицинского\s+страхования|
           номер\s+полиса\s+ОМС|
@@ -32,11 +30,39 @@ object OMS : IHyperMatcher, IKotlinMatcher {
           страховка|
           страхование
         )
+    """.trimIndent()
+    
+    private val numberPattern = """([0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        $keywordsPattern
         \s*[:\-]?\s*
-        ([0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4})
+        $numberPattern
         (?![\p{L}\d])
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)"""
+        } else {
+            """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?<![\p{L}\d])
+            $keywordsPart
+            \s*[:\-]?\s*
+            $numberPattern
+            (?![\p{L}\d])
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -45,6 +71,17 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns = listOf(
         """(?:^|[^\w])(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)\s*[:\-]?\s*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}(?:[^\w]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)"""
+        } else {
+            """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)?"""
+        }
+        return listOf(
+            """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}(?:[^\w]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,
@@ -94,3 +131,4 @@ object OMS : IHyperMatcher, IKotlinMatcher {
 
     override fun toString() = name
 }
+

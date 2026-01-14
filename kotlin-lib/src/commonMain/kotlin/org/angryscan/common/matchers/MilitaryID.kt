@@ -14,10 +14,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object MilitaryID : IHyperMatcher, IKotlinMatcher {
     override val name = "Military ID"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:])
+    
+    private val keywordsPattern = """
         (?:
           удостоверение\s+личности\s+военнослужащего|
           номер\s+удостоверения\s+личности\s+военнослужащего|
@@ -27,11 +25,39 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
           военный\s+билет|
           номер\s+военного\s+билета
         )
+    """.trimIndent()
+    
+    private val numberPattern = """([А-ЯA-Z]{2}[\s№\-]*\d{7})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:])
+        $keywordsPattern
         \s*[:\-]?\s*
-        ([А-ЯA-Z]{2}[\s№\-]*\d{7})
+        $numberPattern
         \b
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
+        } else {
+            """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:])
+            $keywordsPart
+            \s*[:\-]?\s*
+            $numberPattern
+            \b
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -40,6 +66,17 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     override val hyperPatterns: List<String> = listOf(
         """(?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:\.!?])(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)\s*[:\-]?\s*[А-ЯA-Z]{2}[\s№\-]*\d{7}\b"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
+        } else {
+            """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)?"""
+        }
+        return listOf(
+            """(?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:\.!?])$keywordsPart\s*[:\-]?\s*[А-ЯA-Z]{2}[\s№\-]*\d{7}\b"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

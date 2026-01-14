@@ -15,10 +15,8 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object OKPO : IHyperMatcher, IKotlinMatcher {
     override val name = "OKPO"
-    override val javaPatterns = listOf(
-        """
-        (?ix)
-        (?<![\p{L}\d])
+    
+    private val keywordsPattern = """
         (?:
           ОКПО|
           код\s+ОКПО|
@@ -27,11 +25,39 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
           классификатор\s+предприятий\s+и\s+организаций|
           серия\s+и\s+номер\s+ОКПО
         )
+    """.trimIndent()
+    
+    private val numberPattern = """(\d{8}|\d{10})"""
+    
+    override val javaPatterns = listOf(
+        """
+        (?ix)
+        (?<![\p{L}\d])
+        $keywordsPattern
         \s*[:\-]?\s*
-        (\d{8}|\d{10})
+        $numberPattern
         (?![\p{L}\d])
         """.trimIndent()
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
+        } else {
+            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)?"""
+        }
+        return listOf(
+            """
+            (?ix)
+            (?<![\p{L}\d])
+            $keywordsPart
+            \s*[:\-]?\s*
+            $numberPattern
+            (?![\p{L}\d])
+            """.trimIndent()
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -41,6 +67,18 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
         """(?:^|[^\w])(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)\s*[:\-]?\s*\d{8}(?:[^\w]|$)""",
         """(?:^|[^\w])(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)\s*[:\-]?\s*\d{10}(?:[^\w]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val keywordsPart = if (requireKeywords) {
+            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
+        } else {
+            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)?"""
+        }
+        return listOf(
+            """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*\d{8}(?:[^\w]|$)""",
+            """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*\d{10}(?:[^\w]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

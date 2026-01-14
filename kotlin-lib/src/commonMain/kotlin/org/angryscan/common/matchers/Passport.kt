@@ -14,19 +14,59 @@ import org.angryscan.common.engine.kotlin.IKotlinMatcher
 @Serializable
 object Passport : IHyperMatcher, IKotlinMatcher {
     override val name = "Passport"
+    
+    private val passportKeyword = """паспорт"""
+    private val seriesKeyword = """[сc]ерия"""
+    private val numberPattern = """[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6}"""
+    
     override val javaPatterns = listOf(
-        """(?<![\p{L}\d])(паспорт[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?!\d)""",
-        """(?<![\p{L}\d])[сc]ерия[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?!\d)"""
+        """(?<![\p{L}\d])($passportKeyword[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?!\d)""",
+        """(?<![\p{L}\d])$seriesKeyword[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?!\d)"""
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        val passportPart = if (requireKeywords) {
+            passportKeyword
+        } else {
+            """(?:$passportKeyword)?"""
+        }
+        val seriesPart = if (requireKeywords) {
+            seriesKeyword
+        } else {
+            """(?:$seriesKeyword)?"""
+        }
+        return listOf(
+            """(?<![\p{L}\d])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?!\d)""",
+            """(?<![\p{L}\d])$seriesPart[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?!\d)"""
+        )
+    }
+    
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[^а-яА-Яa-zA-Z0-9])(паспорт[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^0-9]|$)""",
+        """(?:^|[^а-яА-Яa-zA-Z0-9])($passportKeyword[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^0-9]|$)""",
         """(?:^|[^а-яА-Яa-zA-Z0-9])[cс]ерия[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?:[^0-9]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        val passportPart = if (requireKeywords) {
+            passportKeyword
+        } else {
+            """(?:$passportKeyword)?"""
+        }
+        val seriesPart = if (requireKeywords) {
+            """[cс]ерия"""
+        } else {
+            """(?:[cс]ерия)?"""
+        }
+        return listOf(
+            """(?:^|[^а-яА-Яa-zA-Z0-9])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^0-9]|$)""",
+            """(?:^|[^а-яА-Яa-zA-Z0-9])$seriesPart[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?:[^0-9]|$)"""
+        )
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,
