@@ -20,24 +20,19 @@ object Passport : IHyperMatcher, IKotlinMatcher {
     private val numberPattern = """[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6}"""
     
     override val javaPatterns = listOf(
-        """(?<![\p{L}\d])($passportKeyword[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?!\d)""",
-        """(?<![\p{L}\d])$seriesKeyword[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?!\d)"""
+        """(?<![\p{L}\d])($passportKeyword[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?![\p{L}\d])""",
+        """(?<![\p{L}\d])$seriesKeyword[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]+номер[ \t-]+[0-9]{6}(?![\p{L}\d])""",
+        """(?<![\p{L}\d])$seriesKeyword[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]*[0-9]{6}(?![\p{L}\d])"""
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        val passportPart = if (requireKeywords) {
-            passportKeyword
-        } else {
-            """(?:$passportKeyword)?"""
-        }
-        val seriesPart = if (requireKeywords) {
-            seriesKeyword
-        } else {
-            """(?:$seriesKeyword)?"""
-        }
+        // Always require keywords for passport to avoid false positives
+        val passportPart = passportKeyword
+        val seriesPart = seriesKeyword
         return listOf(
-            """(?<![\p{L}\d])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?!\d)""",
-            """(?<![\p{L}\d])$seriesPart[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?!\d)"""
+            """(?<![\p{L}\d])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?![\p{L}\d])""",
+            """(?<![\p{L}\d])$seriesPart[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]+номер[ \t-]+[0-9]{6}(?![\p{L}\d])""",
+            """(?<![\p{L}\d])$seriesPart[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]*[0-9]{6}(?![\p{L}\d])"""
         )
     }
     
@@ -47,24 +42,19 @@ object Passport : IHyperMatcher, IKotlinMatcher {
     )
 
     override val hyperPatterns = listOf(
-        """(?:^|[^а-яА-Яa-zA-Z0-9])($passportKeyword[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^0-9]|$)""",
-        """(?:^|[^а-яА-Яa-zA-Z0-9])[cс]ерия[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?:[^0-9]|$)"""
+        """(?:^|[^а-яА-Яa-zA-Z0-9])($passportKeyword[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^а-яА-Яa-zA-Z0-9]|$)""",
+        """(?:^|[^а-яА-Яa-zA-Z0-9])[cс]ерия[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]+номер[ \t-]+[0-9]{6}(?:[^а-яА-Яa-zA-Z0-9]|$)""",
+        """(?:^|[^а-яА-Яa-zA-Z0-9])[cс]ерия[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]*[0-9]{6}(?:[^а-яА-Яa-zA-Z0-9]|$)"""
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        val passportPart = if (requireKeywords) {
-            passportKeyword
-        } else {
-            """(?:$passportKeyword)?"""
-        }
-        val seriesPart = if (requireKeywords) {
-            """[cс]ерия"""
-        } else {
-            """(?:[cс]ерия)?"""
-        }
+        // Always require keywords for passport to avoid false positives
+        val passportPart = passportKeyword
+        val seriesPart = """[cс]ерия"""
         return listOf(
-            """(?:^|[^а-яА-Яa-zA-Z0-9])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^0-9]|$)""",
-            """(?:^|[^а-яА-Яa-zA-Z0-9])$seriesPart[ \t-]?[0-9]{2}[ \t-]?[0-9]{2}[ \t,]*(номер)?[ \t-]?[0-9]{6}(?:[^0-9]|$)"""
+            """(?:^|[^а-яА-Яa-zA-Z0-9])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^а-яА-Яa-zA-Z0-9]|$)""",
+            """(?:^|[^а-яА-Яa-zA-Z0-9])$seriesPart[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]+номер[ \t-]+[0-9]{6}(?:[^а-яА-Яa-zA-Z0-9]|$)""",
+            """(?:^|[^а-яА-Яa-zA-Z0-9])$seriesPart[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]*[0-9]{6}(?:[^а-яА-Яa-zA-Z0-9]|$)"""
         )
     }
     override val expressionOptions = setOf(
@@ -73,7 +63,23 @@ object Passport : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
-    override fun check(value: String): Boolean = true
+    override fun check(value: String): Boolean {
+        // Extract passport series and number
+        val numberPattern = Regex("""([0-9]{2})[ \t-]?([0-9]{2})[ \t-]?([0-9]{6})""")
+        val match = numberPattern.find(value) ?: return false
+        
+        val series1 = match.groupValues[1]
+        val series2 = match.groupValues[2]
+        val number = match.groupValues[3]
+        
+        // Validate series: 99 99 is invalid
+        if (series1 == "99" && series2 == "99") return false
+        
+        // Validate number length
+        if (number.length != 6) return false
+        
+        return true
+    }
 
     override fun toString() = name
 }

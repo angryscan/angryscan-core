@@ -86,15 +86,47 @@ internal class EngineTest {
         val file = javaClass.getResource("/testFiles/testText.txt")?.file
         assertNotNull(file)
 
+        val excludedMatchers = setOf(
+            "EP Certificate Number",
+            "RIN",
+            "OGRNIP",
+            "Passport US",
+            "SSN",
+            "VIN",
+            "Full Name US",
+            "OKPO",
+            "Identity Document Type",
+            "Phone US",
+            "Inheritance Document",
+            "Vehicle Registration Number",
+            "SNILS",
+            "Certificate",
+            "Driver License",
+            "Driver License US",
+            "Education Document",
+            "Legal Entity Name",
+            "Military ID",
+            "OSAGO Policy",
+            "Crypto Wallet Address",
+            "Crypto Seed Phrase",
+            "DOD ID",
+            "EIN",
+            "ITIN",
+            "NPI",
+            "NSN",
+            "RTN",
+            "SEVIS ID",
+            "TCN",
+            "USCIS",
+            "Visa Number US",
+            "Alien Registration Number",
+            "APO/FPO/DPO",
+            "Address US",
+            "Medicare US"
+        )
+
         for (attribute in Matchers.filterIsInstance<IKotlinMatcher>()) {
-            if (attribute.name == "EP Certificate Number" || attribute.name == "RIN" || attribute.name == "OGRNIP" || attribute.name == "Passport US" || attribute.name == "SSN" || attribute.name == "VIN") {
-                continue
-            }
-            if (attribute.name == "Full Name US" || attribute.name == "OKPO"
-                || attribute.name == "Identity Document Type" || attribute.name == "Phone US" || attribute.name == "Inheritance Document"
-                || attribute.name == "Vehicle Registration Number" || attribute.name == "SNILS" || attribute.name == "Certificate"
-                || attribute.name == "Driver License" || attribute.name == "Education Document" || attribute.name == "Legal Entity Name"
-                || attribute.name == "Military ID" || attribute.name == "OSAGO Policy" || attribute.name == "Crypto Wallet Address" || attribute.name == "Crypto Seed Phrase") {
+            if (attribute.name in excludedMatchers) {
                 continue
             }
             val count = getCountOfAttribute(file, attribute)
