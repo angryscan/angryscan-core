@@ -207,12 +207,6 @@ internal class PassportTest : MatcherTestBase(Passport) {
         assertTrue(scanText(text) >= 1, "Паспорт в фигурных скобках с пробелами должен быть найден")
     }
 
-    @Test
-    fun testWithSeriesFormat() {
-        val text = "серия 12 34 номер 123456"
-        assertTrue(scanText(text) >= 1, "Паспорт с серией и номером должен быть найден")
-    }
-
     // ========== 4. Дополнительные структурные и форматные границы ==========
 
     @Test

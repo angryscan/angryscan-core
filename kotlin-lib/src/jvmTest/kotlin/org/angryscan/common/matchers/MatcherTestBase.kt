@@ -9,12 +9,12 @@ import kotlin.test.assertEquals
 
 abstract class MatcherTestBase(val matcher: IMatcher) {
 
-    fun scanText(text: String): Int {
+    fun scanText(text: String, requireKeywords: Boolean = false): Int {
 
-        val kotlinRes = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>()).use {
+        val kotlinRes = KotlinEngine(listOf(matcher).filterIsInstance<IKotlinMatcher>(), requireKeywords).use {
             it.scan(text)
         }
-        val hyperRes = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>()).use {
+        val hyperRes = HyperScanEngine(listOf(matcher).filterIsInstance<IHyperMatcher>(), requireKeywords).use {
             it.scan(text)
         }
         assertEquals(
