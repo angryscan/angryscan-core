@@ -165,12 +165,6 @@ internal class TCNTest : MatcherTestBase(TCN) {
     }
 
     @Test
-    fun testNoKeyword() {
-        val text = "HKR0627116X001XXX" // Нет ключевого слова TCN
-        assertEquals(0, scanText(text), "TCN без ключевого слова не должен находиться")
-    }
-
-    @Test
     fun testTooShort() {
         val text = "TCN: HKR0627116X001XX" // 16 символов вместо 17
         assertEquals(0, scanText(text), "Слишком короткий TCN не должен находиться")

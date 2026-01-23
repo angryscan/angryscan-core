@@ -41,8 +41,8 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for military ID to avoid false positives
-        val keywordsPart = """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
+        val baseKeywords = """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -65,8 +65,8 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for military ID to avoid false positives
-        val keywordsPart = """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
+        val baseKeywords = """(?:удостоверение\s+личности\s+военнослужащего|номер\s+удостоверения\s+личности\s+военнослужащего|серия\s+и\s+номер\s+удостоверения\s+личности\s+военнослужащего|номер\s+УЛВ|УЛВ\s+№|военный\s+билет|номер\s+военного\s+билета)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[\s\r\n\(\)\"\'\[\]\{\};,.:\.!?])$keywordsPart\s*[:\-]?\s*[А-ЯA-Z]{2}[\s№\-]*\d{7}\b"""
         )

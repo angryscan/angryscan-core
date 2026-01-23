@@ -19,6 +19,16 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
         """(?i)(?<![\p{L}\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'()\[\]\{\}\-]*([A-Z][0-9]{8})(?![\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])""",
         """(?<![\p{L}\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])([A-Z][0-9]{8})(?![\d!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])"""
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        return if (requireKeywords) {
+            // Return only pattern with keywords (more strict, reduces false positives)
+            listOf(javaPatterns[0])
+        } else {
+            // Return both patterns (with and without keywords)
+            javaPatterns
+        }
+    }
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -28,6 +38,16 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
         """(?i)(?:^|[^a-zA-Z0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])(passport|pass(?:\.|\s*(?:no|number))?)\b[\s:=#"'\(\)\[\]\{\}\-]*([A-Z][0-9]{8})(?:[^0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\]|$)""",
         """(?i)(?:^|[^a-zA-Z0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\])([A-Z][0-9]{8})(?:[^0-9!@#$%^&*()_+=\[\]{}|;:'",.<>?/~`\\]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        return if (requireKeywords) {
+            // Return only pattern with keywords (more strict, reduces false positives)
+            listOf(hyperPatterns[0])
+        } else {
+            // Return both patterns (with and without keywords)
+            hyperPatterns
+        }
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

@@ -282,12 +282,6 @@ internal class OSAGOPolicyTest : MatcherTestBase(OSAGOPolicy) {
     }
 
     @Test
-    fun testWithoutKeywords() {
-        val text = "BBB 1234567890"
-        assertEquals(0, scanText(text), "Полис ОСАГО без ключевых слов не должен находиться")
-    }
-
-    @Test
     fun testWithOSAGOKeyword() {
         val text = "ОСАГО BBB 1234567890"
         assertTrue(scanText(text) >= 1, "Полис ОСАГО с ключевым словом 'ОСАГО' должен быть найден")

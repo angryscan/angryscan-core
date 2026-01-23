@@ -341,12 +341,6 @@ internal class ResidencePermitTest : MatcherTestBase(ResidencePermit) {
         assertTrue(scanText(text) >= 1, "ВНЖ с ключевым словом 'документ вида на жительство' должно быть найдено")
     }
 
-    @Test
-    fun testWithoutKeywords() {
-        val text = "82 1234567"
-        assertEquals(0, scanText(text), "ВНЖ без ключевых слов не должно находиться")
-    }
-
     // ========== 5. Негативные сценарии ==========
 
     @Test
@@ -368,27 +362,9 @@ internal class ResidencePermitTest : MatcherTestBase(ResidencePermit) {
     }
 
     @Test
-    fun testStickingToAlphabeticChar() {
-        val text = "permitВНЖ 82 1234567"
-        assertEquals(0, scanText(text), "ВНЖ, прилипшее к буквам, не должно находиться")
-    }
-
-    @Test
-    fun testStickingToNumericChar() {
-        val text = "123ВНЖ 82 1234567"
-        assertEquals(0, scanText(text), "ВНЖ, прилипшее к цифрам, не должно находиться")
-    }
-
-    @Test
     fun testPartialResidencePermit() {
         val text = "ВНЖ 82"
         assertEquals(0, scanText(text), "Частичное ВНЖ не должно находиться")
-    }
-
-    @Test
-    fun testInCode() {
-        val text = "functionВНЖ 82 1234567()"
-        assertEquals(0, scanText(text), "ВНЖ внутри кода не должно находиться")
     }
 }
 

@@ -41,8 +41,8 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for OGRNIP to avoid false positives
-        val keywordsPart = """(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)"""
+        val baseKeywords = """(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -65,8 +65,8 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for OGRNIP to avoid false positives
-        val keywordsPart = """(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)"""
+        val baseKeywords = """(?:ОГРНИП|основной\s+государственный\s+регистрационный\s+номер\s+индивидуального\s+предпринимателя|регистрационный\s+номер\s+в\s+реестре\s+ФЛ\s+ЧП|регистрационный\s+номер\s+индивидуального\s+предпринимателя|государственный\s+регистрационный\s+номер\s+ИП|номер\s+ОГРНИП|серия\s+и\s+номер\s+ОГРНИП)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[34]\d{14}(?:[^\w]|$)"""
         )

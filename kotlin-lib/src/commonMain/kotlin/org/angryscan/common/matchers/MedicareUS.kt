@@ -18,6 +18,16 @@ object MedicareUS : IHyperMatcher, IKotlinMatcher {
         """(?i)(?:medicare|mbi|health\s*insurance|medical\s*insurance)(?:\s*[:\-#]\s*|\s+)([0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4})(?:[^a-zA-Z0-9]|$)""",
         """(?:^|[^a-zA-Z0-9])([0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4})(?:[^a-zA-Z0-9]|$)"""
     )
+    
+    override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
+        return if (requireKeywords) {
+            // Return only pattern with keywords (more strict, reduces false positives)
+            listOf(javaPatterns[0])
+        } else {
+            // Return both patterns (with and without keywords)
+            javaPatterns
+        }
+    }
     override val regexOptions = setOf(
         RegexOption.IGNORE_CASE,
         RegexOption.MULTILINE
@@ -27,6 +37,16 @@ object MedicareUS : IHyperMatcher, IKotlinMatcher {
         """(?:medicare|mbi|health\s*insurance|medical\s*insurance)(?:\s*[:\-#]\s*|\s+)[0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4}(?:[^a-zA-Z0-9]|$)""",
         """(?:^|[^a-zA-Z0-9])[0-9][a-z0-9]{3}[\s\t\-]*[a-z0-9]{3}[\s\t\-]*[a-z0-9]{4}(?:[^a-zA-Z0-9]|$)"""
     )
+    
+    override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
+        return if (requireKeywords) {
+            // Return only pattern with keywords (more strict, reduces false positives)
+            listOf(hyperPatterns[0])
+        } else {
+            // Return both patterns (with and without keywords)
+            hyperPatterns
+        }
+    }
     override val expressionOptions = setOf(
         ExpressionOption.MULTILINE,
         ExpressionOption.CASELESS,

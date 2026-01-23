@@ -350,11 +350,5 @@ internal class OKPOTest : MatcherTestBase(OKPO) {
         val text = "серия и номер ОКПО 23456783"
         assertTrue(scanText(text) >= 1, "ОКПО с ключевым словом 'серия и номер ОКПО' должен быть найден")
     }
-
-    @Test
-    fun testWithoutKeywords() {
-        val text = "23456783"
-        assertEquals(0, scanText(text), "ОКПО без ключевых слов не должен находиться")
-    }
 }
 

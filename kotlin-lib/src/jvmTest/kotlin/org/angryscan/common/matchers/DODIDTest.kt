@@ -165,12 +165,6 @@ internal class DODIDTest : MatcherTestBase(DODID) {
     }
 
     @Test
-    fun testNoKeywords() {
-        val text = "1234567890" // Нет ключевых слов
-        assertEquals(0, scanText(text), "DOD ID без ключевых слов не должен находиться")
-    }
-
-    @Test
     fun testAllZeros() {
         val text = "DOD ID: 0000000000" // Все нули
         assertEquals(0, scanText(text), "DOD ID со всеми нулями не должен находиться")

@@ -46,8 +46,8 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for OMS to avoid false positives (but exclude standalone "полис")
-        val keywordsPart = """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)"""
+        val baseKeywords = """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -70,8 +70,8 @@ object OMS : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for OMS to avoid false positives (but exclude standalone "полис")
-        val keywordsPart = """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)"""
+        val baseKeywords = """(?:полис\s+обязательного\s+медицинского\s+страхования|номер\s+полиса\s+ОМС|номер\s+полиса\s+обязательного\s+медицинского\s+страхования|серия\s+и\s+номер\s+полиса\s+ОМС|серия\s+и\s+номер\s+полиса|номер\s+полиса|полис\s+ОМС|ОМС\s+№|омс|страховка|страхование)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}[\s\t-]*[0-9]{4}(?:[^\w]|$)"""
         )

@@ -37,7 +37,14 @@ object TCN : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        return javaPatterns
+        return if (requireKeywords) {
+            javaPatterns
+        } else {
+            // Return pattern without keywords as fallback
+            listOf(
+                """(?ix)(?<![\p{L}\d])$numberPattern(?!\w)"""
+            )
+        }
     }
     
     override val regexOptions = setOf(
@@ -50,7 +57,14 @@ object TCN : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        return hyperPatterns
+        return if (requireKeywords) {
+            hyperPatterns
+        } else {
+            // Return pattern without keywords as fallback
+            listOf(
+                """(?:^|[^a-zA-Z0-9])[A-Z0-9]{17}(?:[^a-zA-Z0-9]|$)"""
+            )
+        }
     }
     
     override val expressionOptions = setOf(

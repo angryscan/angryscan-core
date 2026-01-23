@@ -58,8 +58,8 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for education documents to avoid false positives
-        val keywordsPart = """(?:диплом|аттестат|свидетельство\s+об\s+образовании|сертификат|удостоверение|документ\s+об\s+образовании|образовательный\s+документ|номер\s+диплома|серия\s+и\s+номер\s+диплома|номер\s+аттестата|серия\s+и\s+номер\s+аттестата|номер\s+свидетельства|серия\s+и\s+номер\s+свидетельства)"""
+        val baseKeywords = """(?:диплом|аттестат|свидетельство\s+об\s+образовании|сертификат|удостоверение|документ\s+об\s+образовании|образовательный\s+документ|номер\s+диплома|серия\s+и\s+номер\s+диплома|номер\s+аттестата|серия\s+и\s+номер\s+аттестата|номер\s+свидетельства|серия\s+и\s+номер\s+свидетельства)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -90,8 +90,8 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for education documents to avoid false positives
-        val keywordsPart = """(?:диплом|аттестат|свидетельство\s+об\s+образовании|сертификат|удостоверение|документ\s+об\s+образовании|образовательный\s+документ|номер\s+диплома|серия\s+и\s+номер\s+диплома|номер\s+аттестата|серия\s+и\s+номер\s+аттестата|номер\s+свидетельства|серия\s+и\s+номер\s+свидетельства)"""
+        val baseKeywords = """(?:диплом|аттестат|свидетельство\s+об\s+образовании|сертификат|удостоверение|документ\s+об\s+образовании|образовательный\s+документ|номер\s+диплома|серия\s+и\s+номер\s+диплома|номер\s+аттестата|серия\s+и\s+номер\s+аттестата|номер\s+свидетельства|серия\s+и\s+номер\s+свидетельства)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*\d{6}\s+\d{7}(?:[^\w]|$)""",
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*\d{2}\s+[А-ЯЁ]{2}\s+\d{6,7}(?:[^\w]|$)"""

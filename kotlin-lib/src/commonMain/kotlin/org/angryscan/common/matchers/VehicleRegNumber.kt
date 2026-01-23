@@ -52,8 +52,8 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for vehicle registration number to avoid false positives
-        val keywordsPart = """(?:регистрационный\s+номер\s+ТС|регистрационный\s+номер\s+транспортного\s+средства|госномер|гос\.\s*номер|государственный\s+номер|номерной\s+знак\s+ТС|номерной\s+знак\s+транспортного\s+средства|автомобильный\s+номер|номер\s+автомобиля|регистрационный\s+знак\s+транспортного\s+средства|регистрационный\s+знак\s+ТС|номер\s+ТС)"""
+        val baseKeywords = """(?:регистрационный\s+номер\s+ТС|регистрационный\s+номер\s+транспортного\s+средства|госномер|гос\.\s*номер|государственный\s+номер|номерной\s+знак\s+ТС|номерной\s+знак\s+транспортного\s+средства|автомобильный\s+номер|номер\s+автомобиля|регистрационный\s+знак\s+транспортного\s+средства|регистрационный\s+знак\s+ТС|номер\s+ТС)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -82,8 +82,8 @@ object VehicleRegNumber : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for vehicle registration number to avoid false positives
-        val keywordsPart = """(?:регистрационный\s+номер\s+ТС|регистрационный\s+номер\s+транспортного\s+средства|госномер|гос\.\s*номер|государственный\s+номер|номерной\s+знак\s+ТС|номерной\s+знак\s+транспортного\s+средства|автомобильный\s+номер|номер\s+автомобиля|регистрационный\s+знак\s+транспортного\s+средства|регистрационный\s+знак\s+ТС|номер\s+ТС)"""
+        val baseKeywords = """(?:регистрационный\s+номер\s+ТС|регистрационный\s+номер\s+транспортного\s+средства|госномер|гос\.\s*номер|государственный\s+номер|номерной\s+знак\s+ТС|номерной\s+знак\s+транспортного\s+средства|автомобильный\s+номер|номер\s+автомобиля|регистрационный\s+знак\s+транспортного\s+средства|регистрационный\s+знак\s+ТС|номер\s+ТС)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[АВБГДЕКМНОРСТУХ]\d{3}[АВБГДЕКМНОРСТУХ]{2}\s+(?:$regionCodes)(?:[^\w]|$)""",
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[ABEKMHOPCTYX]\d{3}[ABEKMHOPCTYX]{2}\s+(?:$regionCodes)(?:[^\w]|$)""",

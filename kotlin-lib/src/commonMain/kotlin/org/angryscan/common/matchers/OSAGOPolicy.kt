@@ -41,8 +41,8 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for OSAGO policy to avoid false positives
-        val keywordsPart = """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)"""
+        val baseKeywords = """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -65,8 +65,8 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        // Always require keywords for OSAGO policy to avoid false positives
-        val keywordsPart = """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)"""
+        val baseKeywords = """(?:ОСАГО|полис\s+ОСАГО|полис\s+обязательного\s+страхования\s+автогражданской\s+ответственности|номер\s+полиса\s+ОСАГО|серия\s+и\s+номер\s+полиса\s+ОСАГО|страховой\s+полис\s+ОСАГО|страховка\s+ОСАГО)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*[A-ZА-Я]{3}\s+№?\s*\d{10}(?:[^\w]|$)"""
         )

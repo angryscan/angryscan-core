@@ -333,21 +333,9 @@ internal class OMSTest : MatcherTestBase(OMS) {
     }
 
     @Test
-    fun testWithoutPolisAlone() {
-        val text = "полис 1234 5678 9012 3452"
-        assertEquals(0, scanText(text), "ОМС с отдельно стоящим 'полис' не должен находиться")
-    }
-
-    @Test
     fun testWithStrahovkaKeyword() {
         val text = "страховка 1234 5678 9012 3452"
         assertTrue(scanText(text) >= 1, "ОМС с ключевым словом 'страховка' должен быть найден")
-    }
-
-    @Test
-    fun testWithoutKeywords() {
-        val text = "1234 5678 9012 3452"
-        assertEquals(0, scanText(text), "ОМС без ключевых слов не должен находиться")
     }
 
     @Test

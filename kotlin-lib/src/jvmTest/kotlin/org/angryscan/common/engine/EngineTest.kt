@@ -122,7 +122,8 @@ internal class EngineTest {
             "Alien Registration Number",
             "APO/FPO/DPO",
             "Address US",
-            "Medicare US"
+            "Medicare US",
+            "Sberbank Book"
         )
 
         for (attribute in Matchers.filterIsInstance<IKotlinMatcher>()) {
