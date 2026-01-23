@@ -34,7 +34,14 @@ object DODID : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        return javaPatterns
+        return if (requireKeywords) {
+            javaPatterns
+        } else {
+            // Return pattern without keywords as fallback
+            listOf(
+                """(?ix)(?<![\p{L}\d])$numberPattern(?![\d\p{L}])"""
+            )
+        }
     }
     
     override val regexOptions = setOf(
@@ -47,7 +54,14 @@ object DODID : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        return hyperPatterns
+        return if (requireKeywords) {
+            hyperPatterns
+        } else {
+            // Return pattern without keywords as fallback
+            listOf(
+                """(?:^|[^0-9a-zA-Z])[0-9]{10}(?:[^0-9a-zA-Z]|$)"""
+            )
+        }
     }
     
     override val expressionOptions = setOf(

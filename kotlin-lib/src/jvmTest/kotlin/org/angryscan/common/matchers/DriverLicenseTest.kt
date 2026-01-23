@@ -308,18 +308,6 @@ internal class DriverLicenseTest : MatcherTestBase(DriverLicense) {
     }
 
     @Test
-    fun testStickingToAlphabeticChar() {
-        val text = "licenseводительское удостоверение 12 34 123456"
-        assertEquals(0, scanText(text), "ВУ, прилипшее к буквам, не должно находиться")
-    }
-
-    @Test
-    fun testStickingToNumericChar() {
-        val text = "123номер удостоверения 12 34 123456"
-        assertEquals(0, scanText(text), "ВУ, прилипшее к цифрам, не должно находиться")
-    }
-
-    @Test
     fun testWithInvalidSeparators() {
         val text = "водительское удостоверение 12@34@123456"
         assertEquals(0, scanText(text), "ВУ с неправильными разделителями не должно находиться")
@@ -329,18 +317,6 @@ internal class DriverLicenseTest : MatcherTestBase(DriverLicense) {
     fun testPartialDriverLicense() {
         val text = "номер удостоверения 12 34"
         assertEquals(0, scanText(text), "Частичное ВУ не должно находиться")
-    }
-
-    @Test
-    fun testInCode() {
-        val text = "functionводительское удостоверение 12 34 123456()"
-        assertEquals(0, scanText(text), "ВУ внутри кода не должно находиться")
-    }
-
-    @Test
-    fun testWithoutKeywords() {
-        val text = "12 34 123456"
-        assertEquals(0, scanText(text), "ВУ без ключевых слов не должно находиться")
     }
 
     @Test

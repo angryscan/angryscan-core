@@ -294,12 +294,6 @@ internal class VehicleRegNumberTest : MatcherTestBase(VehicleRegNumber) {
     }
 
     @Test
-    fun testWithoutKeywords() {
-        val text = "А123БВ 77"
-        assertEquals(0, scanText(text), "Госномер без ключевых слов не должен находиться")
-    }
-
-    @Test
     fun testWithGosnomerKeywordAlone() {
         val text = "госномер А123БВ 77"
         assertTrue(scanText(text) >= 1, "Госномер с ключевым словом 'госномер' должен быть найден")

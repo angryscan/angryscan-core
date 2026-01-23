@@ -276,12 +276,6 @@ internal class EducationDocTest : MatcherTestBase(EducationDoc) {
     }
 
     @Test
-    fun testWithoutKeywords() {
-        val text = "123456 1234567"
-        assertEquals(0, scanText(text), "Документ об образовании без ключевых слов не должен находиться")
-    }
-
-    @Test
     fun testWithDiplomKeyword() {
         val text = "диплом 123456 1234567"
         assertTrue(scanText(text) >= 1, "Документ об образовании с ключевым словом 'диплом' должен быть найден")

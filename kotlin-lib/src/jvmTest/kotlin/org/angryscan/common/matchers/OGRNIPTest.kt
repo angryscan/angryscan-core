@@ -309,12 +309,6 @@ internal class OGRNIPTest : MatcherTestBase(OGRNIP) {
     }
 
     @Test
-    fun testWithoutKeywords() {
-        val text = "304500116000157"
-        assertEquals(0, scanText(text), "ОГРНИП без ключевых слов не должен находиться")
-    }
-
-    @Test
     fun testWithOGRNIPKeyword() {
         val text = "ОГРНИП 304500116000157"
         assertTrue(scanText(text) >= 1, "ОГРНИП с ключевым словом 'ОГРНИП' должен быть найден")

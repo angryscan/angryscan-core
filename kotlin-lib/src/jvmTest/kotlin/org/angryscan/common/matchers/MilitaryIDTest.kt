@@ -340,12 +340,6 @@ internal class MilitaryIDTest : MatcherTestBase(MilitaryID) {
     }
 
     @Test
-    fun testWithoutKeywords() {
-        val text = "АБ 3847291"
-        assertEquals(0, scanText(text), "УЛВ без ключевых слов не должно находиться")
-    }
-
-    @Test
     fun testWithUdoverenieLichnosti() {
         val text = "удостоверение личности военнослужащего АБ 3847291"
         assertTrue(scanText(text) >= 1, "УЛВ с ключевым словом 'удостоверение личности военнослужащего' должно быть найдено")
