@@ -41,11 +41,8 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        val keywordsPart = if (requireKeywords) {
-            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
-        } else {
-            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)?"""
-        }
+        val baseKeywords = """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """
             (?ix)
@@ -69,11 +66,8 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        val keywordsPart = if (requireKeywords) {
-            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
-        } else {
-            """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)?"""
-        }
+        val baseKeywords = """(?:ОКПО|код\s+ОКПО|номер\s+ОКПО|общероссийский\s+классификатор\s+предприятий\s+и\s+организаций|классификатор\s+предприятий\s+и\s+организаций|серия\s+и\s+номер\s+ОКПО)"""
+        val keywordsPart = baseKeywords + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*\d{8}(?:[^\w]|$)""",
             """(?:^|[^\w])$keywordsPart\s*[:\-]?\s*\d{10}(?:[^\w]|$)"""

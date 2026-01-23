@@ -26,8 +26,8 @@ object Passport : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getJavaPatterns(requireKeywords: Boolean): List<String> {
-        val passportPart = if (requireKeywords) passportKeyword else "$passportKeyword?"
-        val seriesPart = if (requireKeywords) seriesKeyword else "$seriesKeyword?"
+        val passportPart = passportKeyword + if (!requireKeywords) "?" else ""
+        val seriesPart = seriesKeyword + if (!requireKeywords) "?" else ""
         return listOf(
             """(?<![\p{L}\d])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}$numberPattern)(?![\p{L}\d])""",
             """(?<![\p{L}\d])$seriesPart[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]+номер[ \t-]+[0-9]{6}(?![\p{L}\d])""",
@@ -47,8 +47,9 @@ object Passport : IHyperMatcher, IKotlinMatcher {
     )
     
     override fun getHyperPatterns(requireKeywords: Boolean): List<String> {
-        val passportPart = if (requireKeywords) passportKeyword else "$passportKeyword?"
-        val seriesPart = if (requireKeywords) """[cс]ерия""" else """[cс]ерия?"""
+        val baseSeriesKeyword = """[cс]ерия"""
+        val passportPart = passportKeyword + if (!requireKeywords) "?" else ""
+        val seriesPart = baseSeriesKeyword + if (!requireKeywords) "?" else ""
         return listOf(
             """(?:^|[^а-яА-Яa-zA-Z0-9])($passportPart[ \t-]?([а-яА-Я]*[ \t-]){0,2}[0-9]{2}[ \t-]?[0-9]{2}[ \t-]?[0-9]{6})(?:[^а-яА-Яa-zA-Z0-9]|$)""",
             """(?:^|[^а-яА-Яa-zA-Z0-9])$seriesPart[ \t-]+[0-9]{2}[ \t-]+[0-9]{2}[ \t,]+номер[ \t-]+[0-9]{6}(?:[^а-яА-Яa-zA-Z0-9]|$)""",
