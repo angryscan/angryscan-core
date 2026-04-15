@@ -99,14 +99,17 @@ object MilitaryID : IHyperMatcher, IKotlinMatcher {
         return true
     }
 
+    private val CHECK_MILITARY_NUMBER_PATTERN =
+        Regex("[А-ЯA-Z]{2}[\\s№\\-]*\\d{7}")
+    private val NON_CYRILLIC_LETTER_DIGIT_REGEX = Regex("[^А-Яа-я0-9]")
+
     override fun check(value: String): Boolean {
         // Extract only the number (2 letters + 7 digits) from the match
         // The match may include keywords, so we search for the number pattern
-        val numberPattern = Regex("[А-ЯA-Z]{2}[\\s№\\-]*\\d{7}")
-        val match = numberPattern.find(value)
+        val match = CHECK_MILITARY_NUMBER_PATTERN.find(value)
         if (match == null) return false
         
-        val cleaned = match.value.replace(Regex("[^А-Яа-я0-9]"), "").uppercase()
+        val cleaned = match.value.replace(NON_CYRILLIC_LETTER_DIGIT_REGEX, "").uppercase()
         
         if (cleaned.length != 9)
             return false

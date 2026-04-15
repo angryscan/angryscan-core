@@ -47,9 +47,12 @@ object AddressUS : IHyperMatcher, IKotlinMatcher {
         "UT", "VA", "VT", "WA", "WI", "WV", "WY"
     )
 
+    private val STATE_ZIP_REGEX = Regex("""\s+([a-zA-Z]{2})\s+(\d{5})""", RegexOption.IGNORE_CASE)
+    private val LEADING_HOUSE_NUMBER_REGEX = Regex("""^\d{1,8}\s*""")
+
     override fun check(value: String): Boolean {
         // Check that state code is valid (support any case)
-        val stateMatch = Regex("""\s+([a-zA-Z]{2})\s+(\d{5})""", RegexOption.IGNORE_CASE).find(value)
+        val stateMatch = STATE_ZIP_REGEX.find(value)
         if (stateMatch == null) return false
         
         val stateCode = stateMatch.groupValues[1].uppercase()
@@ -65,7 +68,7 @@ object AddressUS : IHyperMatcher, IKotlinMatcher {
         // Extract part before state code
         val beforeState = stateMatch.range.first
         val addressWithNumber = value.substring(0, beforeState)
-        val addressPart = addressWithNumber.replace(Regex("""^\d{1,8}\s*"""), "").trim()
+        val addressPart = addressWithNumber.replace(LEADING_HOUSE_NUMBER_REGEX, "").trim()
         if (addressPart.length < 7) return false
         
         return true

@@ -29,19 +29,20 @@ object FullName : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val falseWords = setOf(
+        "Республика",
+        "Область",
+        "Край",
+        "Город",
+        "Село",
+        "Деревня",
+        "Улица",
+        "Проспект",
+        "Марий"
+    )
+
     override fun check(value: String): Boolean {
-        val falseList = listOf(
-            "Республика",
-            "Область",
-            "Край",
-            "Город",
-            "Село",
-            "Деревня",
-            "Улица",
-            "Проспект",
-            "Марий"
-        )
-        return !falseList.any { value.contains(it) }
+        return !falseWords.any { value.contains(it) }
     }
 
     override fun toString() = name

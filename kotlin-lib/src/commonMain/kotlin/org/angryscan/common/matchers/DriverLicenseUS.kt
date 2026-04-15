@@ -89,11 +89,18 @@ object DriverLicenseUS : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_CO = Regex("""\d{2}-\d{3}-\d{4}""", RegexOption.IGNORE_CASE)
+    private val CHECK_FL = Regex("""[A-Z]-\d{3}-\d{3}-\d{3}-\d{3}""", RegexOption.IGNORE_CASE)
+    private val CHECK_ND = Regex("""[A-Z]{3}-\d{2}-\d{4}""", RegexOption.IGNORE_CASE)
+    private val CHECK_NJ = Regex("""[A-Z]\d{14}""", RegexOption.IGNORE_CASE)
+    private val CHECK_WA = Regex("""[A-Z]{3}\*\*[A-Z]{2}\d{3}[A-Z]\d""", RegexOption.IGNORE_CASE)
+    private val CHECK_WI = Regex("""[A-Z]\d{3}-\d{4}-\d{4}-\d{2}""", RegexOption.IGNORE_CASE)
+
     override fun check(value: String): Boolean {
         // Check match against one of the formats
         
         // Colorado: ##-###-####
-        if (value.matches(Regex("""\d{2}-\d{3}-\d{4}""", RegexOption.IGNORE_CASE))) {
+        if (value.matches(CHECK_CO)) {
             val digits = value.replace("-", "").filter { it.isDigit() }
             if (digits.length == 9 && !digits.all { it == '0' } && !digits.all { it == digits[0] }) {
                 return true
@@ -101,7 +108,7 @@ object DriverLicenseUS : IHyperMatcher, IKotlinMatcher {
         }
         
         // Florida: L-###-###-###-###
-        if (value.matches(Regex("""[A-Z]-\d{3}-\d{3}-\d{3}-\d{3}""", RegexOption.IGNORE_CASE))) {
+        if (value.matches(CHECK_FL)) {
             val digits = value.filter { it.isDigit() }
             if (digits.length == 12 && !digits.all { it == '0' } && !digits.all { it == digits[0] }) {
                 return true
@@ -109,7 +116,7 @@ object DriverLicenseUS : IHyperMatcher, IKotlinMatcher {
         }
         
         // North Dakota: ABC-12-3456
-        if (value.matches(Regex("""[A-Z]{3}-\d{2}-\d{4}""", RegexOption.IGNORE_CASE))) {
+        if (value.matches(CHECK_ND)) {
             val digits = value.filter { it.isDigit() }
             if (digits.length == 6 && !digits.all { it == '0' } && !digits.all { it == digits[0] }) {
                 return true
@@ -117,7 +124,7 @@ object DriverLicenseUS : IHyperMatcher, IKotlinMatcher {
         }
         
         // New Jersey: A + 14 digits
-        if (value.matches(Regex("""[A-Z]\d{14}""", RegexOption.IGNORE_CASE))) {
+        if (value.matches(CHECK_NJ)) {
             val digits = value.filter { it.isDigit() }
             if (digits.length == 14 && !digits.all { it == '0' } && !digits.all { it == digits[0] }) {
                 return true
@@ -125,7 +132,7 @@ object DriverLicenseUS : IHyperMatcher, IKotlinMatcher {
         }
         
         // Washington: DOE**MJ501P1
-        if (value.matches(Regex("""[A-Z]{3}\*\*[A-Z]{2}\d{3}[A-Z]\d""", RegexOption.IGNORE_CASE))) {
+        if (value.matches(CHECK_WA)) {
             val digits = value.filter { it.isDigit() }
             if (digits.length == 4 && !digits.all { it == '0' } && !digits.all { it == digits[0] }) {
                 return true
@@ -133,7 +140,7 @@ object DriverLicenseUS : IHyperMatcher, IKotlinMatcher {
         }
         
         // Wisconsin: J525-4209-0465-05
-        if (value.matches(Regex("""[A-Z]\d{3}-\d{4}-\d{4}-\d{2}""", RegexOption.IGNORE_CASE))) {
+        if (value.matches(CHECK_WI)) {
             val digits = value.filter { it.isDigit() }
             if (digits.length == 13 && !digits.all { it == '0' } && !digits.all { it == digits[0] }) {
                 return true

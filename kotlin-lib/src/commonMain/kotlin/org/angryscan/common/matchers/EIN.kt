@@ -128,14 +128,18 @@ object EIN : IHyperMatcher, IKotlinMatcher {
         }
     }
 
+    private val CHECK_NUMBER_PATTERN =
+        Regex("""(?:[07][1-7]|1[0-6]|2[0-7]|[35][0-9]|[468][0-8]|9[0-589])-?\d{7}""")
+    private val NON_DIGIT_HYPHEN_REGEX = Regex("[^0-9-]")
+    private val FORMAT_REGEX = Regex("""\d{2}-\d{7}""")
+
     override fun check(value: String): Boolean {
         // Extract EIN number from the match (may include keywords)
-        val numberPattern = Regex("""(?:[07][1-7]|1[0-6]|2[0-7]|[35][0-9]|[468][0-8]|9[0-589])-?\d{7}""")
-        val match = numberPattern.find(value)
+        val match = CHECK_NUMBER_PATTERN.find(value)
         if (match == null) return false
         
         // Extract only digits and hyphens from the matched number
-        val cleaned = match.value.replace(Regex("[^0-9-]"), "")
+        val cleaned = match.value.replace(NON_DIGIT_HYPHEN_REGEX, "")
         
         // Check format: must be digits, possibly with one hyphen
         val digitsOnly = cleaned.replace("-", "")
@@ -146,7 +150,7 @@ object EIN : IHyperMatcher, IKotlinMatcher {
         if (hyphenCount > 1) return false
         if (hyphenCount == 1) {
             // Hyphen must be after the first two digits
-            if (!cleaned.matches(Regex("""\d{2}-\d{7}"""))) return false
+            if (!cleaned.matches(FORMAT_REGEX)) return false
         }
         
         // Check prefix (first two digits of the entire number)

@@ -66,11 +66,13 @@ object PhoneUS : IHyperMatcher, IKotlinMatcher {
         "421", "423", "395", "342", "863", "861",
         "472", "473", "474", "475", "481", "482",
         "483", "484", "485", "486", "487", "491",
-        "492", "493", "494", "800", "900"
+        "492", "493", "494",         "800", "900"
     )
 
+    private val NON_DIGIT_REGEX = Regex("[^0-9]")
+
     override fun check(value: String): Boolean {
-        var digits = value.replace(Regex("[^0-9]"), "")
+        var digits = value.replace(NON_DIGIT_REGEX, "")
         
         if (digits.length == 11 && digits.startsWith("1")) {
             digits = digits.substring(1)

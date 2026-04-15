@@ -125,8 +125,11 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
         return true
     }
 
+    private val NON_DIGIT_REGEX = Regex("[^0-9]")
+    private val WHITESPACE_REGEX = Regex("\\s+")
+
     override fun check(value: String): Boolean {
-        val digits = value.replace(Regex("[^0-9]"), "")
+        val digits = value.replace(NON_DIGIT_REGEX, "")
         
         if (digits.isEmpty()) return false
         
@@ -141,9 +144,9 @@ object EducationDoc : IHyperMatcher, IKotlinMatcher {
 
         if (isRepeatingPattern(digits, 2) || isRepeatingPattern(digits, 3) || isRepeatingPattern(digits, 5)) return false
 
-        val parts = value.split(Regex("\\s+")).filter { it.isNotBlank() }
+        val parts = value.split(WHITESPACE_REGEX).filter { it.isNotBlank() }
         for (part in parts) {
-            val partDigits = part.replace(Regex("[^0-9]"), "")
+            val partDigits = part.replace(NON_DIGIT_REGEX, "")
             if (partDigits.length >= 6 && partDigits.all { it == partDigits[0] }) return false
         }
 

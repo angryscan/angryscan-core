@@ -77,12 +77,14 @@ object OGRNIP : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_OGRNIP_NUMBER_REGEX = Regex("[34]\\d{14}")
+    private val CHECK_NON_DIGIT_STRIP_REGEX = Regex("[^\\d]")
+
     override fun check(value: String): Boolean {
-        val numberPattern = Regex("[34]\\d{14}")
-        val match = numberPattern.find(value)
+        val match = CHECK_OGRNIP_NUMBER_REGEX.find(value)
         if (match == null) return false
         
-        val ogrnipClean = match.value.replace(Regex("[^\\d]"), "")
+        val ogrnipClean = match.value.replace(CHECK_NON_DIGIT_STRIP_REGEX, "")
         if (ogrnipClean.length != 15) return false
         val digits = ogrnipClean.map { it.toString().toInt() }
         val bigNum = ogrnipClean.substring(0, 14).toLong()

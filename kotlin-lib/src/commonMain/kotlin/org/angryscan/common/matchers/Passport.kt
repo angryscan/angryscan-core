@@ -62,10 +62,11 @@ object Passport : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_NUMBER_PATTERN = Regex("""([0-9]{2})[ \t-]?([0-9]{2})[ \t-]?([0-9]{6})""")
+
     override fun check(value: String): Boolean {
         // Extract passport series and number
-        val numberPattern = Regex("""([0-9]{2})[ \t-]?([0-9]{2})[ \t-]?([0-9]{6})""")
-        val match = numberPattern.find(value) ?: return false
+        val match = CHECK_NUMBER_PATTERN.find(value) ?: return false
         
         val series1 = match.groupValues[1]
         val series2 = match.groupValues[2]

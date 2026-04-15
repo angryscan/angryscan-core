@@ -49,8 +49,10 @@ object INN : IHyperMatcher, IKotlinMatcher {
         return true
     }
 
+    private val NON_DIGIT_REGEX = Regex("[^0-9]")
+
     override fun check(value: String): Boolean {
-        val inn = value.replace("[^0-9]".toRegex(), "")
+        val inn = value.replace(NON_DIGIT_REGEX, "")
         if (inn.length != 12) return false
         
         val zeroCount = inn.count { it == '0' }

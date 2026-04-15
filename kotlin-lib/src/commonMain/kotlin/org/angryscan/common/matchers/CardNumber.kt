@@ -56,8 +56,12 @@ class CardNumber(val checkCardBins: Boolean = true) : IHyperMatcher, IKotlinMatc
         ExpressionOption.MULTILINE
     )
 
+    companion object {
+        private val NON_DIGIT_REGEX = Regex("[^0-9]")
+    }
+
     override fun check(value: String): Boolean {
-        val cleanCard = value.replace("[^0-9]".toRegex(), "")
+        val cleanCard = value.replace(NON_DIGIT_REGEX, "")
         return cleanCard != "0000000000000000"
                 && (!checkCardBins || isBinValid(cleanCard))
                 && isCardValid(cleanCard)

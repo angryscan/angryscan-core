@@ -70,10 +70,11 @@ object DODID : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_DOD_ID_TEN_DIGITS_REGEX = Regex("""\d{10}""")
+
     override fun check(value: String): Boolean {
         // Extract 10-digit number from match (may include keywords)
-        val numberPattern = Regex("""\d{10}""")
-        val match = numberPattern.find(value)
+        val match = CHECK_DOD_ID_TEN_DIGITS_REGEX.find(value)
         if (match == null) return false
         
         val digits = match.value

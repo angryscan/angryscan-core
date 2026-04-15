@@ -43,9 +43,10 @@ object SocialUserId : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val USERNAME_CAPTURE_PATTERN = Regex("""@([a-zA-Z0-9_]{3,32})""")
+
     override fun check(value: String): Boolean {
-        val usernamePattern = Regex("""@([a-zA-Z0-9_]{3,32})""")
-        val match = usernamePattern.find(value) ?: return false
+        val match = USERNAME_CAPTURE_PATTERN.find(value) ?: return false
         val username = match.groupValues[1].lowercase()
         
         val cssAtRules = setOf(

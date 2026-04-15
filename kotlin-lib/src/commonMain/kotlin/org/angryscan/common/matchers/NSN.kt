@@ -99,10 +99,11 @@ object NSN : IHyperMatcher, IKotlinMatcher {
         return true
     }
 
+    private val CHECK_NUMBER_PATTERN = Regex("""(?:\d{13}|\d{4}-\d{2}-\d{3}-\d{4})""")
+
     override fun check(value: String): Boolean {
         // Extract NSN number from the match (may include keywords)
-        val numberPattern = Regex("""(?:\d{13}|\d{4}-\d{2}-\d{3}-\d{4})""")
-        val match = numberPattern.find(value)
+        val match = CHECK_NUMBER_PATTERN.find(value)
         if (match == null) return false
         
         // Extract only digits (remove hyphens and other characters)

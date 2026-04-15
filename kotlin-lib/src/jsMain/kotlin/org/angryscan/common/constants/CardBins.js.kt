@@ -1,8 +1,8 @@
 package org.angryscan.common.constants
 
 actual object CardBins {
-    actual val cardBins: List<String>
-        get() = listOf(
+    actual val cardBins: Set<String>
+        get() = setOf(
             "3528",
             "3530",
             "3531",

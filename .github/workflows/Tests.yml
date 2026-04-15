@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -42,4 +43,47 @@ jobs:
         with:
           run: ./gradlew allTests --no-daemon
 
- 
+      - name: Combine benchmark reports
+        if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo "## Benchmark Results"
+            echo ""
+            cat kotlin-lib/build/reports/benchmark-scan.md
+            cat kotlin-lib/build/reports/benchmark-init.md
+            cat kotlin-lib/build/reports/benchmark-consistency.md
+          } > benchmark.md
+
+      - name: Post benchmark results to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- benchmark-results -->';
+            const body = fs.readFileSync('benchmark.md', 'utf8');
+            const fullBody = marker + '\n' + body;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c => c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: fullBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: fullBody,
+              });
+            }

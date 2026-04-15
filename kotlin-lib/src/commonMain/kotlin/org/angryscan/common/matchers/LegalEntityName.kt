@@ -62,6 +62,8 @@ object LegalEntityName : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val WHITESPACE_REGEX = Regex("[\\s]+")
+
     override fun check(value: String): Boolean {
         // Remove quotes and brackets from start and end for validation
         var text = value.trim()
@@ -78,7 +80,7 @@ object LegalEntityName : IHyperMatcher, IKotlinMatcher {
         if (text.any { !it.isLetter() && !it.isWhitespace() }) return false
         
         val legalEntityPrefixes = setOf("ооо", "пао", "зао", "нао", "ип", "фгуп", "гуп", "муп", "фонд", "ассоциация", "союз")
-        val words = text.split(Regex("[\\s]+")).filter { it.isNotBlank() }
+        val words = text.split(WHITESPACE_REGEX).filter { it.isNotBlank() }
         
         if (words.isEmpty()) return false
         

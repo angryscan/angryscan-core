@@ -64,7 +64,6 @@ class HyperScanEngine(
             .filter {
                 expressions[it.matchedExpression]!!.check(it.matchedString)
             }
-            .toMutableList()
 
         return res.map {
             Match(
