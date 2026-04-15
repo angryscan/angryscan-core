@@ -134,10 +134,14 @@ internal class BenchmarkTest {
         println("║  Warmup: $SCAN_WARMUP iters   Measure: $SCAN_MEASURE iters")
         println("╚══════════════════════════════════════════════════════════════════════╝")
 
+        val compiledDb = HyperScanEngine(hyperMatchers).use { it.saveCompiledDatabase() }
+
         val kotlinStats: Stats
         val hyperStats:  Stats
-        var kotlinMatches = 0
-        var hyperMatches  = 0
+        val preloadStats: Stats
+        var kotlinMatches  = 0
+        var hyperMatches   = 0
+        var preloadMatches = 0
 
         KotlinEngine(kotlinMatchers).use { engine ->
             print("  KotlinEngine    warming up... "); System.out.flush()
@@ -157,9 +161,19 @@ internal class BenchmarkTest {
             hyperStats = times.stats()
         }
 
+        HyperScanEngine.fromCompiledDatabase(hyperMatchers, compiledDb).use { engine ->
+            print("  Hyper(preload)  warming up... "); System.out.flush()
+            repeat(SCAN_WARMUP) { engine.scan(corpus) }
+            println("done")
+            val times = LongArray(SCAN_MEASURE)
+            repeat(SCAN_MEASURE) { i -> times[i] = measureNanoTime { preloadMatches += engine.scan(corpus).size } }
+            preloadStats = times.stats()
+        }
+
         println("  --- results ---")
-        kotlinStats.printScan("KotlinEngine",   corpus.length, kotlinMatches / SCAN_MEASURE)
-        hyperStats.printScan("HyperScanEngine", corpus.length, hyperMatches  / SCAN_MEASURE)
+        kotlinStats.printScan("KotlinEngine",    corpus.length, kotlinMatches  / SCAN_MEASURE)
+        hyperStats.printScan("HyperScanEngine",  corpus.length, hyperMatches   / SCAN_MEASURE)
+        preloadStats.printScan("Hyper(preload)",  corpus.length, preloadMatches / SCAN_MEASURE)
         println()
 
         writeReport("benchmark-scan.md", buildString {
@@ -171,8 +185,9 @@ internal class BenchmarkTest {
             appendLine()
             appendLine("| Engine | mean | p50 | σ | Throughput | Matches/iter |")
             appendLine("|:---|---:|---:|---:|---:|---:|")
-            appendLine(kotlinStats.mdScanRow("KotlinEngine",   corpus.length, kotlinMatches / SCAN_MEASURE))
-            appendLine(hyperStats.mdScanRow("HyperScanEngine", corpus.length, hyperMatches  / SCAN_MEASURE))
+            appendLine(kotlinStats.mdScanRow("KotlinEngine",      corpus.length, kotlinMatches  / SCAN_MEASURE))
+            appendLine(hyperStats.mdScanRow("HyperScanEngine",    corpus.length, hyperMatches   / SCAN_MEASURE))
+            appendLine(preloadStats.mdScanRow("HyperScan(preload)", corpus.length, preloadMatches / SCAN_MEASURE))
         })
     }
 
@@ -190,12 +205,20 @@ internal class BenchmarkTest {
         println("║  Warmup: $INIT_WARMUP iters   Measure: $INIT_MEASURE iters")
         println("╚══════════════════════════════════════════════════════════════════════╝")
 
-        val kotlinStats = measureInit("KotlinEngine   ") { KotlinEngine(kotlinMatchers).also { it.close() } }
-        val hyperStats  = measureInit("HyperScanEngine") { HyperScanEngine(hyperMatchers).also { it.close() } }
+        val compiledDb = HyperScanEngine(hyperMatchers).use { it.saveCompiledDatabase() }
+
+        val kotlinStats   = measureInit("KotlinEngine   ") { KotlinEngine(kotlinMatchers).also { it.close() } }
+        val hyperStats    = measureInit("HyperScanEngine") { HyperScanEngine(hyperMatchers).also { it.close() } }
+        val preloadStats  = measureInit("Hyper(preload) ") {
+            HyperScanEngine.fromCompiledDatabase(hyperMatchers, compiledDb).also { it.close() }
+        }
 
         println("  --- results ---")
         kotlinStats.printInit("KotlinEngine")
         hyperStats.printInit("HyperScanEngine")
+        preloadStats.printInit("Hyper(preload)")
+        val speedup = if (preloadStats.mean > 0) hyperStats.mean / preloadStats.mean else Double.NaN
+        println("  Pre-compiled DB speedup: %.1fx".format(speedup))
         println()
 
         writeReport("benchmark-init.md", buildString {
@@ -207,6 +230,9 @@ internal class BenchmarkTest {
             appendLine("|:---|---:|---:|---:|---:|---:|")
             appendLine(kotlinStats.mdInitRow("KotlinEngine"))
             appendLine(hyperStats.mdInitRow("HyperScanEngine"))
+            appendLine(preloadStats.mdInitRow("HyperScan(preload)"))
+            appendLine()
+            appendLine("_Pre-compiled DB speedup: **%.1fx**_".format(speedup))
         })
     }
 
@@ -234,15 +260,22 @@ internal class BenchmarkTest {
         assertNotNull(resource, "testText.txt not found")
         val text = java.io.File(resource.file).readText()
 
-        val kotlinCount = KotlinEngine(kotlinMatchers).use { it.scan(text).size }
-        val hyperCount  = HyperScanEngine(hyperMatchers).use { it.scan(text).size }
+        val compiledDb = HyperScanEngine(hyperMatchers).use { it.saveCompiledDatabase() }
+
+        val kotlinCount  = KotlinEngine(kotlinMatchers).use { it.scan(text).size }
+        val hyperCount   = HyperScanEngine(hyperMatchers).use { it.scan(text).size }
+        val preloadCount = HyperScanEngine.fromCompiledDatabase(hyperMatchers, compiledDb).use { it.scan(text).size }
 
         println("\n  Consistency check on testText.txt:")
-        println("  KotlinEngine    → $kotlinCount matches")
-        println("  HyperScanEngine → $hyperCount matches")
+        println("  KotlinEngine       → $kotlinCount matches")
+        println("  HyperScanEngine    → $hyperCount matches")
+        println("  Hyper(preload)     → $preloadCount matches")
+
         val note = if (kotlinCount == hyperCount) "equal"
                    else "delta=${hyperCount - kotlinCount} (expected — see EngineTest for known differences)"
-        println("  Result: $note")
+        val preloadNote = if (hyperCount == preloadCount) "preload matches compile"
+                          else "MISMATCH: preload=$preloadCount vs compile=$hyperCount"
+        println("  Result: $note  |  $preloadNote")
 
         writeReport("benchmark-consistency.md", buildString {
             appendLine("### Match Consistency (`testText.txt`)")
@@ -251,8 +284,9 @@ internal class BenchmarkTest {
             appendLine("|:---|---:|")
             appendLine("| `KotlinEngine` | $kotlinCount |")
             appendLine("| `HyperScanEngine` | $hyperCount |")
+            appendLine("| `HyperScan(preload)` | $preloadCount |")
             appendLine()
-            appendLine("_${note}_")
+            appendLine("_${note}_ | _${preloadNote}_")
         })
     }
 }

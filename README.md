@@ -69,6 +69,47 @@ HyperScanEngine(Matchers.filterIsInstance<IHyperMatcher>()).use { engine ->
 }
 ```
 
+### Fast startup with a pre-compiled HyperScan database
+Compiling regular expressions on every startup can be slow when the matcher set is large.
+You can compile once, save the database, and reload it instantly on subsequent runs.
+
+```kotlin
+import org.angryscan.common.engine.hyperscan.HyperScanEngine
+import org.angryscan.common.engine.hyperscan.IHyperMatcher
+import org.angryscan.common.extensions.Matchers
+import java.io.File
+
+val matchers = Matchers.filterIsInstance<IHyperMatcher>()
+val dbFile = File("hyperscan.db")
+
+// First run — compile and save
+HyperScanEngine(matchers).use { engine ->
+    engine.saveCompiledDatabase(dbFile)
+}
+
+// Subsequent runs — load (no compilation)
+HyperScanEngine.fromCompiledDatabase(matchers, dbFile).use { engine ->
+    engine.scan(text).forEach { match ->
+        println("${match.matcher.name}: ${match.value}")
+    }
+}
+```
+
+In-memory `ByteArray` variants are also available:
+
+```kotlin
+// Save to bytes
+val bytes: ByteArray = engine.saveCompiledDatabase()
+
+// Load from bytes
+val fast = HyperScanEngine.fromCompiledDatabase(matchers, bytes)
+```
+
+> **Compatibility note:** the saved database is tied to the exact matcher set, their order,
+> and the `requireKeywords` flag used during compilation.
+> Loading a database with a different configuration will throw `IllegalArgumentException`.
+> The binary format is also platform-specific (see Hyperscan documentation).
+
 ### Portable detection with KotlinEngine
 ```kotlin
 import org.angryscan.common.engine.kotlin.IKotlinMatcher
