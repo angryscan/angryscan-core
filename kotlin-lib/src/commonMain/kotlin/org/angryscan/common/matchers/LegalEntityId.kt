@@ -32,6 +32,8 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val WHITESPACE_STRIP_REGEX = Regex("\\s")
+
     override fun check(value: String): Boolean {
         // Normalize: strip leading/trailing non-alphanumeric wrappers (quotes, brackets, punctuation)
         var s = value.trim()
@@ -40,7 +42,7 @@ object LegalEntityId : IHyperMatcher, IKotlinMatcher {
 
         if (s.any { it.isLetter() && it.isLowerCase() }) return false
 
-        val cleanValue = s.replace(Regex("\\s"), "")
+        val cleanValue = s.replace(WHITESPACE_STRIP_REGEX, "")
         
         if (cleanValue.length == 20) {
             val body = cleanValue.substring(0, 18)

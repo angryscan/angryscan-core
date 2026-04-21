@@ -33,12 +33,15 @@ object ITIN : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val NON_DIGIT_HYPHEN_REGEX = Regex("[^0-9-]")
+    private val FORMAT_REGEX = Regex("""9[0-9]{2}-[7-8][0-9]-[0-9]{4}""")
+
     override fun check(value: String): Boolean {
         // Extract only digits and hyphens
-        val cleaned = value.replace(Regex("[^0-9-]"), "")
+        val cleaned = value.replace(NON_DIGIT_HYPHEN_REGEX, "")
         
         // Check format: must be digits with hyphens in format 9XX-7X-XXXX or 9XX-8X-XXXX
-        if (!cleaned.matches(Regex("""9[0-9]{2}-[7-8][0-9]-[0-9]{4}"""))) return false
+        if (!cleaned.matches(FORMAT_REGEX)) return false
         
         // Extract only digits for additional checks
         val digitsOnly = cleaned.replace("-", "")

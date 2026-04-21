@@ -52,9 +52,12 @@ object APOFPODPO : IHyperMatcher, IKotlinMatcher {
     private val validCityCodes = setOf("APO", "FPO", "DPO")
     private val validStateCodes = setOf("AA", "AE", "AP")
 
+    private val CHECK_MILITARY_ADDRESS_REGEX =
+        Regex("""(APO|FPO|DPO)\s+(AA|AE|AP)\s+(\d{5})(?:-(\d{4}))?""", RegexOption.IGNORE_CASE)
+
     override fun check(value: String): Boolean {
         // Extract address parts
-        val match = Regex("""(APO|FPO|DPO)\s+(AA|AE|AP)\s+(\d{5})(?:-(\d{4}))?""", RegexOption.IGNORE_CASE).find(value)
+        val match = CHECK_MILITARY_ADDRESS_REGEX.find(value)
         if (match == null) return false
         
         val cityCode = match.groupValues[1].uppercase()

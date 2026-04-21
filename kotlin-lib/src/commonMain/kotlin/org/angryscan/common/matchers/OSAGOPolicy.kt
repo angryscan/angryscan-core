@@ -77,13 +77,15 @@ object OSAGOPolicy : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_POLICY_NUMBER_REGEX = Regex("[A-ZА-Я]{3}\\s+№?\\s*\\d{10}")
+    private val CHECK_NON_ALPHANUMERIC_STRIP_REGEX = Regex("[^A-Za-z0-9]")
+
     override fun check(value: String): Boolean {
         // Extract only the OSAGO policy number from the match (may include keywords)
-        val numberPattern = Regex("[A-ZА-Я]{3}\\s+№?\\s*\\d{10}")
-        val match = numberPattern.find(value)
+        val match = CHECK_POLICY_NUMBER_REGEX.find(value)
         if (match == null) return false
         
-        val cleaned = match.value.replace(Regex("[^A-Za-z0-9]"), "").uppercase()
+        val cleaned = match.value.replace(CHECK_NON_ALPHANUMERIC_STRIP_REGEX, "").uppercase()
         
         if (cleaned.length != 13) return false
         

@@ -9,9 +9,9 @@ package org.angryscan.common.constants
  */
 expect object CardBins {
     /**
-     * A list of card BIN patterns used for card issuer identification.
-     * Each string in the list represents a BIN pattern that can be matched against
+     * A set of card BIN patterns used for card issuer identification.
+     * Each string in the set represents a BIN pattern that can be matched against
      * the beginning of a card number to identify the card issuer.
      */
-    val cardBins: List<String>
+    val cardBins: Set<String>
 }

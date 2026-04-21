@@ -55,6 +55,8 @@ object FullNameUS : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val WHITESPACE_REGEX = Regex("\\s+")
+
     override fun check(value: String): Boolean {
         if (value.any { it.isDigit() }) {
             return false
@@ -63,7 +65,7 @@ object FullNameUS : IHyperMatcher, IKotlinMatcher {
         // Remove leading and trailing punctuation marks and spaces
         val cleanedValue = value.trim().trimStart { it in "([{\"'" }.trimEnd { it in ")]}\"'" }
         
-        val words = cleanedValue.split(Regex("\\s+")).filter { it.isNotEmpty() && it != "." }
+        val words = cleanedValue.split(WHITESPACE_REGEX).filter { it.isNotEmpty() && it != "." }
         if (words.size < 2) return false
         
         val cities = setOf("new", "los", "san", "las", "washington", "ocean")

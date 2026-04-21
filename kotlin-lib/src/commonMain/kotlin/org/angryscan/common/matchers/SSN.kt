@@ -37,8 +37,10 @@ object SSN : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val NON_DIGIT_REGEX = Regex("[^0-9]")
+
     override fun check(value: String): Boolean {
-        val ssn = value.replace(Regex("[^0-9]"), "").trim()
+        val ssn = value.replace(NON_DIGIT_REGEX, "").trim()
 
         if (ssn.length != 9) return false
 

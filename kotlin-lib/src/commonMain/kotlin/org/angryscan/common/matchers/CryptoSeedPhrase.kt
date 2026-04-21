@@ -36,8 +36,10 @@ object CryptoSeedPhrase : IKotlinMatcher {
         RegexOption.MULTILINE
     )
 
+    private val WHITESPACE_SPLIT_REGEX = Regex("\\s+")
+
     override fun check(value: String): Boolean {
-        val words = value.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        val words = value.trim().split(WHITESPACE_SPLIT_REGEX).filter { it.isNotEmpty() }
         
         if (words.isEmpty()) return false
         

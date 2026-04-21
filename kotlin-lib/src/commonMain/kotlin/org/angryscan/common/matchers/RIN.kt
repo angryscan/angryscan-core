@@ -33,8 +33,10 @@ object RIN : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val NON_DIGIT_X_REGEX = Regex("[^0-9Xx]")
+
     override fun check(value: String): Boolean {
-        val cleaned = value.replace(Regex("[^0-9Xx]"), "").uppercase()
+        val cleaned = value.replace(NON_DIGIT_X_REGEX, "").uppercase()
 
         if (cleaned.length == 18) {
             return validateChineseId(cleaned)

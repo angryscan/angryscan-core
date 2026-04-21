@@ -103,16 +103,18 @@ object SNILS : IHyperMatcher, IKotlinMatcher {
         return true
     }
 
+    private val CHECK_NUMBER_PATTERN = Regex("([0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{2}|[0-9]{11})")
+    private val SNILS_SANITIZE_REGEX = Regex("[^0-9 -]")
+
     override fun check(value: String): Boolean {
         if(value.length <= 2)
             return false
         var summ = 0
         // Extract only the SNILS number from the match (may include keywords)
-        val numberPattern = Regex("([0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{2}|[0-9]{11})")
-        val match = numberPattern.find(value)
+        val match = CHECK_NUMBER_PATTERN.find(value)
         if (match == null) return false
         
-        val snils = match.value.replace(Regex("[^0-9 -]"), "").replace(" ", "").replace("-", "").trim()
+        val snils = match.value.replace(SNILS_SANITIZE_REGEX, "").replace(" ", "").replace("-", "").trim()
 
         if (snils.length != 11)
             return false

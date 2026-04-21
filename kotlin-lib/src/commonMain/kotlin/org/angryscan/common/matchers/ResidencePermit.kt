@@ -78,14 +78,16 @@ object ResidencePermit : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_RESIDENCE_NUMBER_REGEX = Regex("""(?:82|83)\s*(?:№|N)?\s*(\d{7})""")
+    private val CHECK_RESIDENCE_SERIES_REGEX = Regex("""(82|83)""")
+
     override fun check(value: String): Boolean {
         // Extract residence permit number from the value (which may contain keywords)
-        val numberPattern = Regex("""(?:82|83)\s*(?:№|N)?\s*(\d{7})""")
-        val match = numberPattern.find(value) ?: return false
+        val match = CHECK_RESIDENCE_NUMBER_REGEX.find(value) ?: return false
         val numberPart = match.groupValues[1]
         
         // Form the full number: series + number
-        val seriesMatch = Regex("""(82|83)""").find(value)
+        val seriesMatch = CHECK_RESIDENCE_SERIES_REGEX.find(value)
         val series = seriesMatch?.value ?: return false
         
         val cleaned = series + numberPart

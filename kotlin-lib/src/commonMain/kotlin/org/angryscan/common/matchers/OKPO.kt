@@ -79,6 +79,8 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_OKPO_NUMBER_CAPTURE_REGEX = Regex("""(\d{8}|\d{10})""")
+
     private fun isSequential(digits: String, ascending: Boolean): Boolean {
         for (i in 1 until digits.length) {
             val current = digits[i].digitToInt()
@@ -103,8 +105,7 @@ object OKPO : IHyperMatcher, IKotlinMatcher {
 
     override fun check(value: String): Boolean {
         // Extract OKPO number from the value (which may contain keywords)
-        val numberPattern = Regex("""(\d{8}|\d{10})""")
-        val match = numberPattern.find(value) ?: return false
+        val match = CHECK_OKPO_NUMBER_CAPTURE_REGEX.find(value) ?: return false
         val okpoClean = match.value
         val length = okpoClean.length
         if (length != 8 && length != 10) return false

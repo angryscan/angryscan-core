@@ -30,8 +30,10 @@ object VIN : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val NON_VIN_CHARACTER_REGEX = Regex("[^A-HJ-NPR-Z0-9]")
+
     override fun check(value: String): Boolean {
-        val cleaned = value.replace(Regex("[^A-HJ-NPR-Z0-9]"), "").uppercase()
+        val cleaned = value.replace(NON_VIN_CHARACTER_REGEX, "").uppercase()
         
         if (cleaned.length != 17) return false
         

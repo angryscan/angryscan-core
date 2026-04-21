@@ -78,6 +78,9 @@ object VisaNumberUS : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_VISA_NUMBER_8_DIGITS_REGEX = Regex("""\d{8}""")
+    private val CHECK_VISA_NUMBER_LETTER_7_DIGITS_REGEX = Regex("""[A-Z]\d{7}""", RegexOption.IGNORE_CASE)
+
     private fun isSequential(digits: String, ascending: Boolean): Boolean {
         for (i in 1 until digits.length) {
             val current = digits[i].digitToInt()
@@ -140,11 +143,8 @@ object VisaNumberUS : IHyperMatcher, IKotlinMatcher {
     override fun check(value: String): Boolean {
         // Extract visa number from the match (may include keywords)
         // Try to find the number pattern in the value
-        val numberPattern8Digits = Regex("""\d{8}""")
-        val numberPatternLetter7Digits = Regex("""[A-Z]\d{7}""", RegexOption.IGNORE_CASE)
-        
-        val match8Digits = numberPattern8Digits.find(value)
-        val matchLetter7Digits = numberPatternLetter7Digits.find(value)
+        val match8Digits = CHECK_VISA_NUMBER_8_DIGITS_REGEX.find(value)
+        val matchLetter7Digits = CHECK_VISA_NUMBER_LETTER_7_DIGITS_REGEX.find(value)
         
         val number = when {
             match8Digits != null -> match8Digits.value.uppercase()

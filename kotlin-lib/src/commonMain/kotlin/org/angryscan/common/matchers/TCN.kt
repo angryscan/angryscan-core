@@ -73,10 +73,11 @@ object TCN : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_TCN_ALPHANUMERIC_17_REGEX = Regex("""[A-Z0-9]{17}""", RegexOption.IGNORE_CASE)
+
     override fun check(value: String): Boolean {
         // Extract 17-character number from match (may include keyword and separators)
-        val numberPattern = Regex("""[A-Z0-9]{17}""", RegexOption.IGNORE_CASE)
-        val match = numberPattern.find(value)
+        val match = CHECK_TCN_ALPHANUMERIC_17_REGEX.find(value)
         if (match == null) return false
         
         val tcn = match.value.uppercase()

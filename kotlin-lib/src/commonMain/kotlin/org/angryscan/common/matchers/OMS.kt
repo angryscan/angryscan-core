@@ -82,8 +82,10 @@ object OMS : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val NON_DIGIT_REGEX = Regex("""\D""")
+
     override fun check(value: String): Boolean {
-        val oms = value.replace("""\D""".toRegex(), "")
+        val oms = value.replace(NON_DIGIT_REGEX, "")
         
         if (oms.length != 16) return false
         

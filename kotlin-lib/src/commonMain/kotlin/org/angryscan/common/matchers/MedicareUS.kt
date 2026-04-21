@@ -53,8 +53,10 @@ object MedicareUS : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val NON_LETTER_OR_DIGIT_REGEX = Regex("[^A-Z0-9]")
+
     override fun check(value: String): Boolean {
-        val mbi = value.replace(Regex("[^A-Z0-9]"), "").uppercase().trim()
+        val mbi = value.replace(NON_LETTER_OR_DIGIT_REGEX, "").uppercase().trim()
 
         if (mbi.length != 11)
             return false

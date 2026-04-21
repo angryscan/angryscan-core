@@ -54,13 +54,15 @@ object PassportUS : IHyperMatcher, IKotlinMatcher {
         ExpressionOption.UTF8
     )
 
+    private val CHECK_PASSPORT_NUMBER_REGEX = Regex("[A-Z][0-9]{8}")
+    private val CHECK_PASSPORT_NON_ALPHANUMERIC_STRIP_REGEX = Regex("[^A-Z0-9]")
+
     override fun check(value: String): Boolean {
         // Extract passport number from the match (may include keywords)
-        val numberPattern = Regex("[A-Z][0-9]{8}")
-        val match = numberPattern.find(value)
+        val match = CHECK_PASSPORT_NUMBER_REGEX.find(value)
         if (match == null) return false
         
-        val cleaned = match.value.replace(Regex("[^A-Z0-9]"), "").uppercase()
+        val cleaned = match.value.replace(CHECK_PASSPORT_NON_ALPHANUMERIC_STRIP_REGEX, "").uppercase()
 
         if (cleaned.length != 9) return false
 
