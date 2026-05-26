@@ -20,24 +20,28 @@ class KotlinEngine(
 
     override fun scan(text: String): List<Match> {
         return compiledPatterns.flatMap { (regex, matcher) ->
-            regex.findAll(text)
-                .filter { matcher.check(it.value) }
-                .map { match ->
-                    Match(
-                        value = match.value,
-                        before = text.substring(
-                            maxOf(0, match.range.first - 10),
-                            match.range.first
-                        ),
-                        after = if (match.range.last + 1 < text.length)
-                            text.substring(match.range.last + 1, minOf(match.range.last + 11, text.length))
-                        else "",
-                        startPosition = match.range.first.toLong(),
-                        endPosition = match.range.last.toLong(),
-                        matcher = matcher
-                    )
+            buildList {
+                var startIndex = 0
+                while (startIndex < text.length) {
+                    val matchResult = regex.find(text, startIndex) ?: break
+                    if (matcher.check(matchResult.value)) {
+                        add(Match(
+                            value = matchResult.value,
+                            before = text.substring(maxOf(0, matchResult.range.first - 10), matchResult.range.first),
+                            after = if (matchResult.range.last + 1 < text.length)
+                                text.substring(matchResult.range.last + 1, minOf(matchResult.range.last + 11, text.length))
+                            else "",
+                            startPosition = matchResult.range.first.toLong(),
+                            endPosition = matchResult.range.last.toLong(),
+                            matcher = matcher
+                        ))
+                        startIndex = matchResult.range.last + 1
+                    } else {
+                        // Advance by 1 so overlapping candidates after a failed match are not skipped
+                        startIndex = matchResult.range.first + 1
+                    }
                 }
-                .toList()
+            }
         }.distinct()
     }
 
